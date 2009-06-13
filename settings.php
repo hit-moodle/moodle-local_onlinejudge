@@ -13,13 +13,9 @@ $settings->add(new admin_setting_configselect('assignment_max_mem', get_string('
                                              assignment_onlinejudge::get_max_memory_usages(ASSIGNMENT_PROGRAM_MAX_MEM)));
 
 $options = array('sandbox'   => trim(get_string('sandbox', 'assignment_onlinejudge')),
-                 'domjudge'  => trim(get_string('domjudge', 'assignment_onlinejudge')),
                  'compileonly'  => trim(get_string('compileonly', 'assignment_onlinejudge')));
 
 $settings->add(new admin_setting_configselect('assignment_judger', get_string('judger', 'assignment_onlinejudge'),
                    get_string('configjudger', 'assignment_onlinejudge'), ASSIGNMENT_PROGRAM_DEFAULT_JUDGER, $options));
-
-$settings->add(new admin_setting_configtext('assignment_judgehost', get_string('judgehost', 'assignment_onlinejudge'),
-                                            get_string('configjudgehost', 'assignment_onlinejudge'), ''));
 
 ?>
