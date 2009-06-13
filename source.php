@@ -68,7 +68,7 @@
 
     // Load up the required assignment code
     require('assignment.class.php');
-    $assignmentinstance = new assignment_program($cm->id, $assignment, $cm, $course);
+    $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
 
     $filearea = $assignmentinstance->file_area_name($userid);
 
@@ -81,10 +81,10 @@
         $code = fread($gestor, filesize($fpath));
         fclose($gestor);
     } else {
-        error(get_string('filereaderror','assignment_program'));   
+        error(get_string('filereaderror','assignment_onlinejudge'));   
     }
 
-    $lang = $assignmentinstance->epaile->language;
+    $lang = $assignmentinstance->onlinejudge->language;
     
     include('source.html');
 ?>

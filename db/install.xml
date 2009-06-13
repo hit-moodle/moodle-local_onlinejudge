@@ -1,6 +1,6 @@
-<XMLDB PATH="mod/assignment/type/program/db" VERSION="20090202" COMMENT="XMLDB file for Moodle mod/assignment/type/program" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd">
+<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20090202" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd">
     <TABLES>
-        <TABLE NAME="assignment_epaile" COMMENT="Stores assignment programming language" NEXT="assignment_epaile_results">
+        <TABLE NAME="assignment_oj" COMMENT="Stores assignment programming language" NEXT="assignment_oj_results">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="assignment"/>
                 <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="language"/>
@@ -11,7 +11,7 @@
                 <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assignment" REFFIELDS="id" COMMENT="assignment foreign key" PREVIOUS="primary"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="assignment_epaile_results" COMMENT="Submission test results" PREVIOUS="assignment_epaile" NEXT="assignment_epaile_submission">
+        <TABLE NAME="assignment_oj_results" COMMENT="Submission test results" PREVIOUS="assignment_oj" NEXT="assignment_oj_submissions">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="submission"/>
                 <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="test"/>
@@ -25,10 +25,10 @@
            <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
                 <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="test"/>
-                <KEY NAME="test" TYPE="foreign" FIELDS="test" REFTABLE="assignment_epaile_tests" REFFIELDS="id" COMMENT="assignment_epaile_tests foreign key" PREVIOUS="submission"/>
+                <KEY NAME="test" TYPE="foreign" FIELDS="test" REFTABLE="assignment_oj_tests" REFFIELDS="id" COMMENT="assignment_oj_tests foreign key" PREVIOUS="submission"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="assignment_epaile_submission" COMMENT="Info about submitted assignments" PREVIOUS="assignment_epaile_results" NEXT="assignment_epaile_tests">
+        <TABLE NAME="assignment_oj_submissions" COMMENT="Info about submitted assignments" PREVIOUS="assignment_oj_results" NEXT="assignment_oj_tests">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="submission"/>
                 <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="judgeinfo"/>
@@ -40,7 +40,7 @@
                 <KEY NAME="submission" TYPE="foreign-unique" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="assignment_epaile_tests" COMMENT="Info about assignment tests" PREVIOUS="assignment_epaile_submission">
+        <TABLE NAME="assignment_oj_tests" COMMENT="Info about assignment tests" PREVIOUS="assignment_oj_submissions">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="assignment"/>
                 <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="input"/>

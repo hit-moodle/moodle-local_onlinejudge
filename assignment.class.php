@@ -24,7 +24,7 @@ if (!isset($CFG->assignment_judger)) {
  */
 if(!isset($CFG->assignment_judgehost)) {
     // Install DOMjudge before using this type of Assignment
-    set_config('assignment_judgehost', get_string('domjudgeinstall','assignment_program'));
+    set_config('assignment_judgehost', get_string('domjudgeinstall','assignment_onlinejudge'));
 }
 
 
@@ -35,16 +35,16 @@ require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.p
  * 
  * @author Arkaitz Garro, Sunner Sun
  */
-class assignment_program extends assignment_uploadsingle {
+class assignment_onlinejudge extends assignment_uploadsingle {
 
-    var $epaile;
+    var $onlinejudge;
     
-    function assignment_program($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
+    function assignment_onlinejudge($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
         parent::assignment_uploadsingle($cmid, $assignment, $cm, $course);
         $this->type = 'program';
 
         if (isset($this->assignment->id)) {
-            $this->epaile = get_record('assignment_epaile', 'assignment', $this->assignment->id);
+            $this->onlinejudge = get_record('assignment_oj', 'assignment', $this->assignment->id);
         }
     }
 
@@ -67,38 +67,38 @@ class assignment_program extends assignment_uploadsingle {
         
         $lang = 'c'; // Language by default
         if($cm) {
-            $epaile = get_record('assignment_epaile', 'assignment', $cm->instance);
-            $lang = $epaile->language;
+            $onlinejudge = get_record('assignment_oj', 'assignment', $cm->instance);
+            $lang = $onlinejudge->language;
         }
         
         $ynoptions = array(0 => get_string('no'), 1 => get_string('yes'));
         
         // Programming languages
         $choices = $this->get_languages();
-        $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_program'), $choices);
-        $mform->setHelpButton('lang', array('lang',get_string('assignmentlangs','assignment_program'),'assignment'));
+        $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('lang', array('lang',get_string('assignmentlangs','assignment_onlinejudge'),'assignment'));
         $mform->setDefault('lang', $lang);
         
         // Cron date
         // Get assignment cron frequency
         if(get_field('modules','cron','name','assignment')) {
-            $mform->addElement('select', 'var1', get_string('duejudge', 'assignment_program'), $ynoptions);
-            $mform->setHelpButton('var1', array('timecron',get_string('crondate','assignment_program'), 'assignment'));
+            $mform->addElement('select', 'var1', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
+            $mform->setHelpButton('var1', array('timecron',get_string('crondate','assignment_onlinejudge'), 'assignment'));
             $mform->setDefault('var1', 0);
         }
         
         // Max. CPU time
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_max_cpu);
-        $mform->addElement('select', 'var2', get_string('maximumcpu', 'assignment_program'), $choices);
-        $mform->setHelpButton('var2', array('maximumcpu',get_string('maximumcpu','assignment_program'), 'assignment'));
+        $mform->addElement('select', 'var2', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('var2', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
         $mform->setDefault('var2', $CFG->assignment_max_cpu);
         
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_max_mem);
-        $mform->addElement('select', 'var3', get_string('maximummem', 'assignment_program'), $choices);
-        $mform->setHelpButton('var3', array('maximummem',get_string('maximummem','assignment_program'), 'assignment'));
+        $mform->addElement('select', 'var3', get_string('maximummem', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('var3', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
         $mform->setDefault('var3', $CFG->assignment_max_mem);
         
         // Allow resubmit
@@ -115,11 +115,11 @@ class assignment_program extends assignment_uploadsingle {
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[1] = get_string('uploadnotallowed');
         $choices[0] = get_string('courseuploadlimit') . ' (' . display_size($COURSE->maxbytes) . ')';
-        $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_program'), $choices);
+        $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
         
         // Tests form
-        $mform->addElement('header', 'tests', get_string('tests', 'assignment_program'));
+        $mform->addElement('header', 'tests', get_string('tests', 'assignment_onlinejudge'));
         
         // Output filter
         /*
@@ -138,9 +138,9 @@ class assignment_program extends assignment_uploadsingle {
             // Tests allready defined (update assignment)
             $i = 1;
             foreach ($tests as $tstObj => $tstValue) {
-                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_program') . $i);
+                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_onlinejudge') . $i);
                 $mform->setDefault("input[$i]",$tstValue->input);
-                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_program') . $i);
+                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_onlinejudge') . $i);
                 $mform->setDefault("output[$i]",$tstValue->output);
                 
                 $i++;
@@ -148,8 +148,8 @@ class assignment_program extends assignment_uploadsingle {
         } else {
             // New assignment
             for ($i = 1; $i <= NUMTESTS; $i++) {
-                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_program') . $i);
-                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_program') . $i);
+                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_onlinejudge') . $i);
+                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_onlinejudge') . $i);
             }
         }
         
@@ -165,7 +165,7 @@ class assignment_program extends assignment_uploadsingle {
      * will create a new instance and return the id number
      * of the new instance.
      * The due data is added to the calendar
-     * Tests are added to assignment_epaile_tests table
+     * Tests are added to assignment_oj_tests table
      *
      * @param object $assignment The data from the form on mod.html
      * @return int The id of the assignment
@@ -215,24 +215,24 @@ class assignment_program extends assignment_uploadsingle {
         global $CFG;
         
         // DELETE submissions results
-        $sql = 'test IN (SELECT id FROM '.$CFG->prefix.'assignment_epaile_tests WHERE assignment='.$assignment->id.')';
-        if (!delete_records_select('assignment_epaile_results', $sql)) {
+        $sql = 'test IN (SELECT id FROM '.$CFG->prefix.'assignment_oj_tests WHERE assignment='.$assignment->id.')';
+        if (!delete_records_select('assignment_oj_results', $sql)) {
             return false;
         }
         
         // DELETE submissions
         $sql = 'submission IN (SELECT id FROM '.$CFG->prefix.'assignment_submissions WHERE assignment='.$assignment->id.')';
-        if (!delete_records_select('assignment_epaile_submission', $sql)) {
+        if (!delete_records_select('assignment_oj_submissions', $sql)) {
             return false;
         }
         
         // DELETE tests
-        if (!delete_records('assignment_epaile_tests', 'assignment', $assignment->id)) {
+        if (!delete_records('assignment_oj_tests', 'assignment', $assignment->id)) {
             return false;
         }
         
         // DELETE programming language
-        if (!delete_records('assignment_epaile', 'assignment', $assignment->id)) {
+        if (!delete_records('assignment_oj', 'assignment', $assignment->id)) {
             return false;
         }
         
@@ -245,14 +245,14 @@ class assignment_program extends assignment_uploadsingle {
     * This function is called at the end of add_instance
     * and update_instance, to add or update tests and add or update programming language
     * 
-    * @param object $assignment the epaile object.
+    * @param object $assignment the onlinejudge object.
     */
     function after_add_update($assignment) {
         // Count real input/output (not empty tests)
         $assignment->numtests = count($assignment->input);
             
         // Delete actual tests
-        delete_records('assignment_epaile_tests', 'assignment', $assignment->id);
+        delete_records('assignment_oj_tests', 'assignment', $assignment->id);
         
         // Insert new tests
         for ($i = 0; $i < $assignment->numtests; $i++) {
@@ -263,23 +263,23 @@ class assignment_program extends assignment_uploadsingle {
                 $test->input = $assignment->input[$i+1];
                 $test->output = $assignment->output[$i+1];
                 
-                if (!insert_record('assignment_epaile_tests', $test)) {
-                    return get_string('notestinsert', 'assignment_program');
+                if (!insert_record('assignment_oj_tests', $test)) {
+                    return get_string('notestinsert', 'assignment_onlinejudge');
                 }
                 
                 unset ($test);
             }
         }
         
-        $epaile = new Object();
-        $epaile = get_record('assignment_epaile', 'assignment', $assignment->id);
-        if ($epaile) {
-            $epaile->language = $assignment->lang;
-            update_record('assignment_epaile', $epaile);
+        $onlinejudge = new Object();
+        $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
+        if ($onlinejudge) {
+            $onlinejudge->language = $assignment->lang;
+            update_record('assignment_oj', $onlinejudge);
         } else {
-            $epaile->assignment = $assignment->id;
-            $epaile->language = $assignment->lang;
-            insert_record('assignment_epaile', $epaile);
+            $onlinejudge->assignment = $assignment->id;
+            $onlinejudge->language = $assignment->lang;
+            insert_record('assignment_oj', $onlinejudge);
         }
     }
     
@@ -291,13 +291,13 @@ class assignment_program extends assignment_uploadsingle {
      */
     function get_tests($cm) {
         if (isset($cm->instance))
-            return get_records('assignment_epaile_tests', 'assignment', $cm->instance, 'id ASC');
+            return get_records('assignment_oj_tests', 'assignment', $cm->instance, 'id ASC');
         else
             return null;
     }
 
     function get_test() {
-        return get_record('assignment_epaile_tests', 'assignment', $this->assignment->id);
+        return get_record('assignment_oj_tests', 'assignment', $this->assignment->id);
     }
     
     /**
@@ -311,7 +311,7 @@ class assignment_program extends assignment_uploadsingle {
         if ($submissionid == 0 && isset($submission->id))
             $submissionid = $submission->id;
 
-        $comp = get_record('assignment_epaile_submission', 'submission', $submissionid);
+        $comp = get_record('assignment_oj_submissions', 'submission', $submissionid);
             
         return $comp;
     }
@@ -327,7 +327,7 @@ class assignment_program extends assignment_uploadsingle {
         if ($submissionid == 0 && isset($submission->id))
             $submissionid = $submission->id;
 
-        $res = get_records('assignment_epaile_results', 'submission', $submissionid);
+        $res = get_records('assignment_oj_results', 'submission', $submissionid);
             
         return $res;
     }
@@ -432,7 +432,7 @@ class assignment_program extends assignment_uploadsingle {
                 $res = get_object_vars($res);
                 $i=0;
                 foreach ($tests as $tstObj => $tstValue) {
-                    $epailesubmission = new Object();
+                    $oj_submission = new Object();
                     // Response status code
                     switch($res['status'][$i]) {
                         case 0:   // OK
@@ -441,8 +441,8 @@ class assignment_program extends assignment_uploadsingle {
                         case 104: // Program produced no output
                         case 105: // Wrong answer
                         case 137: // Killed
-                            $epailesubmission->submission = $submissionid;
-                            $this->process_compile_output($epailesubmission, $res['compile.out'][$i], $res['compile.time'][$i]);
+                            $oj_submission->submission = $submissionid;
+                            $this->process_compile_output($oj_submission, $res['compile.out'][$i], $res['compile.time'][$i]);
                             
                             // Store result in database
                             $result = new Object();
@@ -453,24 +453,24 @@ class assignment_program extends assignment_uploadsingle {
                             $result->output     = $res['program.out'][$i];
                             $result->error      = $res['program.err'][$i];
 
-                            if(!insert_record('assignment_epaile_results', $result))
+                            if(!insert_record('assignment_oj_results', $result))
                                 return 137;
                             
                             break;
                         case 101: // Compile errors
-                            $epailesubmission->submission = $submissionid;
-                            $this->process_compile_output($epailesubmission, $res['compile.out'][$i], $res['compile.time'][$i]);
+                            $oj_submission->submission = $submissionid;
+                            $this->process_compile_output($oj_submission, $res['compile.out'][$i], $res['compile.time'][$i]);
 
                             // Deny resubmit?    
                             /*
                             $submission->grade = 0;
                             $submission->timemarked = time();
                             
-                            if(!update_record('assignment_epaile', $submission))
+                            if(!update_record('assignment_oj', $submission))
                                 error(get_string('gradeerror', 'assignment'));
                             */
                             
-                            $this->print_compile_errors($epailesubmission->compileout);
+                            $this->print_compile_errors($oj_submission->compileout);
                             return 101;
                             
                             break;
@@ -608,19 +608,19 @@ class assignment_program extends assignment_uploadsingle {
      function print_return_status($statuscode=0) {
          switch($statuscode) {
              case 128: // Conection error
-                       print_error(get_string('couldnotconnect','assignment_program'),'assignment');
+                       print_error(get_string('couldnotconnect','assignment_onlinejudge'),'assignment');
                        break;
              case 137: // Grade error
-                       print_error(get_string('gradeerror', 'assignment_program'),'assignment','view.php?id='.$this->cm->id);
+                       print_error(get_string('gradeerror', 'assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
                        break;
              case 101: // Compile error
-                       print_error(get_string('checkcode','assignment_program'),'assignment','view.php?id='.$this->cm->id);
+                       print_error(get_string('checkcode','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
                        break;
              case 127: // Domjudge internal error
-                       print_error(get_string('domjudgeerror','assignment_program'),'assignment','view.php?id='.$this->cm->id);
+                       print_error(get_string('domjudgeerror','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
                        break;
              case 129: // Could not judge
-                       print_error(get_string('couldnotjudge','assignment_program'),'assignment','view.php?id='.$this->cm->id);
+                       print_error(get_string('couldnotjudge','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
                        break;
              case 0:   // OK
                        $this->view_feedback();
@@ -633,27 +633,27 @@ class assignment_program extends assignment_uploadsingle {
      * Process compile output.
      * Insert / update compile output in database.
      * 
-     * @param object $epailesubmission Epaile submission object
+     * @param object $oj_submission Epaile submission object
      * @param array $res Compile output
      */
-    function process_compile_output(&$epailesubmission, $compileoutput, $compiletime) {
+    function process_compile_output(&$oj_submission, $compileoutput, $compiletime) {
         $compileoutput = addslashes($compileoutput);
         // Check if exists previous submission
-        $epailesub = get_record('assignment_epaile_submission', 'submission', $epailesubmission->submission);
-        if($epailesub) {
+        $oj_sub = get_record('assignment_oj_submission', 'submission', $oj_submission->submission);
+        if($oj_sub) {
             $op = 'update_record';
-            $epailesubmission->id = $epailesub->id;
+            $oj_submission->id = $oj_sub->id;
         }
         else
             $op = 'insert_record';
             
         // Submission data
-        $epailesubmission->compiletime = $compiletime;
-        $epailesubmission->compileout = $compileoutput;
+        $oj_submission->compiletime = $compiletime;
+        $oj_submission->compileout = $compileoutput;
                             
         // Insert / Update submission
-        if(!$op('assignment_epaile_submission', $epailesubmission))
-            error(get_string('gradeerror', 'assignment_program'));
+        if(!$op('assignment_oj_submissions', $oj_submission))
+            error(get_string('gradeerror', 'assignment_onlinejudge'));
     }
     
     /**
@@ -664,14 +664,14 @@ class assignment_program extends assignment_uploadsingle {
      */
     function get_status($code) {
         // Program exit status
-        $status = array(0   => get_string('e_correct','assignment_program'),
-                        101 => get_string('e_compile','assignment_program'),
-                        102 => get_string('e_timelimit','assignment_program'),
-                        103 => get_string('e_runerror','assignment_program'),
-                        104 => get_string('e_output','assignment_program'),
-                        105 => get_string('e_answer','assignment_program'),
-                        117 => get_string('e_intern','assignment_program'),
-                        137 => get_string('e_killed','assignment_program'));
+        $status = array(0   => get_string('e_correct','assignment_onlinejudge'),
+                        101 => get_string('e_compile','assignment_onlinejudge'),
+                        102 => get_string('e_timelimit','assignment_onlinejudge'),
+                        103 => get_string('e_runerror','assignment_onlinejudge'),
+                        104 => get_string('e_output','assignment_onlinejudge'),
+                        105 => get_string('e_answer','assignment_onlinejudge'),
+                        117 => get_string('e_intern','assignment_onlinejudge'),
+                        137 => get_string('e_killed','assignment_onlinejudge'));
                         
         $statusstring = $status[$code];
         if(empty($statusstring))
@@ -729,10 +729,10 @@ class assignment_program extends assignment_uploadsingle {
         if ($submission->timemodified) {
             /*
                 $output = link_to_popup_window ('/mod/assignment/type/program/history.php?id='.$this->cm->id.'&amp;userid='.$userid,
-                                                'history'.$userid, get_string('status'.$submission->status, 'assignment_program'), 500, 780, get_string('history', 'assignment_program', fullname($userid)), 'none', true);
+                                                'history'.$userid, get_string('status'.$submission->status, 'assignment_onlinejudge'), 500, 780, get_string('history', 'assignment_onlinejudge', fullname($userid)), 'none', true);
             $output .= '&nbsp;';
              */
-            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_program') . ': </strong>';
+            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>';
         }
 
         $output = $mark . $output . str_replace($mark, '', parent::print_student_answer($userid, true));
@@ -812,30 +812,30 @@ class assignment_program extends assignment_uploadsingle {
         //$table->class = 'box generalbox boxaligncenter';
         $table->id = 'summary';
 
-        $item_name = get_string('assignmentlangs','assignment_program').':';
-        $lang = get_string('lang' . $this->epaile->language, 'assignment_program');
+        $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
+        $lang = get_string('lang' . $this->onlinejudge->language, 'assignment_onlinejudge');
         $table->data[] = array($item_name, $lang);
 
         if (is_null($submission))
             $submission = $this->get_submission();
         if ($submission) {
             $item_name = get_string('status').':';
-            $item = get_string('status' . $submission->status, 'assignment_program');
+            $item = get_string('status' . $submission->status, 'assignment_onlinejudge');
             $table->data[] = array($item_name, $item);
 
             if (isset($submission->judgetime)) {
-                $item_name = get_string('judgetime','assignment_program').':';
+                $item_name = get_string('judgetime','assignment_onlinejudge').':';
                 $item = userdate($submission->judgetime);
                 $table->data[] = array($item_name, $item);
             }
 
             if (!empty($submission->error)) {
-                $table->data[] = array(get_string('errorinfo', 'assignment_program').':', '<pre>'.$submission->error.'</pre>');
+                $table->data[] = array(get_string('errorinfo', 'assignment_onlinejudge').':', '<pre>'.$submission->error.'</pre>');
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
             if (has_capability('mod/assignment:grade', $context)) {
-                $table->data[] = array(get_string('output', 'assignment_program').':', '<pre>'.$submission->output.'</pre>');
+                $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', '<pre>'.$submission->output.'</pre>');
             }
         }
 
@@ -852,23 +852,23 @@ class assignment_program extends assignment_uploadsingle {
 
         if ($submission) {
 
-            $epaile = get_record('assignment_epaile_submission', 'submission', $submission->id);
-            if (empty($epaile) && $createnew) {
+            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
+            if (empty($onlinejudge) && $createnew) {
                 $newsubmission = new Object; 
                 $newsubmission->submission = $submission->id;
-                if (!insert_record("assignment_epaile_submission", $newsubmission)) {
-                    error("Could not insert a new empty epaile submission");
+                if (!insert_record("assignment_oj_submissions", $newsubmission)) {
+                    error("Could not insert a new empty onlinejudge submission");
                 }
                 unset($newsubmission);
             }
 
-            $epaile = get_record('assignment_epaile_submission', 'submission', $submission->id);
-            if ($epaile) {
-                $submission->judged = $epaile->judged;
-                $submission->epaileid = $epaile->id;
+            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
+            if ($onlinejudge) {
+                $submission->judged = $onlinejudge->judged;
+                $submission->oj_id = $onlinejudge->id;
             }
 
-            $results = get_recordset_select('assignment_epaile_results', 'submission = '.$submission->id.' AND judgetime > '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
+            $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime > '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
             $results = recordset_to_array($results);
             if ($results) {
                 $result = array_pop($results);
@@ -884,16 +884,16 @@ class assignment_program extends assignment_uploadsingle {
         return $submission;
     }
 
-    function update_submission($submission, $newepaile=false) {
+    function update_submission($submission, $new_oj=false) {
 
         update_record('assignment_submission', $submission);
 
-        if ($newepaile) {
+        if ($new_oj) {
             $submission->submission = $submission->id;
-            insert_record('assignment_epaile_submission', $submission);
+            insert_record('assignment_oj_submissions', $submission);
         } else {
-            $submission->id = $submission->epaileid;
-            update_record('assignment_epaile_submission', $submission);
+            $submission->id = $submission->oj_id;
+            update_record('assignment_oj_submissions', $submission);
         }
     }
 
@@ -908,7 +908,7 @@ class assignment_program extends assignment_uploadsingle {
         $output = '';
         $clear = '<div class="clearer"></div>';
         if ($compileout) {
-            $message  = '<strong>'.get_string('compileout','assignment_program').'</strong><br />';
+            $message  = '<strong>'.get_string('compileout','assignment_onlinejudge').'</strong><br />';
             $message .= '<pre>'.$compileout.'</pre>';
 
             $output .= print_box($message,'box generalbox boxaligncenter','intro',$return);
@@ -1009,13 +1009,13 @@ class assignment_program extends assignment_uploadsingle {
         
         $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
         foreach ($names as $name) {
-            $lang[$name] = get_string('lang' . $name, 'assignment_program');
+            $lang[$name] = get_string('lang' . $name, 'assignment_onlinejudge');
         }
         
         asort($lang);
         
         $lang = array();
-        $lang['c'] = get_string('langc', 'assignment_program');
+        $lang['c'] = get_string('langc', 'assignment_onlinejudge');
         return $lang;
     }
 
@@ -1030,7 +1030,7 @@ class assignment_program extends assignment_uploadsingle {
                     sub.*, epsub.judged, epsub.submission, epsub.id AS epsubid '.
                'FROM '
                     .$CFG->prefix.'assignment_submissions AS sub, '
-                    .$CFG->prefix.'assignment_epaile_submission AS epsub '.
+                    .$CFG->prefix.'assignment_oj_submissions AS epsub '.
                'WHERE '.
                     'sub.id = epsub.submission '.
                     'AND epsub.judged = 0 '.
@@ -1046,7 +1046,7 @@ class assignment_program extends assignment_uploadsingle {
             $epsubmission = new Object;
             $epsubmission->id = $submission->epsubid;
             $epsubmission->judged = 1;
-            update_record('assignment_epaile_submission', $epsubmission);
+            update_record('assignment_oj_submissions', $epsubmission);
         }
 
         set_cron_lock('assignment_judging', null);
@@ -1163,7 +1163,7 @@ class assignment_program extends assignment_uploadsingle {
         $ret = true;
 
         // Make temp dir
-        $temp_dir = $CFG->dataroot.'/temp/assignment_program/'.$sub->id;
+        $temp_dir = $CFG->dataroot.'/temp/assignment_onlinejudge/'.$sub->id;
         if (!check_dir_exists($temp_dir, true, true)) {
             mtrace("Can't mkdir ".$temp_dir);
             return false;
@@ -1204,7 +1204,7 @@ class assignment_program extends assignment_uploadsingle {
         }
 
         $result->judgetime = time();
-        if ($ret = insert_record('assignment_epaile_results', $result, false)) {
+        if ($ret = insert_record('assignment_oj_results', $result, false)) {
             $newsub->timemarked = time();
             $newsub->grade = $this->grade_marker($result->status);
             $ret = update_record('assignment_submissions', $newsub);
@@ -1226,7 +1226,7 @@ class assignment_program extends assignment_uploadsingle {
         while ($submission = $this->get_unjudged_submission()) {
             // Construct
             $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
-            $this->assignment_program($cm->id);
+            $this->assignment_onlinejudge($cm->id);
 
             $this->judge($submission);
         }
