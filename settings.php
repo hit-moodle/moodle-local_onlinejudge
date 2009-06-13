@@ -1,7 +1,7 @@
 <?php  //$Id: settings.php,v 1.1.2.3 2008/01/24 20:29:36 skodak Exp $
 
 require_once($CFG->dirroot.'/mod/assignment/lib.php');
-require_once($CFG->dirroot.'/mod/assignment/type/program/assignment.class.php');
+require_once($CFG->dirroot.'/mod/assignment/type/onlinejudge/assignment.class.php');
 
 
 $settings->add(new admin_setting_configselect('assignment_max_cpu', get_string('maximumcpu', 'assignment_onlinejudge'),
