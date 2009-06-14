@@ -391,7 +391,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                                 $file . 'sourcecode', get_string('preview'), 710, 780, $file, 'none', true, 'button'.$userid);
 
                     $output .= '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.
-                            '<a href="'.$ffurl.'" >'.$file.'</a> '.$viewlink.'<br />';
+                            '<a href="'.$ffurl.'" >'.$file.'</a> ('.$viewlink.')<br />';
                 }
             }
         }
