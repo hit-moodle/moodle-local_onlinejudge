@@ -6,6 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 $plugin->version  = 2009061401;
-$plugin->requires = 2009010100;  // Requires this Moodle version
+$plugin->requires = 2007010100;  // Requires this Moodle version
 
 ?>
