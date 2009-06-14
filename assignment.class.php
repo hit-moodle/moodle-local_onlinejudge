@@ -581,7 +581,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $lang = array ();
         
-        $dir = $CFG->dirroot . '/mod/assignment/type/program/languages/';
+        $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
         $files = get_directory_list($dir);
         
         $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
@@ -591,8 +591,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         asort($lang);
         
-        $lang = array();
-        $lang['c'] = get_string('langc', 'assignment_onlinejudge');
         return $lang;
     }
 
@@ -757,10 +755,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         $return = null;
 
                         copy($basedir.'/'.$file, $temp_dir.'/'.$file);
-                        $command = 'cd '.$temp_dir.' && gcc '.$file.' 2>&1';
+                        $shell_script = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
+                        $command = "$shell_script $temp_dir/$file $temp_dir/a.out 2>&1";
+                        echo $command;
                         exec($command, $output, $return);
 
+                        echo $return;
                         if ($return) { //Compile error
+                            $output = str_replace($temp_dir.'/', '', $output);
                             $error = implode("\n", $output);
 
                             $result->error = addslashes($error);
