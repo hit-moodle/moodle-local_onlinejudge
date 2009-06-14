@@ -1,9 +1,11 @@
 <?php
 // $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
 
+require_once($CFG->libdir.'/soaplib.php');
+
 //define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted');
 define('NUMTESTS', 1); // Default number of test cases
-define('ASSIGNMENT_PROGRAM_MAX_CPU', 5); // Default maximum cpu time (seconds) for all assignments
+define('ASSIGNMENT_PROGRAM_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
 define('ASSIGNMENT_PROGRAM_MAX_MEM', 16777216); // Default memory usage (bytes) for all assignments
 
 define('ASSIGNMENT_PROGRAM_DEFAULT_JUDGER', 'sandbox'); // Default judger
