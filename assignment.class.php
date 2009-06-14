@@ -1,8 +1,6 @@
 <?php
 // $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
 
-require_once($CFG->libdir.'/soaplib.php');
-
 //define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted');
 define('NUMTESTS', 1); // Default number of test cases
 define('ASSIGNMENT_PROGRAM_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
@@ -21,12 +19,6 @@ if (!isset($CFG->assignment_max_mem)) {
 if (!isset($CFG->assignment_judger)) {
     set_config('assignment_judger', ASSIGNMENT_PROGRAM_DEFAULT_JUDGER);
 }
-
-if(!isset($CFG->assignment_judgehost)) {
-    // Install DOMjudge before using this type of Assignment
-    set_config('assignment_judgehost', get_string('domjudgeinstall','assignment_onlinejudge'));
-}
-
 
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
 
@@ -120,16 +112,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         // Tests form
         $mform->addElement('header', 'tests', get_string('tests', 'assignment_onlinejudge'));
-        
-        // Output filter
-        /*
-        unset ($choices);
-        $choices[1] = get_string('ignorespace', 'assignment');
-        $choices[2] = get_string('ignorecase', 'assignment');
-        $choices[3] = get_string('exactouput', 'assignment');
-        $mform->addElement('select', 'var4', get_string('outputfilter', 'assignment'), $choices);
-        $mform->setHelpButton('var4', array('outputfilter',get_string('outputfilter','assignment'), 'assignment'));
-        */
         
         // Get tests data
         $tests = array ();
@@ -301,38 +283,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
     
     /**
-     * Get compile time warnings/errors
-     * 
-     * @param int $submissionid Submission id
-     * @return Array $comp
-     */
-    function get_compile($submissionid=0) {
-
-        if ($submissionid == 0 && isset($submission->id))
-            $submissionid = $submission->id;
-
-        $comp = get_record('assignment_oj_submissions', 'submission', $submissionid);
-            
-        return $comp;
-    }
-    
-    /**
-     * Get tests results for current submission
-     * 
-     * @param int $submissionid Submission id
-     * @return Array $res
-     */
-    function get_results($submissionid=0) {
-
-        if ($submissionid == 0 && isset($submission->id))
-            $submissionid = $submission->id;
-
-        $res = get_records('assignment_oj_results', 'submission', $submissionid);
-            
-        return $res;
-    }
-    
-    /**
      * Display the assignment intro
      *
      */
@@ -369,354 +319,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
     }
 
-   /**
-     * Grade the given submission
-     *
-     * Given an object containing all the necessary data,
-     * this function will grade uploaded source code
-     * 
-     * @param object $assignment Actual assginment object
-     * @param object $submission Actual submission object
-     * @param object $um Uploaded file
-     * 
-     * @return int judge status code
-     *              101: compileerror
-     *              127: domjudge internal error
-     *              128: could not connect
-     *              129: could not judge
-     *              137: grade error
-     */
-    function domjudge($assignment, $submission, $file_path='') {
-        global $USER, $CFG;
-        
-        // Something strange with $submission->id
-        $submissionid = $submission->id;
-        unset($submission->id);
-        
-        // Get source code from file
-        $source = addslashes($this->read_file_content($file_path));
-        
-        // Get all program tests
-        $tests = array();
-        $tests = $this->get_tests($assignment->cm);
-        if($tests) {
-            // Build input / output array
-            $input = array();
-            $output = array();
-            foreach ($tests as $tstObj => $tstValue) {
-                $input[] = $tstValue->input;
-                $output[] = $tstValue->output;
-            }
-            
-            // SOAP call params
-            $params = array('source'     => $source,
-                            'input'      => $input,
-                            'output'     => $output,
-                            'lang'       => $this->get_language($assignment->cm),
-                            'maxbytes'   => ($assignment->maxbytes/1024),
-                            'time'       => $assignment->var2,
-                            'mem'        => ($assignment->var3/1024),
-                            'assignment' => $assignment->id,
-                            'user'       => $USER->id);
-
-            // SOAP call
-            $url = $CFG->assignment_judgehost;
-            $client = soap_connect($url, true);
-            if (!$client) {
-                return 128;
-            }
-                
-            $res = soap_call($client, 'judge', $params);
-            print_object($res);
-            if(!empty($res)) {
-                $res = get_object_vars($res);
-                $i=0;
-                foreach ($tests as $tstObj => $tstValue) {
-                    $oj_submission = new Object();
-                    // Response status code
-                    switch($res['status'][$i]) {
-                        case 0:   // OK
-                        case 102: // Time limit exceed
-                        case 103: // Runtime error
-                        case 104: // Program produced no output
-                        case 105: // Wrong answer
-                        case 137: // Killed
-                            $oj_submission->submission = $submissionid;
-                            $this->process_compile_output($oj_submission, $res['compile.out'][$i], $res['compile.time'][$i]);
-                            
-                            // Store result in database
-                            $result = new Object();
-                            $result->submission = $submissionid;
-                            $result->test       = $tstValue->id;
-                            $result->runtime    = $res['program.time'][$i];
-                            $result->status     = $res['status'][$i];
-                            $result->output     = $res['program.out'][$i];
-                            $result->error      = $res['program.err'][$i];
-
-                            if(!insert_record('assignment_oj_results', $result))
-                                return 137;
-                            
-                            break;
-                        case 101: // Compile errors
-                            $oj_submission->submission = $submissionid;
-                            $this->process_compile_output($oj_submission, $res['compile.out'][$i], $res['compile.time'][$i]);
-
-                            // Deny resubmit?    
-                            /*
-                            $submission->grade = 0;
-                            $submission->timemarked = time();
-                            
-                            if(!update_record('assignment_oj', $submission))
-                                error(get_string('gradeerror', 'assignment'));
-                            */
-                            
-                            $this->print_compile_errors($oj_submission->compileout);
-                            return 101;
-                            
-                            break;
-                        case 127: // DOMjudge internal error
-                        default:  // Unknown return value
-                            return 127;
-                            break;
-                    } // switch
-                    
-                    $i++;
-                } // foreach()    
-            } else {
-                return 129;
-            } // if($res)
-
-            $results = $this->get_results($submissionid);
-            if($results) {
-                // Calculate grade
-                $totalscore = 0;
-                foreach($results as $resObj => $resValue) {
-                    $score = $this->get_score($resValue->status,count($results),$assignment->grade);
-                    $totalscore += $score;
-                }
-                
-                // Update submission
-                $submission->id = $submissionid;
-                $submission->grade = round($totalscore,0);
-                $submission->timemarked = time();
-                if(!update_record('assignment_submissions', $submission))
-                    return 137;
-            }
-        } // if($tests)
-        
-        return 0;
-    }
-    
-    /**
-     * Produces a table with tests results for a given submission.
-     * More information displayed if teacher
-     * 
-     * @param object $submission
-     */
-    function print_results_table($submissionid=0, $teacher=false, $return=false) {
-        global $CFG;
-        
-        if($submissionid) {
-            /// Test results table
-            
-            // Table columns
-            $tablecolumns = array();
-            $tablecolumns[] = 'test';
-            $tablecolumns[] = 'status';
-            if($teacher) {
-                $tablecolumns[] = 'output';
-                $tablecolumns[] = 'programoutput';
-            }
-            $tablecolumns[] = 'error';
-            $tablecolumns[] = 'score';
-            
-            // Table headers
-            $tableheaders = array();
-            $tableheaders[] = '';
-            $tableheaders[] = 'Status';
-            if($teacher) {
-                $tableheaders[] = 'Expected output';
-                $tableheaders[] = 'Program output';
-            }
-            $tableheaders[] = 'Error';
-            $tableheaders[] = 'Score';
-            
-            require_once ($CFG->libdir . '/tablelib.php');
-            
-            $table = new flexible_table('mod-assignment-view');
-            $table->define_columns($tablecolumns);
-            $table->define_headers($tableheaders);
-            
-            $table->sortable(false);
-            $table->collapsible(true);
-            
-            $table->column_class('test', 'test');
-            $table->column_class('status', 'status');
-            $table->column_class('score', 'score');
-            
-            $table->set_attribute('cellpadding', '2');
-            $table->set_attribute('id', 'attempts');
-            $table->set_attribute('class', 'results');
-            if($teacher)
-                $table->set_attribute('width', '100%');
-            else
-                $table->set_attribute('width', '80%');
-            $table->set_attribute('align', 'center');
-            
-            // Start working -- this is necessary as soon as the niceties are over
-            $table->setup();
-            
-            // Table rows
-            $tests = array();
-            $tests = $this->get_tests($this->cm);
-            $results = $this->get_results($submissionid);
-            if($results) {
-                $i = 1;
-                $totalscore = 0;
-                foreach($results as $resObj => $resValue) {
-                    $status = $this->get_status($resValue->status);
-                    $expectedoutput = $tests[$resValue->test]->output;
-                    $programoutput = $resValue->output;
-                    $error = '<pre>'.$resValue->error.'</pre>';
-                    $score = format_float($this->get_score($resValue->status,count($results),$this->assignment->grade),2);
-                    $totalscore += $score;
-                    
-                    $row = array();
-                    $row[] = 'Test #'.$i;
-                    $row[] = $status;
-                    if($teacher) {
-                        $row[] = $expectedoutput;
-                        $row[] = $programoutput;
-                    }
-                    $row[] = $error;
-                    $row[] = $score;
-                    $i++;
-                    
-                    $table->add_data($row);
-                }
-            }
-            
-            $table->print_html();
-        }
-    }
-    
-    /**
-     * Print judge function return status
-     * 
-     * @param int $statuscode Judge function returned status code
-     */
-     function print_return_status($statuscode=0) {
-         switch($statuscode) {
-             case 128: // Conection error
-                       print_error(get_string('couldnotconnect','assignment_onlinejudge'),'assignment');
-                       break;
-             case 137: // Grade error
-                       print_error(get_string('gradeerror', 'assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
-                       break;
-             case 101: // Compile error
-                       print_error(get_string('checkcode','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
-                       break;
-             case 127: // Domjudge internal error
-                       print_error(get_string('domjudgeerror','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
-                       break;
-             case 129: // Could not judge
-                       print_error(get_string('couldnotjudge','assignment_onlinejudge'),'assignment','view.php?id='.$this->cm->id);
-                       break;
-             case 0:   // OK
-                       $this->view_feedback();
-                       echo '<br />';                 
-                       print_continue('view.php?id='.$this->cm->id);
-         }  
-     }
-    
-    /**
-     * Process compile output.
-     * Insert / update compile output in database.
-     * 
-     * @param object $oj_submission Epaile submission object
-     * @param array $res Compile output
-     */
-    function process_compile_output(&$oj_submission, $compileoutput, $compiletime) {
-        $compileoutput = addslashes($compileoutput);
-        // Check if exists previous submission
-        $oj_sub = get_record('assignment_oj_submission', 'submission', $oj_submission->submission);
-        if($oj_sub) {
-            $op = 'update_record';
-            $oj_submission->id = $oj_sub->id;
-        }
-        else
-            $op = 'insert_record';
-            
-        // Submission data
-        $oj_submission->compiletime = $compiletime;
-        $oj_submission->compileout = $compileoutput;
-                            
-        // Insert / Update submission
-        if(!$op('assignment_oj_submissions', $oj_submission))
-            error(get_string('gradeerror', 'assignment_onlinejudge'));
-    }
-    
-    /**
-     * Get program status string
-     * 
-     * @param int $code Program exit code
-     * @return string $statusstring
-     */
-    function get_status($code) {
-        // Program exit status
-        $status = array(0   => get_string('e_correct','assignment_onlinejudge'),
-                        101 => get_string('e_compile','assignment_onlinejudge'),
-                        102 => get_string('e_timelimit','assignment_onlinejudge'),
-                        103 => get_string('e_runerror','assignment_onlinejudge'),
-                        104 => get_string('e_output','assignment_onlinejudge'),
-                        105 => get_string('e_answer','assignment_onlinejudge'),
-                        117 => get_string('e_intern','assignment_onlinejudge'),
-                        137 => get_string('e_killed','assignment_onlinejudge'));
-                        
-        $statusstring = $status[$code];
-        if(empty($statusstring))
-            $statusstring = 'Unknown';
-            
-        return $statusstring;
-    }
-    
-    /**
-     * Get obtained score in a test
-     * Actually: score = $assignment->grade / $numtest
-     * 
-     * @param int $code Program exit code
-     * @param int $numtests Number of tests for this assignment
-     * @param int $grade Actual assignment grade
-     * @return int $score
-     */
-     function get_score($code, $numtests=NUMTESTS, $grade=0) {
-         if(!$grade)
-            $grade = $this->assignment->grade;
-            
-         if(!$code) {
-            return $grade / $numtests;
-         } else
-            return 0;
-     }
-    
-    /**
-     * Returns file content
-     * 
-     * @param string path Absolute file path
-     * @return string File content
-     */
-    function read_file_content($path='') {
-        $content = '';
-        if(file_exists($path)) {
-            // Read file content
-            $pointer = fopen($path, 'r');
-            $content = fread($pointer, filesize($path));
-            fclose($pointer);
-        }
-        
-        return $content;
-    }
-    
     /**
      * Print a link to student submitted file.
      * 
@@ -898,31 +500,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     /**
-     * Show compile errors
-     *
-     * @param boolean $return optional defaults to false. If true the list is returned rather than printed
-     * @return string optional
-     */
-    function print_compile_errors($compileout = '', $return = false) {
-        
-        $output = '';
-        $clear = '<div class="clearer"></div>';
-        if ($compileout) {
-            $message  = '<strong>'.get_string('compileout','assignment_onlinejudge').'</strong><br />';
-            $message .= '<pre>'.$compileout.'</pre>';
-
-            $output .= print_box($message,'box generalbox boxaligncenter','intro',$return);
-        }
-        
-        $output = '<div class="errors">' . $output . '</div>';
-        
-        if ($return)
-            return $clear . $output;
-        
-        echo $clear . $output;
-    }
-    
-    /**
      * This function returns an
      * array of possible memory sizes in an array, translated to the
      * local language.
@@ -1043,10 +620,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $submission = array_pop($submissions);
 
             // Set judged mark
-            $epsubmission = new Object;
-            $epsubmission->id = $submission->epsubid;
-            $epsubmission->judged = 1;
-            update_record('assignment_oj_submissions', $epsubmission);
+            $ojsubmission = new Object;
+            $ojsubmission->id = $submission->epsubid;
+            $ojsubmission->judged = 1;
+            update_record('assignment_oj_submissions', $ojsubmission);
         }
 
         set_cron_lock('assignment_judging', null);
