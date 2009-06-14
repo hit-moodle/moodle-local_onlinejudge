@@ -669,7 +669,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
          */
 
-        $sand = $CFG->dirroot . '/mod/assignment/type/program/sandbox/sand';
+        $sand = $CFG->dirroot . '/mod/assignment/type/onlinejudge/sandbox/sand';
         $sand .= ' -l cpu='.$this->assignment->var2.' -l memory='.$this->assignment->var3.' '.$exec_file; 
 
         $descriptorspec = array(
