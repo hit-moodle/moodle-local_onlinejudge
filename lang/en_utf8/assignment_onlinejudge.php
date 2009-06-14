@@ -18,7 +18,7 @@
     $string['infoie'] = 'Sandbox error. Ask admin';
     $string['infomle'] = 'You ate too much memory.';
     $string['infope'] = 'Almost right, except some format mistakes.';
-    $string['infopending'] = 'Waiting for the judgement.';
+    $string['infopending'] = 'Waiting for judgement.';
     $string['infore'] = 'Bad array index, bad pointer access or even worse.';
     $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
     $string['infotle'] = 'The program has run for a long or infinite time.';
