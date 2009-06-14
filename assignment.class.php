@@ -431,8 +431,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $table->data[] = array($item_name, $item);
             }
 
+            if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->error))
+                $submission->error = get_string('info'.$submission->status, 'assignment_onlinejudge');
             if (!empty($submission->error)) {
-                $table->data[] = array(get_string('errorinfo', 'assignment_onlinejudge').':', '<pre>'.$submission->error.'</pre>');
+                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', $submission->error);
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
@@ -633,10 +635,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     function diff($answer, $output) {
-        $answer = rtrim($answer);
-        $output = rtrim($output);
+        $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
+        $output = trim($output);
 
-        if ($answer === $output)
+        if (strcmp($answer, $output) == 0)
             return 'ac';
         else {
             $tokens = Array();
@@ -670,6 +672,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
          */
 
         $sand = $CFG->dirroot . '/mod/assignment/type/onlinejudge/sandbox/sand';
+        if (!is_executable($sand)){
+            return 'ie';
+        }
+
         $sand .= ' -l cpu='.$this->assignment->var2.' -l memory='.$this->assignment->var3.' '.$exec_file; 
 
         $descriptorspec = array(
@@ -750,30 +756,33 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         if ($basedir = $this->file_area($sub->userid)) {
             if ($files = get_directory_list($basedir)) {
                 foreach ($files as $key => $file) {
-                    if (!substr_compare($file, '.c', -2, 2, true)) { //It is a c file
-                        $output = null;
-                        $return = null;
 
-                        copy($basedir.'/'.$file, $temp_dir.'/'.$file);
-                        $shell_script = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
-                        $command = "$shell_script $temp_dir/$file $temp_dir/a.out 2>&1";
-                        exec($command, $output, $return);
-
-                        if ($return) { //Compile error
-                            $output = str_replace($temp_dir.'/', '', $output);
-                            $error = implode("\n", $output);
-
-                            $result->error = addslashes($error);
-                            $result->status = 'ce';
-
-                        } else {  //Run it!
-                            $result->status = $this->run_in_sandbox($temp_dir.'/a.out', $output);
-                            $result->error = '';
-                            $result->output = $output;
-                        }
-
+                    copy($basedir.'/'.$file, $temp_dir.'/'.$file);
+                    $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
+                    if (!is_executable($compiler)) {
+                        $result->status = 'ie';
                         break;
                     }
+
+                    $output = null;
+                    $return = null;
+                    $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
+                    exec($command, $output, $return);
+
+                    if ($return) { //Compile error
+                        //strip path info
+                        $output = str_replace($temp_dir.'/', '', $output);
+                        $error = implode('<br />', $output);
+
+                        $result->error = addslashes($error);
+                        $result->status = 'ce';
+                    } else {  //Run it!
+                        $result->status = $this->run_in_sandbox($temp_dir.'/a.out', $output);
+                        $result->error = '';
+                        $result->output = $output;
+                    }
+
+                    break;
                 }
 
                 if (!isset($result->status)) {
