@@ -33,7 +33,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     
     function assignment_onlinejudge($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
         parent::assignment_uploadsingle($cmid, $assignment, $cm, $course);
-        $this->type = 'program';
+        $this->type = 'onlinejudge';
 
         if (isset($this->assignment->id)) {
             $this->onlinejudge = get_record('assignment_oj', 'assignment', $this->assignment->id);
