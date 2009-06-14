@@ -1,0 +1,126 @@
+[2007/02/09] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h added a TFLAGS_IN_SYSCALL bit in the `tflags' field of proc_t
+    as well as the {SET,CLR}_IN_SYSCALL macros for fliping the bit
+  * in sandbox.c correct the SYSRET event invocation with WITH_TSC_COUNTER 
+    directive defined
+  * in sandbox.spec and Makefile update version to 0.2.14-1
+  * in platform.h cleared up THE_SYSCALL, IS_SYSCALL and IS_SYSRET macros
+  * in sandbox.spec and Makefile update version to 0.2.14-2
+
+[2007/02/08] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c added a missing argument in the PROC_BEGIN verbose info
+  * in platform.c changed CACHE_SIZE assumption to 2MB (1 << 21)
+  * in sandbox.c deleted code for handling the initial `execve' system call
+    (i.e. responsibility transferred to policies for simplicity)
+  * in sandbox.spec and Makefile update version to 0.2.13-3
+  * in platform.h added an IS_RET macro for inspecting opcode on i386 platforms
+  * in sandbox.c sandbox_tracer now updates `tsc' counter as soon as it receives
+    the SIGTRAP signal (i.e. instead of probing memory usage first)
+  * in sandbox.c the system call stack in sandbox_tracer is initialized with a 
+    fake SYS_execve system call
+  * in sandbox.spec and Makefile update version to 0.2.13-4
+
+[2007/02/02] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h removed unused header inclusion <linux/sys.h>
+  * in sandbox.spec and Makefile update version to 0.2.13-2
+  * updated years in copyright notices to 2004-2007
+
+[2007/01/21] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h and platform.c added an `opt' argument to proc_probe() to
+    specify probe targets
+  * in sandbox.c change invocations of proc_probe() to reflect the above change
+  * in platform.c proc_dump() uses procfs to access target process
+  * in platform.h added macros SYSCALL_ARG[1-5] and SYSRET_RETVAL for accessing
+    arguments / ret values of system calls in a platform independent manner
+  * in sandbox.c change the formation of SYSCALL and SYSRET events to reflect
+    the above change
+  * in sandbox.spec and Makefile update version to 0.2.13-1
+  
+[2007/01/06] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h and platform.c each call to proc_dump() now dumps a machine
+    word `long' instead of an `int'
+  * in sandbox.spec and Makefile update version to 0.2.12-3
+
+[2007/01/05] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.h and sandbox.c resumed some data structures on monitor()
+    for backward compatibility
+  * in sandbox.spec and Makefile update version to 0.2.12-2
+
+[2007/01/04] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c fixed a debug message in trace_self() indicating wrong
+    function call
+  * in platform.c fixed a debug message in proc_dump() with bad alignment
+  * in sandbox.c fixed a debug message in task_execute() indicating wrong
+    function call
+  * in sandbox.c invoke policy entry in sandbox_tracer() instead of 
+    sandbox_monitor()
+  * in sandbox.spec and Makefile update version to 0.2.11-4
+  * in sandbox.c invoke policy entry in sandbox_monitor() as did in 0.2.11-3
+  * in sandbox.h resume to single thread model in order to get rid of the
+    limitation of ptrace()
+  * in sandbox.spec and Makefile update version to 0.2.12-1
+
+[2007/01/02] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c fixed a debug message in sandbox_execute() causing the library 
+    fail to compile with NDEBUG undefined
+  * in sandbox.spec and Makefile update version to 0.2.11-3
+  * in platform.c added a debug information in proc_dump()
+
+[2006/12/31] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.h added a pid field to ctrl_t to facilitate process dumping
+  * in sandbox.c fork process in sandbox_execute() instead of sandbox_tracer()
+  * in sandbox.c revised wording in some comments
+  * in sandbpx.spec and Makefile update version to 0.2.11-1
+  * in sandbox.c close unused file descriptors in __sandbox_task_execute() 
+    instead of sandbox_execute()
+  * in sandbox.spec and Makefile update version to 0.2.11-2
+
+[2006/12/30] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c probe the prisoner process when it is stopped rather than it 
+    receives SIGTRAP signal (resume the changes of 0.2.9-7)
+  * in sandbox.c pass the pid of targeted process via syscall event parameter
+  * in sandbox.spec and Makefile updated version to 0.2.10-4
+  * canceled the pid parameter in syscall events
+
+[2006/12/29] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.h added a IS_IDLE macro for testing control logic status
+  * in sandbox.c applied IS_IDLE to control logic status testing
+  * in sandbox.spec and Makefile updated version to 0.2.10-3
+
+[2006/12/14] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c fixed a debug message indicating wrong function return
+  * in sandbox.spec and Makefile updated version to 0.2.10-2
+  
+[2006/12/12] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h and problem.c added `proc_dump' function for dumping data
+    from the specified address of targeted process.
+  * in sandbox.spec and Makefile updated version to 0.2.10-1
+  
+[2006/12/08] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c probe the prisoner process when it is stopped rather than it
+    receives SIGTRAP signal (reverse the changes of 0.2.9-5)
+  * in sandbox.spec and Makefile updated version to 0.2.9-7
+  * canceled previous change
+  * in sandbox.spec and Makefile updated version to 0.2.9-8
+
+[2006/11/10] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h added `regs' field to `struct proc_t' for non-Linux platforms
+  * in sandbox.c added `ebx' thru `edi' to the data fields of SYSCALL event
+  * in sandbox.spec and Makefile updated version to 0.2.9-6
+
+[2006/07/06] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c probe the prisoner process when it receives SIGTRAP instead of
+    when it is stopped by arbitrary signal.
+  * in sandbox.spec and Makefile updated version to 0.2.9-5
+
+[2006/04/12] LIU Yu, <pineapple.liu@gmail.com>
+  * unbrella project renamed to libsandbox at sourceforge.net
+  * changed copyright notices and other namings in source files accordingly
+
+[2006/03/25] LIU Yu, <pineapple.liu@gmail.com>
+  * renamed rpmbuild.spec to sandbox.spec and made a number of refinement
+  * in sandbox.spec and Makefile updated version to 0.2.9-4
+
+[2006/03/23] LIU Yu, <pineapple.liu@gmail.com>
+  * finished rpm packaging specification
+  * in rpmbuild.spec and Makefile updated version to 0.2.9-2
