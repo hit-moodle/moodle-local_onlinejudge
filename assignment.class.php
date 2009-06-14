@@ -386,7 +386,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $ffurl = get_file_url("$filearea/$file", array('forcedownload'=>1));
 
                     // Syntax Highlighert source code
-                    $viewlink = link_to_popup_window('/mod/assignment/type/program/source.php?id='
+                    $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
                                 .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
                                 $file . 'sourcecode', get_string('preview'), 710, 780, $file, 'none', true, 'button'.$userid);
 
@@ -757,10 +757,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         copy($basedir.'/'.$file, $temp_dir.'/'.$file);
                         $shell_script = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
                         $command = "$shell_script $temp_dir/$file $temp_dir/a.out 2>&1";
-                        echo $command;
                         exec($command, $output, $return);
 
-                        echo $return;
                         if ($return) { //Compile error
                             $output = str_replace($temp_dir.'/', '', $output);
                             $error = implode("\n", $output);
