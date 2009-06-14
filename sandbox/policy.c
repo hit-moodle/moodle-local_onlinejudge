@@ -2,8 +2,10 @@
 #include <linux/unistd.h>
 
 int allowed_syscall [] = {
+    __NR_open,
     __NR_read,
     __NR_write,
+    __NR_close,
     __NR_munmap,
     __NR_mmap2,
     __NR_fstat64,
@@ -17,8 +19,8 @@ int allow(const event_t * pevent)
 
     if (initing) 
     {
-        // set_thread_area is the last init syscall
-        if (pevent->data._SYSCALL.scno == __NR_set_thread_area)
+        // mprotect() is the last init syscall
+        if (pevent->data._SYSCALL.scno == __NR_mprotect)
             initing = 0;
         return 1;
     }
