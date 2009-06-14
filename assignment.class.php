@@ -436,7 +436,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-            if (has_capability('mod/assignment:grade', $context)) {
+            if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
                 $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', '<pre>'.$submission->output.'</pre>');
             }
         }
