@@ -1,15 +1,13 @@
 <?php
 // $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
 
-require_once($CFG->libdir.'/soaplib.php');
-
 //define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted');
 define('NUMTESTS', 1); // Default number of test cases
-define('ASSIGNMENT_PROGRAM_MAX_CPU', 60); // Default maximum cpu time (seconds) for all assignments
-define('ASSIGNMENT_PROGRAM_MAX_MEM', 536870912); // Default memory usage (bytes) for all assignments
+define('ASSIGNMENT_PROGRAM_MAX_CPU', 5); // Default maximum cpu time (seconds) for all assignments
+define('ASSIGNMENT_PROGRAM_MAX_MEM', 16777216); // Default memory usage (bytes) for all assignments
 
 define('ASSIGNMENT_PROGRAM_DEFAULT_JUDGER', 'sandbox'); // Default judger
-/*
+
 if (!isset($CFG->assignment_max_cpu)) {
     set_config('assignment_max_cpu', ASSIGNMENT_PROGRAM_MAX_CPU);
 }
@@ -21,7 +19,7 @@ if (!isset($CFG->assignment_max_mem)) {
 if (!isset($CFG->assignment_judger)) {
     set_config('assignment_judger', ASSIGNMENT_PROGRAM_DEFAULT_JUDGER);
 }
- */
+
 if(!isset($CFG->assignment_judgehost)) {
     // Install DOMjudge before using this type of Assignment
     set_config('assignment_judgehost', get_string('domjudgeinstall','assignment_onlinejudge'));
