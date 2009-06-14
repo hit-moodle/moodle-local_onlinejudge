@@ -596,7 +596,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $lang;
     }
 
-    //Get one unjudged submission and set it as judged
+    /**
+     * Get one unjudged submission and set it as judged
+     * The function can be reentranced
+     */
     function get_unjudged_submission() {
         global $CFG;
 
