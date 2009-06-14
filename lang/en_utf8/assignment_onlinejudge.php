@@ -22,6 +22,7 @@
     $string['infore'] = 'Bad array index, bad pointer access or even worse.';
     $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
     $string['infotle'] = 'The program has run for a long or infinite time.';
+    $string['infowa'] = 'Double check your code please.';
     $string['input'] = 'Input';
     $string['judgetime'] = 'Judge time';
     $string['langbash'] = 'Bash';
