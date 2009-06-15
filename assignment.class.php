@@ -6,18 +6,12 @@ define('NUMTESTS', 5); // Default number of test cases
 define('ASSIGNMENT_ONLINEJUDGE_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
 define('ASSIGNMENT_ONLINEJUDGE_MAX_MEM', 16777216); // Default memory usage (bytes) for all assignments
 
-define('ASSIGNMENT_ONLINEJUDGE_DEFAULT_JUDGER', 'sandbox'); // Default judger
-
 if (!isset($CFG->assignment_max_cpu)) {
     set_config('assignment_oj_max_cpu', ASSIGNMENT_ONLINEJUDGE_MAX_CPU);
 }
 
 if (!isset($CFG->assignment_max_mem)) {
     set_config('assignment_oj_max_mem', ASSIGNMENT_ONLINEJUDGE_MAX_MEM);
-}
-
-if (!isset($CFG->assignment_judger)) {
-    set_config('assignment_oj_judger', ASSIGNMENT_ONLINEJUDGE_DEFAULT_JUDGER);
 }
 
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
