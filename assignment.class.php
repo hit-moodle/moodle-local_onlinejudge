@@ -68,24 +68,24 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         // Cron date
         // Get assignment cron frequency
         if(get_field('modules','cron','name','assignment')) {
-            $mform->addElement('select', 'var1', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
-            $mform->setHelpButton('var1', array('timecron',get_string('crondate','assignment_onlinejudge'), 'assignment'));
-            $mform->setDefault('var1', 0);
+            $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
+            $mform->setHelpButton('duejudge', array('timecron',get_string('crondate','assignment_onlinejudge'), 'assignment'));
+            $mform->setDefault('duejudge', 0);
         }
         
         // Max. CPU time
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
-        $mform->addElement('select', 'var2', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('var2', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('var2', $CFG->assignment_oj_max_cpu);
+        $mform->addElement('select', 'cpulimit', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('cpulimit', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
+        $mform->setDefault('cpulimit', $CFG->assignment_oj_max_cpu);
         
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
-        $mform->addElement('select', 'var3', get_string('maximummem', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('var3', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('var3', $CFG->assignment_oj_max_mem);
+        $mform->addElement('select', 'memlimit', get_string('maximummem', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('memlimit', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
+        $mform->setDefault('memlimit', $CFG->assignment_oj_max_mem);
         
         // Allow resubmit
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
@@ -249,12 +249,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $onlinejudge = new Object();
         $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
+        $onlinejudge->language = $assignment->lang;
+        $onlinejudge->memlimit = $assignment->memlimit;
+        $onlinejudge->cpulimit = $assignment->cpulimit;
+        $onlinejudge->compileonly = $assignment->compileonly;
         if ($onlinejudge) {
-            $onlinejudge->language = $assignment->lang;
             update_record('assignment_oj', $onlinejudge);
         } else {
             $onlinejudge->assignment = $assignment->id;
-            $onlinejudge->language = $assignment->lang;
             insert_record('assignment_oj', $onlinejudge);
         }
     }
@@ -670,7 +672,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             return 'ie';
         }
 
-        $sand .= ' -l cpu='.$this->assignment->var2.' -l memory='.$this->assignment->var3.' '.$exec_file; 
+        $sand .= ' -l cpu='.$this->onlinejudge->cpulimit.' -l memory='.$this->onlinejudge->memlimit.' '.$exec_file; 
 
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -820,11 +822,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
             $now = time();
             $later = $now + ($cronfreq*60);
-            $where = "(var1 >= $now AND var1 <= $later) AND assignmenttype LIKE 'program'";
+            $where = "(duejudge >= $now AND duejudge <= $later) AND assignmenttype LIKE 'program'";
             $where = "assignmenttype LIKE 'program'";
 
             // Get program type assignments with cron date in next $cronfreq minutes
-            if($assignments = get_records_select('assignment',$where,'var1 ASC')) {
+            if($assignments = get_records_select('assignment',$where,'duejudge ASC')) {
                 
                 foreach($assignments as $ass) {
                     // Get submissions for this assignments
