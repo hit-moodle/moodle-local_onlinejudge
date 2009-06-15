@@ -90,8 +90,13 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         // Allow resubmit
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
         $mform->setHelpButton('resubmit', array('resubmit',get_string('allowresubmit','assignment'), 'assignment'));
-        $mform->setDefault('resubmit', 0);
+        $mform->setDefault('resubmit', 1);
         
+        // Compile only?
+        $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
+        $mform->setHelpButton('compileonly', array('compileonly',get_string('compileonly','assignment_onlinejudge'), 'assignment'));
+        $mform->setDefault('compileonly', 0);
+
         // Email teachers
         $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
         $mform->setHelpButton('emailteachers', array('emailteachers',get_string('emailteachers','assignment'), 'assignment'));
@@ -249,14 +254,18 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $onlinejudge = new Object();
         $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
-        $onlinejudge->language = $assignment->lang;
-        $onlinejudge->memlimit = $assignment->memlimit;
-        $onlinejudge->cpulimit = $assignment->cpulimit;
-        $onlinejudge->compileonly = $assignment->compileonly;
         if ($onlinejudge) {
+            $onlinejudge->language = $assignment->lang;
+            $onlinejudge->memlimit = $assignment->memlimit;
+            $onlinejudge->cpulimit = $assignment->cpulimit;
+            $onlinejudge->compileonly = $assignment->compileonly;
             update_record('assignment_oj', $onlinejudge);
         } else {
             $onlinejudge->assignment = $assignment->id;
+            $onlinejudge->language = $assignment->lang;
+            $onlinejudge->memlimit = $assignment->memlimit;
+            $onlinejudge->cpulimit = $assignment->cpulimit;
+            $onlinejudge->compileonly = $assignment->compileonly;
             insert_record('assignment_oj', $onlinejudge);
         }
     }

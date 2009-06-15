@@ -1,6 +1,7 @@
 <?php
     $string['addtest'] = 'Add new test';
     $string['assignmentlangs'] = 'Programming language';
+    $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['couldnotconnect'] = 'Could not connect to judge server.';

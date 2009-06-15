@@ -4,7 +4,7 @@
     $string['errorinfo'] = '错误信息';
     $string['input'] = '输入';
     $string['judgetime'] = '评测时间';
-    $string['maximumcpu'] = 'CPU最长运行时间';
+    $string['maximumcpu'] = '最长CPU运行时间';
     $string['maximumfilesize'] = '源文件最大长度';
     $string['maximummem'] = '内存最多可用';
     $string['output'] = '输出';
