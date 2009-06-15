@@ -2,22 +2,22 @@
 // $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
 
 //define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted');
-define('NUMTESTS', 1); // Default number of test cases
-define('ASSIGNMENT_PROGRAM_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
-define('ASSIGNMENT_PROGRAM_MAX_MEM', 16777216); // Default memory usage (bytes) for all assignments
+define('NUMTESTS', 5); // Default number of test cases
+define('ASSIGNMENT_ONLINEJUDGE_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
+define('ASSIGNMENT_ONLINEJUDGE_MAX_MEM', 16777216); // Default memory usage (bytes) for all assignments
 
-define('ASSIGNMENT_PROGRAM_DEFAULT_JUDGER', 'sandbox'); // Default judger
+define('ASSIGNMENT_ONLINEJUDGE_DEFAULT_JUDGER', 'sandbox'); // Default judger
 
 if (!isset($CFG->assignment_max_cpu)) {
-    set_config('assignment_max_cpu', ASSIGNMENT_PROGRAM_MAX_CPU);
+    set_config('assignment_oj_max_cpu', ASSIGNMENT_ONLINEJUDGE_MAX_CPU);
 }
 
 if (!isset($CFG->assignment_max_mem)) {
-    set_config('assignment_max_mem', ASSIGNMENT_PROGRAM_MAX_MEM);
+    set_config('assignment_oj_max_mem', ASSIGNMENT_ONLINEJUDGE_MAX_MEM);
 }
 
 if (!isset($CFG->assignment_judger)) {
-    set_config('assignment_judger', ASSIGNMENT_PROGRAM_DEFAULT_JUDGER);
+    set_config('assignment_oj_judger', ASSIGNMENT_ONLINEJUDGE_DEFAULT_JUDGER);
 }
 
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
@@ -81,17 +81,17 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         // Max. CPU time
         unset($choices);
-        $choices = $this->get_max_cpu_times($CFG->assignment_max_cpu);
+        $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'var2', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
         $mform->setHelpButton('var2', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('var2', $CFG->assignment_max_cpu);
+        $mform->setDefault('var2', $CFG->assignment_oj_max_cpu);
         
         // Max. memory usage
         unset($choices);
-        $choices = $this->get_max_memory_usages($CFG->assignment_max_mem);
+        $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
         $mform->addElement('select', 'var3', get_string('maximummem', 'assignment_onlinejudge'), $choices);
         $mform->setHelpButton('var3', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('var3', $CFG->assignment_max_mem);
+        $mform->setDefault('var3', $CFG->assignment_oj_max_mem);
         
         // Allow resubmit
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
@@ -110,7 +110,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
         
-        // Tests form
+        // Testcases form
         $mform->addElement('header', 'tests', get_string('tests', 'assignment_onlinejudge'));
         
         // Get tests data
@@ -507,7 +507,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * local language.
      *
      * @uses SORT_NUMERIC
-     * @param int $sizebytes Moodle site $CGF->assignment_maxmem
+     * @param int $sizebytes Moodle site $CGF->assignment_oj_max_mem
      * @return array
      */
     static function get_max_memory_usages($sitebytes=0) {
@@ -522,8 +522,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                           67108864, 134217728, 268435456, 536870912);
     
         // Allow maxbytes to be selected if it falls outside the above boundaries
-        if( isset($CFG->assignment_max_mem) && !in_array($CFG->assignment_max_mem, $sizelist) ){
-                $sizelist[] = $CFG->assignment_max_mem;
+        if( isset($CFG->assignment_oj_max_mem) && !in_array($CFG->assignment_oj_max_mem, $sizelist) ){
+                $sizelist[] = $CFG->assignment_oj_max_mem;
         }
     
         foreach ($sizelist as $sizebytes) {
@@ -542,7 +542,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * array of possible CPU time (in seconds) in an array
      *
      * @uses SORT_NUMERIC
-     * @param int $time Moodle site $CGF->assignment_maxcpu
+     * @param int $time Moodle site $CGF->assignment_oj_max_cpu
      * @return array
      */
     static function get_max_cpu_times($time=0) {
@@ -558,8 +558,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                           25, 30, 40, 50, 60);
     
         // Allow maxtime to be selected if it falls outside the above boundaries
-        if( isset($CFG->assignment_max_cpu) && !in_array($CFG->assignment_max_cpu, $timelist) ){
-                $cputime[] = $CFG->assignment_max_cpu;
+        if( isset($CFG->assignment_oj_max_cpu) && !in_array($CFG->assignment_oj_max_cpu, $timelist) ){
+                $cputime[] = $CFG->assignment_oj_max_cpu;
         }
     
         foreach ($timelist as $timesecs) {
