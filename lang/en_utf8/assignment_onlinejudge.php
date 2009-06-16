@@ -1,11 +1,10 @@
 <?php
-    $string['addtest'] = 'Add new test';
+    $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
+    $string['case'] = 'Case $a:';
     $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
-    $string['couldnotconnect'] = 'Could not connect to judge server.';
-    $string['couldnotjudge'] = 'Error procesing the jury.';
     $string['crondate'] = 'Cron date';
     $string['cronjudge'] = 'This submission will be graded on<br />';
     $string['duejudge'] = 'Judge after due date';
@@ -16,6 +15,7 @@
     $string['ignorecase'] = 'Ignore Upcase / Lowcase';
     $string['info'] = 'Information';
     $string['infoat'] = 'A good program must return 0 if no error occur.';
+    $string['infocompileok'] = 'It seems that the compiler likes your code.';
     $string['infoie'] = 'Sandbox error. Ask admin';
     $string['infomle'] = 'You ate too much memory.';
     $string['infope'] = 'Almost right, except some format mistakes.';
@@ -39,16 +39,16 @@
     $string['statusac'] = 'Accept';
     $string['statusat'] = 'Abnormal Termination';
     $string['statusce'] = 'Compilation Error';
+    $string['statuscompileok'] = 'Compilation Ok';
     $string['statusie'] = 'Internal Error';
     $string['statusmle'] = 'Memory-Limit Exceed';
+    $string['statusmultiple'] = 'Multi-status';
     $string['statuspe'] = 'Presentation Error';
     $string['statuspending'] = 'Pending...';
     $string['statusre'] = 'Runtime Error (SIGSEGV)';
     $string['statusrf'] = 'Restricted Functions';
     $string['statustle'] = 'Time-Limit Exceed';
     $string['statuswa'] = 'Wrong answer';
+    $string['testcases'] = 'Test Cases';
     $string['testresults'] = 'Test results';
-    $string['tests'] = 'Test cases';
-    $string['typeprogram'] = 'Autograde';
-    $string['userfile'] = 'Last uploaded file';
 ?>

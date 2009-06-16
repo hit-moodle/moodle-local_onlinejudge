@@ -39,22 +39,18 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * 
      * @param $mform object Allready existant form
      */
-    function setup_elements(& $mform) {
+    function setup_elements(& $mform, & $modform) {
         global $CFG, $COURSE;
         
         $add       = optional_param('add', '', PARAM_ALPHA);
         $update    = optional_param('update', 0, PARAM_INT);
         
         // Get course module instance
-        $cm = false;
+        $cm = null;
+        $onlinejudge = null;
         if (!empty($update)) {
             $cm = get_record('course_modules', 'id', $update);
-        }
-        
-        $lang = 'c'; // Language by default
-        if($cm) {
             $onlinejudge = get_record('assignment_oj', 'assignment', $cm->instance);
-            $lang = $onlinejudge->language;
         }
         
         $ynoptions = array(0 => get_string('no'), 1 => get_string('yes'));
@@ -63,14 +59,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $choices = $this->get_languages();
         $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         $mform->setHelpButton('lang', array('lang',get_string('assignmentlangs','assignment_onlinejudge'),'assignment'));
-        $mform->setDefault('lang', $lang);
+        $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
         
         // Cron date
         // Get assignment cron frequency
         if(get_field('modules','cron','name','assignment')) {
             $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
             $mform->setHelpButton('duejudge', array('timecron',get_string('crondate','assignment_onlinejudge'), 'assignment'));
-            $mform->setDefault('duejudge', 0);
+            $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
         }
         
         // Max. CPU time
@@ -78,14 +74,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'cpulimit', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
         $mform->setHelpButton('cpulimit', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('cpulimit', $CFG->assignment_oj_max_cpu);
+        $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : $CFG->assignment_oj_max_cpu);
         
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
         $mform->addElement('select', 'memlimit', get_string('maximummem', 'assignment_onlinejudge'), $choices);
         $mform->setHelpButton('memlimit', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('memlimit', $CFG->assignment_oj_max_mem);
+        $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
         
         // Allow resubmit
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
@@ -95,7 +91,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
         $mform->setHelpButton('compileonly', array('compileonly',get_string('compileonly','assignment_onlinejudge'), 'assignment'));
-        $mform->setDefault('compileonly', 0);
+        $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
 
         // Email teachers
         $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
@@ -109,33 +105,36 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
         
-        // Testcases form
-        $mform->addElement('header', 'tests', get_string('tests', 'assignment_onlinejudge'));
-        
-        // Get tests data
-        $tests = array ();
+        // Testcases form ----------------------------------------------------------------------------------------
+        $mform->addElement('header', 'testcases', get_string('testcases', 'assignment_onlinejudge'));
+        $repeatarray = array();
+        $repeatarray[] = &$mform->createElement('modgrade', 'subgrade', get_string('grade'));
+        $repeatarray[] = &$mform->createElement('textarea', 'input', get_string('input', 'assignment_onlinejudge'), 'wrap="virtual" rows="1" cols="50"');
+        $mform->setType('input', PARAM_RAW);
+        $repeatarray[] = &$mform->createElement('textarea', 'output', get_string('output', 'assignment_onlinejudge'), 'wrap="virtual" rows="1" cols="50"');
+        $mform->setType('output', PARAM_RAW);
+        $repeatarray[] = &$mform->createElement('text', 'feedback', get_string('feedback', 'quiz'), array('size' => 50));
+        $mform->setType('feedbacktext', PARAM_RAW);
+
+        $repeateloptions = array();
+        $repeateloptions['subgrade']['default'] = 0;
+
         $tests = $this->get_tests($cm);
+        $numtestcases = max(count($tests) + 1, NUMTESTS);
+
+        $modform->repeat_elements($repeatarray, $numtestcases, $repeateloptions, 'boundary_repeats', 'add_testcases', 1, get_string('addtestcases', 'assignment_onlinejudge', 1), true);
+        $mform->setDefault('subgrade[0]', 100);
+
         if ($tests) {
-            // Tests allready defined (update assignment)
-            $i = 1;
+            $i = 0;
             foreach ($tests as $tstObj => $tstValue) {
-                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_onlinejudge') . $i);
-                $mform->setDefault("input[$i]",$tstValue->input);
-                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_onlinejudge') . $i);
-                $mform->setDefault("output[$i]",$tstValue->output);
-                
+                $mform->setDefault("input[$i]", $tstValue->input);
+                $mform->setDefault("output[$i]", $tstValue->output);
+                $mform->setDefault("feedback[$i]", $tstValue->feedback);
+                $mform->setDefault("subgrade[$i]", $tstValue->subgrade);
                 $i++;
             }
-        } else {
-            // New assignment
-            for ($i = 1; $i <= NUMTESTS; $i++) {
-                $mform->addElement('textarea', "input[$i]", get_string('input', 'assignment_onlinejudge') . $i);
-                $mform->addElement('textarea', "output[$i]", get_string('output', 'assignment_onlinejudge') . $i);
-            }
         }
-        
-        $mform->addRule('input[1]', null, 'required', null, 'client');
-        $mform->addRule('output[1]', null, 'required', null, 'client');
     }
     
     /**
@@ -196,7 +195,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
         
         // DELETE submissions results
-        $sql = 'test IN (SELECT id FROM '.$CFG->prefix.'assignment_oj_tests WHERE assignment='.$assignment->id.')';
+        $sql = 'submission IN (SELECT id FROM '.$CFG->prefix.'assignment_submissions WHERE assignment='.$assignment->id.')';
         if (!delete_records_select('assignment_oj_results', $sql)) {
             return false;
         }
@@ -229,23 +228,23 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     * @param object $assignment the onlinejudge object.
     */
     function after_add_update($assignment) {
-        // Count real input/output (not empty tests)
-        $assignment->numtests = count($assignment->input);
-            
         // Delete actual tests
         delete_records('assignment_oj_tests', 'assignment', $assignment->id);
         
         // Insert new tests
-        for ($i = 0; $i < $assignment->numtests; $i++) {
+        for ($i = 0; $i < $assignment->boundary_repeats; $i++) {
             // Check if tests is not empty
-            if(!empty($assignment->input[$i+1]) && !empty($assignment->output[$i+1])) {
+            if(!empty($assignment->input[$i]) || !empty($assignment->output[$i])
+               || !empty($assignment->feedback[$i]) || !empty($assignment->subgrade[$i])) {
                 $test = new Object();
                 $test->assignment = $assignment->id;
-                $test->input = $assignment->input[$i+1];
-                $test->output = $assignment->output[$i+1];
+                $test->input = $assignment->input[$i];
+                $test->output = $assignment->output[$i];
+                $test->feedback = $assignment->feedback[$i];
+                $test->subgrade = $assignment->subgrade[$i];
                 
                 if (!insert_record('assignment_oj_tests', $test)) {
-                    return get_string('notestinsert', 'assignment_onlinejudge');
+                    error('Can\'t insert testcase');
                 }
                 
                 unset ($test);
@@ -276,17 +275,17 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @param object $cm Course module
      * @return array tests An array of tests objects
      */
-    function get_tests($cm) {
+    function get_tests($cm=null) {
         if (isset($cm->instance))
-            return get_records('assignment_oj_tests', 'assignment', $cm->instance, 'id ASC');
+            $instanceid = $cm->instance;
+        else if (isset($this->cm->instance))
+            $instanceid = $this->cm->instance;
         else
             return null;
+
+        return get_records('assignment_oj_tests', 'assignment', $instanceid, 'id ASC');
     }
 
-    function get_test() {
-        return get_record('assignment_oj_tests', 'assignment', $this->assignment->id);
-    }
-    
     /**
      * Display the assignment intro
      *
@@ -436,10 +435,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $table->data[] = array($item_name, $item);
             }
 
-            if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->error))
-                $submission->error = get_string('info'.$submission->status, 'assignment_onlinejudge');
-            if (!empty($submission->error)) {
-                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', $submission->error);
+            if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info))
+                $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
+            if (!empty($submission->info)) {
+                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', $submission->info);
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
@@ -481,7 +480,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $results = recordset_to_array($results);
             if ($results) {
                 $result = array_pop($results);
-                $submission->error = $result->error;
+                $submission->info = $result->info;
                 $submission->status = $result->status;
                 $submission->judgetime = $result->judgetime;
                 $submission->output = $result->output;
@@ -664,9 +663,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
     }
 
-    function run_in_sandbox($exec_file, &$output) {
+    function run_in_sandbox($exec_file, $case) {
         global $CFG;
 
+        $ret = new Object();
+        $ret->output = '';
         $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
         /* Only root can chroot(set jail)
         $jail = $CFG->dataroot.'/temp/sandbox_jail/';
@@ -678,7 +679,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $sand = $CFG->dirroot . '/mod/assignment/type/onlinejudge/sandbox/sand';
         if (!is_executable($sand)){
-            return 'ie';
+            $ret->status = 'ie';
+            return $ret;
         }
 
         $sand .= ' -l cpu='.$this->onlinejudge->cpulimit.' -l memory='.$this->onlinejudge->memlimit.' '.$exec_file; 
@@ -691,14 +693,15 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $proc = proc_open($sand, $descriptorspec, $pipes);
 
-        if (!is_resource($proc))
-            return 'ie';
+        if (!is_resource($proc)) {
+            $ret->status = 'ie';
+            return $ret;
+        }
 
-        $test = $this->get_test();
-        fwrite($pipes[0], $test->input);
+        fwrite($pipes[0], $case->input);
         fclose($pipes[0]);
 
-        $output = stream_get_contents($pipes[1]);
+        $ret->output = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
 
         $error = stream_get_contents($pipes[2]);
@@ -708,16 +711,19 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $return_value = proc_close($proc);
 
-        if ($return_value == 255)
-            return 'ie';
-        else if ($return_value >= 2)
-            return $result[$return_value];
-        else if ($return_value == 0) {
+        if ($return_value == 255) {
+            $ret->status = 'ie';
+            return $ret;
+        } else if ($return_value >= 2) {
+            $ret->status = $result[$return_value];
+            return $ret;
+        } else if ($return_value == 0) {
             mtrace('Pending? Why?');
             exit();
         }
 
-        return $this->diff($test->output, $output);
+        $ret->status = $this->diff($case->output, $ret->output);
+        return $ret;
     }
 
     function grade_marker($result) {
@@ -738,25 +744,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $grades[$result];
     }
 
-    // Judge in local
-    function judge($sub) {
-        
+    function compile($sub, $temp_dir) {
         global $CFG;
-
-        $newsub = null;
         $result = null;
-
-        $result->submission = $newsub->id = $sub->id;
-        $newsub->teacher = 0;
-        $newsub->mailed = 0;
-        $ret = true;
-
-        // Make temp dir
-        $temp_dir = $CFG->dataroot.'/temp/assignment_onlinejudge/'.$sub->id;
-        if (!check_dir_exists($temp_dir, true, true)) {
-            mtrace("Can't mkdir ".$temp_dir);
-            return false;
-        }
 
         if ($basedir = $this->file_area($sub->userid)) {
             if ($files = get_directory_list($basedir)) {
@@ -775,32 +765,91 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     exec($command, $output, $return);
 
                     if ($return) { //Compile error
-                        //strip path info
-                        $output = str_replace($temp_dir.'/', '', $output);
-                        $error = implode('<br />', $output);
-
-                        $result->error = addslashes($error);
                         $result->status = 'ce';
-                    } else {  //Run it!
-                        $result->status = $this->run_in_sandbox($temp_dir.'/a.out', $output);
-                        $result->error = '';
-                        $result->output = $output;
+                    } else { 
+                        $result->status = 'compileok';
                     }
 
-                    break;
-                }
+                    //strip path info
+                    $output = str_replace($temp_dir.'/', '', $output);
+                    $error = implode('<br />', $output);
+                    $result->info = addslashes($error);
 
-                if (!isset($result->status)) {
-                    $result->error = '';
-                    $result->status = 'badfile';
-                }
+                    return $result;
+                }  
             }
+        }          
+
+        $result->status = 'badfile';
+        return $result;
+    }
+
+    function merge_results($results, $testcases) {
+        $result = null;
+        $result->output = '';
+        $result->info = '';
+        $result->grade = 0;
+
+        reset($testcases);
+
+        foreach ($results as $i => $one) {
+            $testcase = each($testcases);
+            $result->output .= $one->output;
+
+            $result->info .= get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$one->status, 'assignment_onlinejudge');
+            if ($one->status === 'wa' && !empty($testcase['value']->feedback)) {
+                $result->info .= '('.$testcase['value']->feedback.')';
+            }
+            $result->info .= '<br />';
+
+            if ($one->status === 'ac') {
+                $result->grade += $testcase['value']->subgrade;
+            }
+
+            if ($i == 0)
+                $result->status = $one->status;
+            else if ($result->status !== $one->status)
+                $result->status = 'multiple';
         }
 
+        return $result;
+    }
+
+    // Judge in local
+    function judge($sub) {
+        
+        global $CFG;
+
+        $ret = false;
+
+        // Make temp dir
+        $temp_dir = $CFG->dataroot.'/temp/assignment_onlinejudge/'.$sub->id;
+        if (!check_dir_exists($temp_dir, true, true)) {
+            mtrace("Can't mkdir ".$temp_dir);
+            return false;
+        }
+
+        $result = $this->compile($sub, $temp_dir);
+        $result->grade = -1;
+        if ($result->status === 'compileok' && !$this->onlinejudge->compileonly) { //Run and test!
+            $results = array();
+            $cases = $this->get_tests();
+            foreach ($cases as $case) {
+                $results[] = $this->run_in_sandbox($temp_dir.'/a.out', $case);
+            }
+
+            $result = $this->merge_results($results, $cases);
+        }
+
+        $result->submission = $sub->id;
         $result->judgetime = time();
         if ($ret = insert_record('assignment_oj_results', $result, false)) {
+            $newsub = null;
+            $newsub->id = $sub->id;
+            $newsub->teacher = 0;
+            $newsub->mailed = 0;
             $newsub->timemarked = time();
-            $newsub->grade = $this->grade_marker($result->status);
+            $newsub->grade = $result->grade;
             $ret = update_record('assignment_submissions', $newsub);
             $this->update_grade($sub);
         }
