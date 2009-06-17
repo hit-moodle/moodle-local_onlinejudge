@@ -5,9 +5,9 @@
     $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
+    $string['cpulimit'] = 'Maximum CPU time';
     $string['crondate'] = 'Cron date';
     $string['cronjudge'] = 'This submission will be graded on<br />';
-    $string['duejudge'] = 'Judge after due date';
     $string['exactouput'] = 'Exact output';
     $string['gradeerror'] = 'Grade error';
     $string['helpprogram'] = '<center>Here you can define the inputs and corresponding outputs of the program.<br />Add or delete tests if needed.</center>';
@@ -29,9 +29,8 @@
     $string['langbash'] = 'Bash';
     $string['langc'] = 'C';
     $string['langcpp'] = 'C++';
-    $string['maximumcpu'] = 'Maximum CPU time';
     $string['maximumfilesize'] = 'Maximum source file size';
-    $string['maximummem'] = 'Maximum memory usage';
+    $string['memlimit'] = 'Maximum memory usage';
     $string['output'] = 'Output';
     $string['outputfilter'] = 'Output filter';
     $string['resultsfromdomjuge'] = 'Results from DOMjudge';
