@@ -810,6 +810,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $result->status = 'multiple';
         }
 
+        //Make sure the grade is not too big
+        $result->grade = min($result->grade, $this->assignment->grade);
+
         return $result;
     }
 
