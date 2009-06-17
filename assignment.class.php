@@ -410,7 +410,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * Display auto generated info about the assignment
      */
     function view_summary($submission=null, $return = false) {
-        global $USER;
+        global $USER, $CFG;
         
         $table = new Object();
         //$table->class = 'box generalbox boxaligncenter';
@@ -433,8 +433,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $table->data[] = array($item_name, $item);
             }
 
-            if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info))
+            if ($submission->status === 'pending') {
+                $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+                $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
+                $left = $left > 0 ? $left : 0;
+                $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
+            } else if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info))
                 $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
+
             if (!empty($submission->info)) {
                 $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', $submission->info);
             }
@@ -867,6 +873,15 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     function cron() {
         global $CFG;
 
+        // Detect the frequence of cron
+        if (!isset($CFG->assignment_oj_cronfreq)) {
+            $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+            if ($lastcron) {
+                set_config('assignment_oj_cronfreq', time() - $lastcron);
+            }
+        }
+
+        // Judge unjudged
         while ($submission = $this->get_unjudged_submission()) {
             // Construct
             $cm = get_coursemodule_from_instance('assignment', $submission->assignment);

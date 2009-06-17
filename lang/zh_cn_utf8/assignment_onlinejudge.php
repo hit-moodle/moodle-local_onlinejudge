@@ -13,7 +13,7 @@
     $string['infoie'] = '沙箱程序出错，请报告管理员！';
     $string['infomle'] = '你使用了太多内存。';
     $string['infope'] = '几乎正确，除了某些格式问题……';
-    $string['infopending'] = '等待评判。';
+    $string['infopending'] = '还剩大约{$a}分钟。';
     $string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
     $string['inforf'] = '你的程序调用了一些<em>不</em>允许使用的函数。';
     $string['infotle'] = '此程序运行得太久了。';
