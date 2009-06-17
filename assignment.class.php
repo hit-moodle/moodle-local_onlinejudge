@@ -800,9 +800,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $testcase = each($testcases);
             $result->output .= $one->output;
 
-            $result->info .= get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$one->status, 'assignment_onlinejudge');
+            $result->info .= get_string('case', 'assignment_onlinejudge', $i+1).' '.get_string('status'.$one->status, 'assignment_onlinejudge');
             if ($one->status === 'wa' && !empty($testcase['value']->feedback)) {
                 $result->info .= '('.$testcase['value']->feedback.')';
+            } else if ($one->status !== 'ac') {
+                $result->info .= '('.get_string('info'.$one->status, 'assignment_onlinejudge').')';
             }
             $result->info .= '<br />';
 
