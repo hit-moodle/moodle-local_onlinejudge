@@ -681,7 +681,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             return $ret;
         }
 
-        $sand .= ' -l cpu='.$this->onlinejudge->cpulimit.' -l memory='.$this->onlinejudge->memlimit.' '.$exec_file; 
+        $sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' '.$exec_file; 
 
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
