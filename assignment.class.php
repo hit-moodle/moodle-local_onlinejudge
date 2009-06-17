@@ -58,14 +58,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         // Programming languages
         $choices = $this->get_languages();
         $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('lang', array('lang',get_string('assignmentlangs','assignment_onlinejudge'),'assignment'));
         $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
         
         // Cron date
         // Get assignment cron frequency
         if(get_field('modules','cron','name','assignment')) {
             $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
-            $mform->setHelpButton('duejudge', array('timecron',get_string('crondate','assignment_onlinejudge'), 'assignment'));
             $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
         }
         
@@ -73,29 +71,24 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'cpulimit', get_string('maximumcpu', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('cpulimit', array('maximumcpu',get_string('maximumcpu','assignment_onlinejudge'), 'assignment'));
         $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : $CFG->assignment_oj_max_cpu);
         
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
         $mform->addElement('select', 'memlimit', get_string('maximummem', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('memlimit', array('maximummem',get_string('maximummem','assignment_onlinejudge'), 'assignment'));
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
         
         // Allow resubmit
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
-        $mform->setHelpButton('resubmit', array('resubmit',get_string('allowresubmit','assignment'), 'assignment'));
         $mform->setDefault('resubmit', 1);
         
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
-        $mform->setHelpButton('compileonly', array('compileonly',get_string('compileonly','assignment_onlinejudge'), 'assignment'));
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
 
         // Email teachers
         $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
-        $mform->setHelpButton('emailteachers', array('emailteachers',get_string('emailteachers','assignment'), 'assignment'));
         $mform->setDefault('emailteachers', 0);
         
         // Submission max bytes
