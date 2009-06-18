@@ -631,10 +631,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $submission = array_pop($submissions);
 
             // Set judged mark
-            $ojsubmission = new Object;
-            $ojsubmission->id = $submission->epsubid;
-            $ojsubmission->judged = 1;
-            update_record('assignment_oj_submissions', $ojsubmission);
+            set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
         }
 
         set_cron_lock('assignment_judging', null);
