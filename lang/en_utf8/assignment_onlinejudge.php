@@ -22,7 +22,9 @@
     $string['judgetime'] = 'Judge time';
     $string['langc'] = 'C';
     $string['langcpp'] = 'C++';
+    $string['maxcpuusage'] = 'Maximum CPU usage';
     $string['maximumfilesize'] = 'Maximum source file size';
+    $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
     $string['output'] = 'Output';
     $string['runtimeout'] = 'Runtime output';

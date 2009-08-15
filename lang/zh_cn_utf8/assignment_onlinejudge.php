@@ -20,7 +20,9 @@
     $string['infowa'] = '请仔细检查你的代码。';
     $string['input'] = '输入';
     $string['judgetime'] = '评测时间';
+    $string['maxcpuusage'] = '最长CPU运行时间';
     $string['maximumfilesize'] = '源文件最大长度';
+    $string['maxmemusage'] = '最大内存用量';
     $string['memlimit'] = '内存最多可用';
     $string['output'] = '输出';
     $string['statusac'] = '测试通过';
