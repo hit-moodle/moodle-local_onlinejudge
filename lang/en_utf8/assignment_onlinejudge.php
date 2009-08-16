@@ -28,7 +28,7 @@
     $string['memlimit'] = 'Maximum memory usage';
     $string['output'] = 'Output';
     $string['runtimeout'] = 'Runtime output';
-    $string['statusac'] = 'Accept';
+    $string['statusac'] = '<font color=red>Accepted</font>';
     $string['statusat'] = 'Abnormal Termination';
     $string['statusce'] = 'Compilation Error';
     $string['statuscompileok'] = 'Compilation Ok';
