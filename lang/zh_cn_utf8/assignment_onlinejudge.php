@@ -25,7 +25,6 @@
     $string['maxmemusage'] = '最大内存用量';
     $string['memlimit'] = '内存最多可用';
     $string['output'] = '输出';
-    $string['statusac'] = '<font color=red>Accepted<font>';
     $string['statusat'] = '非正常结束';
     $string['statusce'] = '编译错误';
     $string['statuscompileok'] = '编译通过';
