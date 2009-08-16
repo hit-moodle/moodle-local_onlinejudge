@@ -2,22 +2,30 @@
  * SyntaxHighlighter
  * http://alexgorbatchev.com/
  *
- * @version
- * 2.0.287 (February 06 2009)
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/wiki/SyntaxHighlighter:Donate
  *
- * @author
- * Alex Gorbatchev
+ * @version
+ * 2.0.320 (May 03 2009)
  * 
  * @copyright
  * Copyright (C) 2004-2009 Alex Gorbatchev.
  *
- * Licensed under a GNU Lesser General Public License.
- * http://creativecommons.org/licenses/LGPL/2.1/
- *
- * SyntaxHighlighter is donationware. You are allowed to download, modify and distribute 
- * the source code in accordance with LGPL 2.1 license, however if you want to use 
- * SyntaxHighlighter on your site or include it in your product, you must donate.
- * http://alexgorbatchev.com/wiki/SyntaxHighlighter:Donate
+ * @license
+ * This file is part of SyntaxHighlighter.
+ * 
+ * SyntaxHighlighter is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SyntaxHighlighter is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SyntaxHighlighter.  If not, see <http://www.gnu.org/copyleft/lesser.html>.
  */
 var dp = {
 	SyntaxHighlighter : {}
