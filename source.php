@@ -78,7 +78,7 @@
     }
 
     if($gestor = fopen($fpath,'r')) {
-        $code = fread($gestor, filesize($fpath));
+        $code = htmlentities(fread($gestor, filesize($fpath)));
         fclose($gestor);
     } else {
         error(get_string('filereaderror','assignment_onlinejudge'));   
