@@ -12,6 +12,7 @@
     $string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';
     $string['infoie'] = '沙箱程序出错，请报告管理员！';
     $string['infomle'] = '你使用了太多内存。';
+    $string['infoole'] = '你的代码向stdout输出太多数据了。';
     $string['infope'] = '几乎正确，除了某些格式问题……';
     $string['infopending'] = '还剩大约{$a}分钟。';
     $string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
@@ -31,6 +32,7 @@
     $string['statusie'] = '内部错误';
     $string['statusmle'] = '内存超限';
     $string['statusmultiple'] = '多个状态';
+    $string['statusole'] = '数据输出超限';
     $string['statuspe'] = '格式错误';
     $string['statuspending'] = '等待评测...';
     $string['statusre'] = '运行时错误';

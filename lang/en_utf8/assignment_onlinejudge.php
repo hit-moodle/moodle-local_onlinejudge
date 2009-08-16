@@ -12,6 +12,7 @@
     $string['infocompileok'] = 'It seems that the compiler likes your code.';
     $string['infoie'] = 'Sandbox error. Report to admin please.';
     $string['infomle'] = 'You ate too much memory.';
+    $string['infoole'] = 'Your code sent too much to stdout.';
     $string['infope'] = 'Almost right, except some format mistakes.';
     $string['infopending'] = 'About $a minute(s) left.';
     $string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse.';
@@ -35,6 +36,7 @@
     $string['statusie'] = 'Internal Error';
     $string['statusmle'] = 'Memory-Limit Exceed';
     $string['statusmultiple'] = 'Multi-status';
+    $string['statusole'] = 'Output-Limit Exceed';
     $string['statuspe'] = 'Presentation Error';
     $string['statuspending'] = 'Pending...';
     $string['statusre'] = 'Runtime Error';

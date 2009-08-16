@@ -684,12 +684,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             return $ret;
         }
 
-        $sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' '.$exec_file; 
+        $sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' -l disk=512000 '.$exec_file; 
 
         $descriptorspec = array(
-            0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-            1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-            2 => array("pipe", "w") // stderr is a file to write to
+            0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
+            1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file to write to
+            2 => array('pipe', '$exec_file.err', 'w') // stderr is a file to write to
         );
 
         $proc = proc_open($sand, $descriptorspec, $pipes);
@@ -702,13 +702,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         fwrite($pipes[0], $case->input);
         fclose($pipes[0]);
 
-        $ret->output = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-
-        $error = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-        if ($error)
-            mtrace('('.$exec_file.')'.$error);
+        $ret->output = file_get_contents($exec_file.'.out');
 
         $return_value = proc_close($proc);
 
