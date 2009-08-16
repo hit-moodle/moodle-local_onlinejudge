@@ -339,7 +339,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>';
         }
 
-        $output = $mark . $output . str_replace($mark, '', parent::print_student_answer($userid, true));
+        $output = $mark . str_replace($mark, $output, parent::print_student_answer($userid, true));
+
         /*
                     
                     $output = link_to_popup_window('/mod/assignment/type/program/source.php?id='
