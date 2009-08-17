@@ -26,6 +26,7 @@
 
     require_once('../../../../config.php');
     require_once('../../lib.php');
+    require_once('../../../../lib/filelib.php');
     
     global $CFG, $USER;
     
@@ -73,9 +74,10 @@
     $filearea = $assignmentinstance->file_area_name($userid);
 
     if ($basedir = $assignmentinstance->file_area($userid)) {
-
         $fpath = "$CFG->dataroot/$filearea/$file";
     }
+
+    $ffurl = get_file_url("$filearea/$file");
 
     if($gestor = fopen($fpath,'r')) {
         $code = htmlentities(fread($gestor, filesize($fpath)));
