@@ -328,25 +328,36 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @param boolean $return Return the link or print it directly
      */
     function print_student_answer($userid, $return = false) {
-        $mark = '<div class="files">';
-        $submission = $this->get_submission($userid);
-        if ($submission->timemodified) {
-            /*
-                $output = link_to_popup_window ('/mod/assignment/type/program/history.php?id='.$this->cm->id.'&amp;userid='.$userid,
-                                                'history'.$userid, get_string('status'.$submission->status, 'assignment_onlinejudge'), 500, 780, get_string('history', 'assignment_onlinejudge', fullname($userid)), 'none', true);
-            $output .= '&nbsp;';
-             */
-            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>';
+           global $CFG, $USER;
+
+        $filearea = $this->file_area_name($userid);
+
+        $output = '';
+
+        if ($basedir = $this->file_area($userid)) {
+            if ($files = get_directory_list($basedir)) {
+                require_once($CFG->libdir.'/filelib.php');
+                foreach ($files as $key => $file) {
+
+                    $icon = mimeinfo('icon', $file);
+                    // Syntax Highlighert source code
+                    $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
+                                .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
+                                $file . 'sourcecode', $file, 710, 780, $file, 'none', true, 'button'.$userid);
+
+                    //died right here
+                    //require_once($ffurl);
+                    $output = '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.$viewlink.'<br />';
+                }
+            }
         }
 
-        $output = $mark . str_replace($mark, $output, parent::print_student_answer($userid, true));
+        $submission = $this->get_submission($userid);
+        if ($submission->timemodified) {
+            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>'.$output;
+        }
+        $output = '<div class="files">'.$output.'</div>';
 
-        /*
-                    
-                    $output = link_to_popup_window('/mod/assignment/type/program/source.php?id='
-                                .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                                $file.'source code', $file, 710, 780, $file, 'none', true, 'button'.$userid);
-         */
         return $output;
             
     }
