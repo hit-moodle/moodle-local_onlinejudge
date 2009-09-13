@@ -714,9 +714,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         fwrite($pipes[0], $case->input);
         fclose($pipes[0]);
 
-        $ret->output = file_get_contents($exec_file.'.out');
 
         $return_value = proc_close($proc);
+        $ret->output = file_get_contents($exec_file.'.out');
 
         if ($return_value == 255) {
             $ret->status = 'ie';
@@ -867,7 +867,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
 
         // Clean temp dir
-        exec('rm -Rf '.$temp_dir);
+        //exec('rm -Rf '.$temp_dir);
 
         return $ret;
     }
