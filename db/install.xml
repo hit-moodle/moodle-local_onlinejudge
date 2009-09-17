@@ -21,8 +21,8 @@
                 <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="test"/>
                 <FIELD NAME="test" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="submission" NEXT="status"/>
                 <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pending" SEQUENCE="false" ENUM="true" ENUMVALUES="'pending', 'ac', 'wa', 'pe', 're', 'tle', 'mle', 'ole', 'ce', 'badfile', 'ie', 'rf', 'at', 'compileok', 'multiple'" COMMENT="Possible values: 'Accepted', 'Wrong answer', 'Internal error'" PREVIOUS="test" NEXT="output"/>
-                <FIELD NAME="output" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Compiler/program output" PREVIOUS="status" NEXT="info"/>
-                <FIELD NAME="info" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Program runtime/compiler error" PREVIOUS="output" NEXT="judgetime"/>
+                <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Compiler/program output" PREVIOUS="status" NEXT="info"/>
+                <FIELD NAME="info" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Program runtime/compiler error" PREVIOUS="output" NEXT="judgetime"/>
                 <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="The time when judgment finished" PREVIOUS="info"/>
             </FIELDS>
             <KEYS>
@@ -46,9 +46,9 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="assignment"/>
                 <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="input"/>
-                <FIELD NAME="input" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Program input" PREVIOUS="assignment" NEXT="output"/>
-                <FIELD NAME="output" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Expected program output" PREVIOUS="input" NEXT="feedback"/>
-                <FIELD NAME="feedback" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="output" NEXT="subgrade"/>
+                <FIELD NAME="input" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Program input" PREVIOUS="assignment" NEXT="output"/>
+                <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Expected program output" PREVIOUS="input" NEXT="feedback"/>
+                <FIELD NAME="feedback" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="output" NEXT="subgrade"/>
                 <FIELD NAME="subgrade" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="feedback"/>
             </FIELDS>
             <KEYS>
