@@ -855,6 +855,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $result->submission = $sub->id;
         $result->judgetime = time();
+        $result->info = addslashes($result->info);
+        $result->output = addslashes($result->output);
         if ($ret = insert_record('assignment_oj_results', $result, false)) {
             $newsub = null;
             $newsub->id = $sub->id;
