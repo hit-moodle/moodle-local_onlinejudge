@@ -236,7 +236,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                || !empty($assignment->feedback[$i]) || !empty($assignment->subgrade[$i])) {
                 $test = new Object();
                 $test->assignment = $assignment->id;
-                $test->input = $assignment->input[$i];
+                $test->input = str_replace("\r", "", $assignment->input[$i]);
                 $test->output = $assignment->output[$i];
                 $test->feedback = $assignment->feedback[$i];
                 $test->subgrade = $assignment->subgrade[$i];
