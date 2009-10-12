@@ -15,6 +15,7 @@ if (!isset($CFG->assignment_oj_max_mem)) {
 }
 
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
+require_once($CFG->dirroot.'/lib/filelib.php');
 
 /**
  * Extends the uploadsingle assignment class
