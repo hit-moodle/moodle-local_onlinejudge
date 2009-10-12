@@ -869,7 +869,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
 
         // Clean temp dir
-        exec('rm -Rf '.$temp_dir);
+        fulldelete($temp_dir);
 
         return $ret;
     }
