@@ -1,4 +1,4 @@
-<?PHP // $Id: version.php,v 1.3 2007/08/29 14:26:26 stronk7 Exp $
+<?PHP 
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Code fragment to define the plugin version etc.
