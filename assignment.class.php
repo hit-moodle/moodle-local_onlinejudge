@@ -1,7 +1,28 @@
-<?php
-// $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
+<?php // $Id: assignment.class.php,v 1.7 2007/09/04 09:27:20 arkaitz_garro Exp $
 
-//define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted');
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//            Online Judge assignment type for Moodle                    //
+//           http://code.google.com/p/sunner-projects/                   //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 2 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
 define('NUMTESTS', 5); // Default number of test cases
 define('ASSIGNMENT_ONLINEJUDGE_MAX_CPU', 10); // Default maximum cpu time (seconds) for all assignments
 define('ASSIGNMENT_ONLINEJUDGE_MAX_MEM', 16 * 1024 * 1024); // Default memory usage (bytes) for all assignments
