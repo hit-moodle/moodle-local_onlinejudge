@@ -40,4 +40,5 @@
     $string['statustle'] = '运行超时';
     $string['statuswa'] = '错误答案';
     $string['testcases'] = '测试用例';
+    $string['typeonlinejudge'] = '在线评测';
 ?>

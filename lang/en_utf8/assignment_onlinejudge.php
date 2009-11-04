@@ -44,4 +44,5 @@
     $string['statustle'] = 'Time-Limit Exceed';
     $string['statuswa'] = 'Wrong answer';
     $string['testcases'] = 'Test Cases';
+    $string['typeonlinejudge'] = 'Online Judge';
 ?>
