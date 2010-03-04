@@ -765,7 +765,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         'mle'     => 0,
                         'ole'     => 0,
                         'ce'      => 0,
-                        'badfile' => 0,
                         'ie'      => -1,
                         'rf'      => 0,
                         'at'      => 0);
@@ -785,6 +784,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
                     if (!is_executable($compiler)) {
                         $result->status = 'ie';
+                        $result->info = get_string('cannotruncompiler', 'assignment_onlinejudge');
                         break;
                     }
 
@@ -804,12 +804,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $error = implode('<br />', $output);
                     $result->info = addslashes($error);
 
+                    //Compile the first file only
                     return $result;
                 }  
             }
         }          
 
-        $result->status = 'badfile';
         return $result;
     }
 

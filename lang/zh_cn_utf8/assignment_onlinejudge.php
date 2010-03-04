@@ -1,6 +1,7 @@
 <?php
     $string['addtestcases'] = '增加 $a 个测试用例';
     $string['assignmentlangs'] = '编程语言';
+    $string['cannotruncompiler'] = '无法执行编译器脚本';
     $string['case'] = '用例{$a}:';
     $string['compileonly'] = '只编译';
     $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';

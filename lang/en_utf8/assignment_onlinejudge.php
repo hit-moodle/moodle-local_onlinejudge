@@ -1,6 +1,7 @@
 <?php
     $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
+    $string['cannotruncompiler'] = 'Can not execute the script of compiler';
     $string['case'] = 'Case $a:';
     $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
