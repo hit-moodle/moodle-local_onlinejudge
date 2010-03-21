@@ -94,7 +94,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : $CFG->assignment_oj_max_cpu);
+        $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
         
         // Max. memory usage
         unset($choices);
@@ -610,7 +610,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
            }
         }
     
-        krsort($cputime, SORT_NUMERIC);
+        ksort($cputime, SORT_NUMERIC);
     
         return $cputime;
     }

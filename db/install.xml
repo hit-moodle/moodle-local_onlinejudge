@@ -6,7 +6,7 @@
                 <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="language"/>
                 <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Assignment programming language" PREVIOUS="assignment" NEXT="memlimit"/>
                 <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" ENUM="false" PREVIOUS="language" NEXT="cpulimit"/>
-                <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="5" SEQUENCE="false" ENUM="false" PREVIOUS="memlimit" NEXT="duejudge"/>
+                <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" ENUM="false" PREVIOUS="memlimit" NEXT="duejudge"/>
                 <FIELD NAME="duejudge" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="cpulimit" NEXT="compileonly"/>
                 <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="duejudge"/>
             </FIELDS>
