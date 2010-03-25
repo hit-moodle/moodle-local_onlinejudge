@@ -476,12 +476,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
 
             if (!empty($submission->info)) {
-                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', stripslashes($submission->info));
+                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', format_text(stripslashes($submission->info), FORMAT_MOODLE));
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
             if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
-                $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', '<pre>'.$submission->output.'</pre>');
+                $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
             }
         }
 
@@ -801,7 +801,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
                     //strip path info
                     $output = str_replace($temp_dir.'/', '', $output);
-                    $error = implode('<br />', $output);
+                    $error = htmlspecialchars(implode("\n", $output));
                     $result->info = addslashes($error);
 
                     //Compile the first file only
