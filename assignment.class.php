@@ -476,7 +476,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
 
             if (!empty($submission->info)) {
-                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', $submission->info);
+                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', stripslashes($submission->info));
             }
 
             $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
