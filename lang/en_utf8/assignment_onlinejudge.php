@@ -8,6 +8,7 @@
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['cpulimit'] = 'Maximum CPU time';
     $string['duejudge'] = 'Judge after due date';
+    $string['feedbackforwa'] = 'Feedback for Wrong Answer';
     $string['info'] = 'Information';
     $string['infoat'] = 'A good program must "return 0 if no error occur.';
     $string['infocompileok'] = 'It seems that the compiler likes your code.';

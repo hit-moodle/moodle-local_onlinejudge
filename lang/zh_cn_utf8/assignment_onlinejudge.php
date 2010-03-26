@@ -8,6 +8,7 @@
     $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
     $string['cpulimit'] = 'CPU使用时间上限';
     $string['duejudge'] = '到截止时间后才评测';
+    $string['feedbackforwa'] = '给错误答案的反馈';
     $string['info'] = '信息';
     $string['infoat'] = '一个好程序在没遇到错误的时候，必须“return 0”。';
     $string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';

@@ -133,7 +133,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->setType('input', PARAM_RAW);
         $repeatarray[] = &$mform->createElement('textarea', 'output', get_string('output', 'assignment_onlinejudge'), 'wrap="virtual" rows="1" cols="50"');
         $mform->setType('output', PARAM_RAW);
-        $repeatarray[] = &$mform->createElement('text', 'feedback', get_string('feedback', 'quiz'), array('size' => 50));
+        $repeatarray[] = &$mform->createElement('text', 'feedback', get_string('feedbackforwa', 'assignment_onlinejudge'), array('size' => 50));
         $mform->setType('feedbacktext', PARAM_RAW);
 
         $repeateloptions = array();
