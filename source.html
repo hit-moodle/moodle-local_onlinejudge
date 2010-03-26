@@ -31,8 +31,8 @@
 
 <body>
 
-        <a href="<?php echo $ffurl?>"> <?php echo $file ?> </a>
-        <pre name="code" class="brush: <?php echo $lang ?>; ruler: true"><?php echo $code ?></pre>
+        <a href="<?php echo $ffurl?>"> <?php echo get_string('download', 'assignment_onlinejudge') . $file ?> </a>
+        <pre name="code" class="brush: <?php echo $lang ?>"><?php echo $code ?></pre>
         <p align="center">
             <?php
                 close_window_button();

@@ -7,6 +7,7 @@
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['cpulimit'] = 'Maximum CPU time';
+    $string['download'] = 'Download ';
     $string['duejudge'] = 'Judge after due date';
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
     $string['info'] = 'Information';

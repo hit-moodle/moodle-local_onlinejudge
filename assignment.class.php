@@ -365,7 +365,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     // Syntax Highlighert source code
                     $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
                                 .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                                $file . 'sourcecode', $file, 710, 780, $file, 'none', true, 'button'.$userid);
+                                $file . 'sourcecode', $file, 740, 500, $file, 'none', true, 'button'.$userid);
 
                     //died right here
                     //require_once($ffurl);
@@ -424,7 +424,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     // Syntax Highlighert source code
                     $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
                                 .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                                $file . 'sourcecode', get_string('preview'), 710, 780, $file, 'none', true, 'button'.$userid);
+                                $file . 'sourcecode', get_string('preview'), 500, 740, $file, 'none', true, 'button'.$userid);
 
                     $output .= '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.
                             '<a href="'.$ffurl.'" >'.$file.'</a> ('.$viewlink.')<br />';

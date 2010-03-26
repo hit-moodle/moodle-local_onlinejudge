@@ -7,6 +7,7 @@
     $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';
     $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
     $string['cpulimit'] = 'CPU使用时间上限';
+    $string['download'] = '下载 ';
     $string['duejudge'] = '到截止时间后才评测';
     $string['feedbackforwa'] = '给错误答案的反馈';
     $string['info'] = '信息';
