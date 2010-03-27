@@ -640,6 +640,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
     /**
      * Get one unjudged submission and set it as judged
+     * If all submissions have been judged, return false
      * The function can be reentranced
      */
     function get_unjudged_submission() {
@@ -659,11 +660,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                'ORDER BY '.
                     'sub.timemodified ASC';
 
-        $submissions = get_records_sql($sql, '', 1);
-        $submission = null;
-        if ($submissions) {
-            $submission = array_pop($submissions);
-
+        $submission = get_record_sql($sql);
+        if ($submission) {
             // Set judged mark
             set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
         }
