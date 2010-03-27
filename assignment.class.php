@@ -37,6 +37,7 @@ if (!isset($CFG->assignment_oj_max_mem)) {
 
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
+require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 
 /**
  * Extends the uploadsingle assignment class
@@ -86,6 +87,13 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
         $mform->setHelpButton('duejudge', array('duejudge', get_string('duejudge', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
         $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
+        
+        // Presentation error grade ratio
+        unset($choices);
+        $choices = get_grade_options()->gradeoptions; // Steal from question lib
+        $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
+        $mform->setHelpButton('ratiope', array('ratiope', get_string('descratiope', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
         
         // Max. CPU time
         unset($choices);
@@ -275,6 +283,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $onlinejudge->memlimit = $assignment->memlimit;
             $onlinejudge->cpulimit = $assignment->cpulimit;
             $onlinejudge->compileonly = $assignment->compileonly;
+            $onlinejudge->ratiope = $assignment->ratiope;
             update_record('assignment_oj', $onlinejudge);
         } else {
             $onlinejudge->assignment = $assignment->id;
@@ -282,6 +291,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $onlinejudge->memlimit = $assignment->memlimit;
             $onlinejudge->cpulimit = $assignment->cpulimit;
             $onlinejudge->compileonly = $assignment->compileonly;
+            $onlinejudge->ratiope = $assignment->ratiope;
             insert_record('assignment_oj', $onlinejudge);
         }
     }
@@ -511,7 +521,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $submission->oj_id = $onlinejudge->id;
             }
 
-            $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime > '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
+            $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime >= '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
             $results = recordset_to_array($results);
             if ($results) {
                 $result = array_pop($results);
@@ -750,11 +760,16 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $ret;
     }
 
-    function grade_marker($result) {
+    /**
+     * return grage
+     * status means ac, wa, pe and etc.
+     * maxgrade means maxgrade, :-)
+     */
+    function grade_marker($status, $maxgrade) {
         $grades = array('pending' => -1,
-                        'ac'      => $this->assignment->grade,
+                        'ac'      => $maxgrade,
                         'wa'      => 0,
-                        'pe'      => 0,
+                        'pe'      => $maxgrade * $this->onlinejudge->ratiope,
                         're'      => 0,
                         'tle'     => 0,
                         'mle'     => 0,
@@ -764,7 +779,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         'rf'      => 0,
                         'at'      => 0);
 
-        return $grades[$result];
+        return $grades[$status];
     }
 
     function compile($sub, $temp_dir) {
@@ -828,9 +843,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             }
             $result->info .= '<br />';
 
-            if ($one->status === 'ac') {
-                $result->grade += $testcase['value']->subgrade;
-            }
+            $grade = $this->grade_marker($one->status, $testcase['value']->subgrade);
+            if ($grade != -1)
+                $result->grade += $grade;
 
             if ($i == 0)
                 $result->status = $one->status;
@@ -868,6 +883,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             }
 
             $result = $this->merge_results($results, $cases);
+        } else if ($result->status === 'ce') {
+            $result->grade = $this->grade_marker('ce', $this->assignment->grade);
+            $result->output = '';
         }
 
         $result->submission = $sub->id;

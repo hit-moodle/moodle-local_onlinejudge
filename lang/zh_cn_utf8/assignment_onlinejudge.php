@@ -7,6 +7,7 @@
     $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';
     $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
     $string['cpulimit'] = 'CPU使用时间上限';
+    $string['descratiope'] = '格式错误获得的分数等于用例最高分乘以这个比例';
     $string['download'] = '下载 ';
     $string['duejudge'] = '到截止时间后才评测';
     $string['feedbackforwa'] = '给错误答案的反馈';
@@ -16,7 +17,7 @@
     $string['infoie'] = '沙箱程序出错，请报告管理员！';
     $string['infomle'] = '你使用了太多内存。';
     $string['infoole'] = '你的代码向stdout输出太多数据了。';
-    $string['infope'] = '几乎正确，除了某些格式问题……';
+    $string['infope'] = '几乎完美，除了几个用错的空格、tab和换行等。';
     $string['infopending'] = '还剩大约{$a}分钟。';
     $string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
     $string['inforf'] = '你的程序调用了一些<em>不</em>允许使用的函数。';
@@ -29,6 +30,7 @@
     $string['maxmemusage'] = '最大内存用量';
     $string['memlimit'] = '内存最多可用';
     $string['output'] = '输出';
+    $string['ratiope'] = '格式错误得分比例';
     $string['statusat'] = '非正常结束';
     $string['statusce'] = '编译错误';
     $string['statuscompileok'] = '编译通过';

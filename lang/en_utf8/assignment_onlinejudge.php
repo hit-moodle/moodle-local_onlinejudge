@@ -7,6 +7,7 @@
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['cpulimit'] = 'Maximum CPU time';
+    $string['descratiope'] = 'Grade of presentation error is equal to testcast\'s max grade times this ratio';
     $string['download'] = 'Download ';
     $string['duejudge'] = 'Judge after due date';
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
@@ -16,7 +17,7 @@
     $string['infoie'] = 'Sandbox error. Report to admin please.';
     $string['infomle'] = 'You ate too much memory.';
     $string['infoole'] = 'Your code sent too much to stdout.';
-    $string['infope'] = 'Almost right, except some format mistakes.';
+    $string['infope'] = 'Almost perfect, except some bad white spaces, tabs, new lines and etc.';
     $string['infopending'] = 'About $a minute(s) left.';
     $string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse.';
     $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
@@ -31,6 +32,7 @@
     $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
     $string['output'] = 'Output';
+    $string['ratiope'] = 'Ratio for presentation error';
     $string['runtimeout'] = 'Runtime output';
     $string['statusac'] = '<font color=red>Accepted</font>';
     $string['statusat'] = 'Abnormal Termination';

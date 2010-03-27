@@ -1,7 +1,7 @@
 <?php  //$Id: upgrade.php,v 1.2 2007/08/29 14:26:26 stronk7 Exp $
 
 // This file keeps track of upgrades to
-// the assignment->program submodule
+// the assignment->onlinejudge submodule
 //
 // Sometimes, changes between versions involve
 // alterations to database structures and other
@@ -17,20 +17,22 @@
 // The commands in here will all be database-neutral,
 // using the functions defined in lib/ddllib.php
 
-function xmldb_assignment_type_program_upgrade($oldversion=0) {
+function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
 
     global $CFG, $THEME, $db;
 
     $result = true;
 
-/// And upgrade begins here. For each one, you'll need one
-/// block of code similar to the next one. Please, delete
-/// this comment lines once this file start handling proper
-/// upgrade code.
+    if ($result && $oldversion < 2010032700) {
 
-/// if ($result && $oldversion < YYYYMMDD00) { //New version in version.php
-///     $result = result of "/lib/ddllib.php" function calls
-/// }
+        /// Define field ratiope to be added to assignment_oj
+        $table = new XMLDBTable('assignment_oj');
+        $field = new XMLDBField('ratiope');
+        $field->setAttributes(XMLDB_TYPE_NUMBER, '20, 10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0.0', 'compileonly');
+
+        /// Launch add field ratiope
+        $result = $result && add_field($table, $field);
+    }
 
     return $result;
 }

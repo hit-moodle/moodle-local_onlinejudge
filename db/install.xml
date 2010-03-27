@@ -8,7 +8,8 @@
                 <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" ENUM="false" PREVIOUS="language" NEXT="cpulimit"/>
                 <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" ENUM="false" PREVIOUS="memlimit" NEXT="duejudge"/>
                 <FIELD NAME="duejudge" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="cpulimit" NEXT="compileonly"/>
-                <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="duejudge"/>
+                <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="duejudge" NEXT="ratiope"/>
+                <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0.0" SEQUENCE="false" ENUM="false" DECIMALS="10" COMMENT="How much grade can earn when get a presentation error." PREVIOUS="compileonly"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
