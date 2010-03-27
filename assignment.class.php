@@ -82,13 +82,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
         
-        // Cron date
-        // Get assignment cron frequency
-        if(get_field('modules','cron','name','assignment')) {
-            $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
-            $mform->setHelpButton('duejudge', array('duejudge', get_string('duejudge', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
-            $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
-        }
+        // Judge immediately or on due date
+        $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
+        $mform->setHelpButton('duejudge', array('duejudge', get_string('duejudge', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
         
         // Max. CPU time
         unset($choices);
