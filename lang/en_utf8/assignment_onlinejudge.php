@@ -1,4 +1,9 @@
 <?php
+    $string['rejudge'] = 'Rejudge';
+    $string['rejudgeall'] = 'Rejudge all';
+    $string['rejudgeallnotice'] = 'All the submissions of assignment $a will be rejudged after clicking the continue button.<br />If you do <em>not</em> want to do so, please close this windows.';
+    $string['rejudgefailed'] = 'Can not submitted rejudge request.';
+    $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
     $string['cannotruncompiler'] = 'Can not execute the script of compiler';

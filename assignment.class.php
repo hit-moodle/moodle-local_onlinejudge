@@ -314,6 +314,46 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     /**
+     * Append rejudge all link to the teachers' view subimissions link
+     */
+    function submittedlink($allgroups=false) {
+
+        global $USER;
+
+        $parent_link = parent::submittedlink($allgroups);
+
+        $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
+        if (has_capability('mod/assignment:grade', $context))
+        {
+            $rejudge_link = element_to_popup_window ('link', '/mod/assignment/type/onlinejudge/rejudge.php?id='.$this->cm->id, null, 
+                                                     get_string('rejudgeall','assignment_onlinejudge'), 
+                                                     330, 500, null, null, true, null, null);
+            return $parent_link .'<br />'.$rejudge_link;
+        } else {
+            return $parent_link;
+        }    
+    }
+
+    /**
+     * Rejudge all submissions
+     * return bool Success
+     */
+    function rejudge_all() {
+        global $CFG;
+
+        $sql = 'UPDATE '.
+                    $CFG->prefix.'assignment_oj_submissions '.
+               'SET '.
+                    'judged = 0 '.
+               'WHERE '.
+                    'submission in '.
+                        '(SELECT id FROM '.$CFG->prefix.'assignment_submissions '.
+                        'WHERE assignment = '.$this->assignment->id.')';
+
+        return execute_sql($sql, false);
+    }
+
+    /**
      * Display the assignment intro
      *
      */
@@ -519,16 +559,23 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             if ($onlinejudge) {
                 $submission->judged = $onlinejudge->judged;
                 $submission->oj_id = $onlinejudge->id;
+            } else {
+                $submission->judged = 0;
             }
 
-            $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime >= '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
-            $results = recordset_to_array($results);
-            if ($results) {
-                $result = array_pop($results);
-                $submission->info = $result->info;
-                $submission->status = $result->status;
-                $submission->judgetime = $result->judgetime;
-                $submission->output = $result->output;
+            if ($submission->judged) {
+                $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime >= '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
+                $results = recordset_to_array($results);
+                if ($results) {
+                    $result = array_pop($results);
+                    $submission->info = $result->info;
+                    $submission->status = $result->status;
+                    $submission->judgetime = $result->judgetime;
+                    $submission->output = $result->output;
+                } else {
+                    $submission->judged = 0; //It is been judging
+                    $submission->status = 'pending';
+                }
             } else {
                 $submission->status = 'pending';
             }

@@ -1,4 +1,9 @@
 <?php
+    $string['rejudge'] = '重新评测';
+    $string['rejudgeall'] = '全部重新评测';
+    $string['rejudgeallnotice'] = '点击继续按钮后，{$a}中的所有提交都会被重新评测。<br />如果您<em>不</em>想这么做，请直接关闭本窗口。';
+    $string['rejudgefailed'] = '无法提交重新评测请求。';
+    $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
     $string['addtestcases'] = '增加 $a 个测试用例';
     $string['assignmentlangs'] = '编程语言';
     $string['cannotruncompiler'] = '无法执行编译器脚本';
