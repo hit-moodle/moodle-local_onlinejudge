@@ -494,7 +494,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $USER, $CFG;
         
         $table = new Object();
-        //$table->class = 'box generalbox boxaligncenter';
         $table->id = 'summary';
 
         $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
@@ -503,17 +502,24 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         if (is_null($submission))
             $submission = $this->get_submission();
-        if ($submission) {
-            $item_name = get_string('status').':';
+
+        $item_name = get_string('status').':';
+        $item = get_string('notavailable');
+        if (!empty($submission->status)) {
             $item = get_string('status' . $submission->status, 'assignment_onlinejudge');
-            $table->data[] = array($item_name, $item);
+        }
+        $table->data[] = array($item_name, $item);
 
-            if (isset($submission->judgetime)) {
-                $item_name = get_string('judgetime','assignment_onlinejudge').':';
-                $item = userdate($submission->judgetime);
-                $table->data[] = array($item_name, $item);
-            }
+        $item_name = get_string('judgetime','assignment_onlinejudge').':';
+        $item = get_string('notavailable');
+        if (isset($submission->judgetime)) {
+            $item = userdate($submission->judgetime);
+        }
+        $table->data[] = array($item_name, $item);
 
+        $item_name = get_string('info','assignment_onlinejudge').':';
+        $item = get_string('notavailable');
+        if (isset($submission->status)) {
             if ($submission->status === 'pending') {
                 $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
                 $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
@@ -521,15 +527,15 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
             } else if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info))
                 $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
-
             if (!empty($submission->info)) {
-                $table->data[] = array(get_string('info', 'assignment_onlinejudge').':', format_text(stripslashes($submission->info), FORMAT_MOODLE));
+                $item = $submission->info;
             }
+        }
+        $table->data[] = array($item_name, format_text(stripslashes($item), FORMAT_MOODLE));
 
-            $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-            if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
-                $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
-            }
+        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+        if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
+            $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
         $output = print_table($table, true);
