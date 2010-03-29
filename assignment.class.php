@@ -714,8 +714,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                'ORDER BY '.
                     'sub.timemodified ASC';
 
-        $submission = get_record_sql($sql);
-        if ($submission) {
+        $submissions = get_records_sql($sql, '', 1);
+        $submission = null;
+        if ($submissions) {
+            $submission = array_pop($submissions);
             // Set judged mark
             set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
         }
