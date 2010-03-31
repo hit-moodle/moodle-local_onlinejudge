@@ -27,7 +27,7 @@
     $string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse.';
     $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
     $string['infotle'] = 'The program has been running for a too long time.';
-    $string['infowa'] = 'Double check your code please.';
+    $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired words';
     $string['input'] = 'Input';
     $string['judgetime'] = 'Judge time';
     $string['langc'] = 'C';

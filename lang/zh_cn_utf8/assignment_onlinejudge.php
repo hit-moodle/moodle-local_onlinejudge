@@ -27,7 +27,7 @@
     $string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
     $string['inforf'] = '你的程序调用了一些<em>不</em>允许使用的函数。';
     $string['infotle'] = '此程序运行得太久了。';
-    $string['infowa'] = '请仔细检查你的代码。';
+    $string['infowa'] = '请仔细检查您的代码。不要在输出中有手误或任何未要求的字词';
     $string['input'] = '输入';
     $string['judgetime'] = '评测时间';
     $string['maxcpuusage'] = '最长CPU运行时间';
