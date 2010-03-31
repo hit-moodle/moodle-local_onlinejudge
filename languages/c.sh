@@ -11,5 +11,5 @@ DEST="$2"
 # -O2:		Level 2 optimizations (default for speed)
 # -static:	Static link with all libraries
 # -lm:		Link with math-library (has to be last argument!)
-gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -O2 -static -o $DEST $SOURCE -lm
+gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
 exit $?

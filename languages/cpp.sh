@@ -10,5 +10,5 @@ DEST="$2"
 # -Wall:	Report all warnings
 # -O2:		Level 2 optimizations (default for speed)
 # -static:	Static link with all libraries
-g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -O2 -static -o $DEST $SOURCE
+g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE
 exit $?
