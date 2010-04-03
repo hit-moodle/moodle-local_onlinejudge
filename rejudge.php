@@ -39,7 +39,7 @@ require_capability('mod/assignment:grade', get_context_instance(CONTEXT_MODULE, 
 require ("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
 $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
 
-if($force == 1){
+if($force == 1 && confirm_sesskey()){
     rejudge_showresult($assignmentinstance->rejudge_all());
 } else {
     rejudge_notice();
@@ -53,8 +53,7 @@ function rejudge_notice() {
     $message = get_string('rejudgeallnotice', 'assignment_onlinejudge', $assignment->name);
     $link = 'rejudge.php?id='.$id.'&force=1';
 
-    print_box($message, 'generalbox', 'notice');
-    print_continue($link);
+    notice_okcancel($message, $link, array('sesskey' => sesskey()));
 
     print_footer('none');
 }
@@ -74,6 +73,28 @@ function rejudge_showresult($success=true) {
     print_footer('none');
 }
 
+/**
+ * Print a message along with "Ok" link for the user to continue and "Cancel" link to close window.
+ *
+ * @param string $message The text to display
+ * @param string $linkok The link to take the user to if they choose "Ok"
+ * TODO Document remaining arguments
+ */
+function notice_okcancel ($message, $linkok, $optionsok=NULL, $methodok='post') {
+
+    global $CFG;
+
+    $message = clean_text($message);
+    $linkok = clean_text($linkok);
+
+    print_box_start('generalbox', 'notice');
+    echo '<p>'. $message .'</p>';
+    echo '<div class="buttons">';
+    print_single_button($linkok, $optionsok, get_string('ok'), $methodok, $CFG->framename);
+    close_window_button('cancel');
+    echo '</div>';
+    print_box_end();
+}
 ?>
 
 
