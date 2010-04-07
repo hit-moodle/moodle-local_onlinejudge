@@ -34,6 +34,25 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
         $result = $result && add_field($table, $field);
     }
 
+    if ($result && $oldversion < 2010040700) {
+
+    /// Define index judged (not unique) to be added to assignment_oj_submissions
+        $table = new XMLDBTable('assignment_oj_submissions');
+        $index = new XMLDBIndex('judged');
+        $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('judged'));
+
+    /// Launch add index judged
+        $result = $result && add_index($table, $index);
+
+    /// Define index judgetime (not unique) to be added to assignment_oj_results
+        $table = new XMLDBTable('assignment_oj_results');
+        $index = new XMLDBIndex('judgetime');
+        $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('judgetime'));
+
+    /// Launch add index judgetime
+        $result = $result && add_index($table, $index);
+    }
+
     return $result;
 }
 
