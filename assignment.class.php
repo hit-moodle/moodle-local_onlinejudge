@@ -716,9 +716,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     .$CFG->prefix.'assignment_oj_submissions AS epsub '.
                'WHERE '.
                     'sub.id = epsub.submission '.
-                    'AND epsub.judged = 0 '.
-               'ORDER BY '.
-                    'sub.timemodified ASC';
+                    'AND epsub.judged = 0 ';
 
         $submissions = get_records_sql($sql, '', 1);
         $submission = null;
