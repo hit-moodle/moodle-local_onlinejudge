@@ -711,12 +711,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $sql = 'SELECT 
                     sub.*, epsub.judged, epsub.submission, epsub.id AS epsubid '.
-               'FROM '
-                    .$CFG->prefix.'assignment_submissions AS sub, '
-                    .$CFG->prefix.'assignment_oj_submissions AS epsub '.
+               'FROM '.$CFG->prefix.'assignment_submissions AS sub '.
+               'LEFT JOIN '.$CFG->prefix.'assignment_oj_submissions AS epsub '.
+                    'ON sub.id = epsub.submission '.
                'WHERE '.
-                    'sub.id = epsub.submission '.
-                    'AND epsub.judged = 0 ';
+                    'epsub.judged = 0 ';
 
         $submissions = get_records_sql($sql, '', 1);
         $submission = null;
