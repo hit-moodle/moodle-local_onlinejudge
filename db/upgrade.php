@@ -34,7 +34,7 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
         $result = $result && add_field($table, $field);
     }
 
-    if ($result && $oldversion < 2010040700) {
+    if ($result && $oldversion < 2010040701) {
 
     /// Define index judged (not unique) to be added to assignment_oj_submissions
         $table = new XMLDBTable('assignment_oj_submissions');
