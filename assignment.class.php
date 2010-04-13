@@ -220,15 +220,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
         
         // DELETE submissions results
-        $sql = 'submission IN (SELECT id FROM '.$CFG->prefix.'assignment_submissions WHERE assignment='.$assignment->id.')';
-        if (!delete_records_select('assignment_oj_results', $sql)) {
-            return false;
-        }
-        
-        // DELETE submissions
-        $sql = 'submission IN (SELECT id FROM '.$CFG->prefix.'assignment_submissions WHERE assignment='.$assignment->id.')';
-        if (!delete_records_select('assignment_oj_submissions', $sql)) {
-            return false;
+        $submissions = get_records('assignment_submissions', 'assignment', $assignment->id);
+        foreach ($submissions as $submission) {
+            if (!delete_records('assignment_oj_results', 'submission', $submission->id))
+                return false;
+            if (!delete_records('assignment_oj_submissions', 'submission', $submission->id))
+                return false;
         }
         
         // DELETE tests
