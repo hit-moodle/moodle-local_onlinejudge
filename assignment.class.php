@@ -518,10 +518,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $item = get_string('notavailable');
         if (isset($submission->status)) {
             if ($submission->status === 'pending') {
-                $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
-                $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
-                $left = $left > 0 ? $left : 0;
-                $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
+                if (!isset($CFG->assignment_oj_daemon_pid)) { //Judge from cron
+                    $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+                    $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
+                    $left = $left > 0 ? $left : 0;
+                    $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
+                } else {  // Judge from daemon
+                    $submission->info = get_string('notavailable');
+                }
             } else if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info))
                 $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
             if (!empty($submission->info)) {
@@ -963,61 +967,78 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * Evaluate student submissions
      */
     function cron() {
+
         global $CFG;
 
-        // Detect the frequence of cron
-        if (!isset($CFG->assignment_oj_cronfreq)) {
-            $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
-            if ($lastcron) {
-                set_config('assignment_oj_cronfreq', time() - $lastcron);
+        // There are two judge routines
+        //  1. Judge only when cron job is running. 
+        //  2. After installation, the first cron running will fork a daemon to be judger.
+        // Routine two works only when the cron job is executed by php cli
+        //
+        if (!function_exists('pcntl_fork')) { // pcntl_fork is not supported. So use routine one.
+            // Detect the frequence of cron
+            if (!isset($CFG->assignment_oj_cronfreq)) {
+                $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+                if ($lastcron) {
+                    set_config('assignment_oj_cronfreq', time() - $lastcron);
+                }
+            }
+
+            $this->judge_all_unjudged();
+
+        } else { // pcntl_fork supported. Use routine two
+
+            if(!isset($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
+                $pid = pcntl_fork(); 
+
+                if ($pid == -1) {
+                    mtrace('Could not fork');
+                } else if ($pid){ //Parent process
+                    global $db;
+
+                    //Reconnect db, so that the parent won't close the db connection shared with child after exit.
+                    $db->Close();
+                    $db->NConnect();
+                    configure_dbconnection();
+
+                    set_config('assignment_oj_daemon_pid' , $pid);
+                } else {
+                    $this->run_daemon(); 
+                }
             }
         }
+    }
 
-        // Judge unjudged
+    function run_daemon()
+    {
+        global $CFG, $db;
+
+        mtrace('Judge daemon created');
+
+        // Reconnect db
+        $db->Close();
+        $db->NConnect();
+        configure_dbconnection();
+
+        // Run forever until being killed
+        while(1){
+            $this->judge_all_unjudged();
+
+            //Check interval is 5 seconds
+            sleep(5);
+        }
+    }
+
+    // Judge all unjudged submissions
+    function judge_all_unjudged()
+    {
         while ($submission = $this->get_unjudged_submission()) {
-            // Construct
             $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
             $this->assignment_onlinejudge($cm->id);
 
             $this->judge($submission);
         }
-/*
-        // If defined cron for assignment...
-        if($cronfreq = get_field('modules','cron','name','assignment')) {
-            echo "\n\tProcessing program assignment type ...\n";
-
-            $now = time();
-            $later = $now + ($cronfreq*60);
-            $where = "(duejudge >= $now AND duejudge <= $later) AND assignmenttype LIKE 'program'";
-            $where = "assignmenttype LIKE 'program'";
-
-            // Get program type assignments with cron date in next $cronfreq minutes
-            if($assignments = get_records_select('assignment',$where,'duejudge ASC')) {
-                
-                foreach($assignments as $ass) {
-                    // Get submissions for this assignments
-                    if($submissions = assignment_get_all_submissions($ass)) {
-                        
-                        // Judge each submission
-                        foreach($submissions as $submission) {
-                            $cm = get_coursemodule_from_instance('assignment',$ass->id);
-                            $basedir = $CFG->dataroot.'/'.$cm->course.'/'.$CFG->moddata.'/assignment/'.$ass->id.'/'.$submission->userid.'/';
-                            
-                            if($files = get_directory_list($basedir)) {
-                                foreach ($files as $key => $file)
-                                    $file_path = $basedir.$file;
-                                
-                                $ass->cm = $cm;
-                                echo "\t\tJudging assignment [$ass->id] / submission [$submission->id] / Return:";    
-                                $return = $this->judge($ass,$submission,$file_path);
-                                echo "$return\n";
-                            }
-                        }
-                    }
-                }
-            }
-         }
-        echo "\tDone\n";*/
     }
+
 }
 ?>
