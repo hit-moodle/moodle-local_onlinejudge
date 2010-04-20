@@ -1002,7 +1002,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     configure_dbconnection();
 
                     set_config('assignment_oj_daemon_pid' , $pid);
-                } else {
+                } else { //Child process
                     $this->run_daemon(); 
                 }
             }
@@ -1014,6 +1014,23 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG, $db;
 
         mtrace('Judge daemon created');
+
+        // Start a new sesssion. So it works like a daemon
+        $sid = posix_setsid();
+        if ($sid < 0) {
+            mtrace('Can not setsid');
+            exit;
+        }
+        
+        //Redirect error output to php log
+        $CFG->debugdisplay = false;
+        @ini_set('display_errors', '0');
+        @ini_set('log_errors', '1');
+
+        // Close unused fd
+        fclose(STDIN);
+        fclose(STDOUT);
+        fclose(STDERR);
 
         // Reconnect db
         $db->Close();
