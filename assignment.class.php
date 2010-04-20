@@ -993,7 +993,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
                 if ($pid == -1) {
                     mtrace('Could not fork');
-                } else if ($pid){ //Parent process
+                } else if ($pid > 0){ //Parent process
                     global $db;
 
                     //Reconnect db, so that the parent won't close the db connection shared with child after exit.
