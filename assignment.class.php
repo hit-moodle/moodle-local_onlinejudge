@@ -974,19 +974,18 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         global $CFG;
 
+        // Detect the frequence of cron
+        $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+        if ($lastcron) {
+            set_config('assignment_oj_cronfreq', time() - $lastcron);
+        }
+
         // There are two judge routines
         //  1. Judge only when cron job is running. 
         //  2. After installation, the first cron running will fork a daemon to be judger.
         // Routine two works only when the cron job is executed by php cli
         //
         if (!function_exists('pcntl_fork')) { // pcntl_fork is not supported. So use routine one.
-            // Detect the frequence of cron
-            if (!isset($CFG->assignment_oj_cronfreq)) {
-                $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
-                if ($lastcron) {
-                    set_config('assignment_oj_cronfreq', time() - $lastcron);
-                }
-            }
 
             $this->judge_all_unjudged();
 
