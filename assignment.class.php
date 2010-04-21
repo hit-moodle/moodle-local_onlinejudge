@@ -38,6 +38,7 @@ if (!isset($CFG->assignment_oj_max_mem)) {
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
+require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 
 //Whether the deamon has been killed by kill
 $killed = false;
@@ -1016,7 +1017,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     {
         global $CFG, $db;
 
-        mtrace('Judge daemon created');
+        mtrace('Judge daemon created. PID = ' . posix_getpid());
 
         // Start a new sesssion. So it works like a daemon
         $sid = posix_setsid();
