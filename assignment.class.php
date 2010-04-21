@@ -514,7 +514,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $item_name = get_string('judgetime','assignment_onlinejudge').':';
         $item = get_string('notavailable');
         if (isset($submission->judgetime)) {
-            $item = userdate($submission->judgetime);
+            $item = userdate($submission->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $submission->judgetime)) . ')';
         }
         $table->data[] = array($item_name, $item);
 
