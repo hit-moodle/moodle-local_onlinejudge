@@ -39,6 +39,9 @@ require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.p
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 
+//Whether the deamon has been killed by kill
+$killed = false;
+
 /**
  * Extends the uploadsingle assignment class
  * 
@@ -518,7 +521,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $item = get_string('notavailable');
         if (isset($submission->status)) {
             if ($submission->status === 'pending') {
-                if (!isset($CFG->assignment_oj_daemon_pid)) { //Judge from cron
+                if (empty($CFG->assignment_oj_daemon_pid)) { //Judge from cron
                     $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
                     $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
                     $left = $left > 0 ? $left : 0;
@@ -988,7 +991,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         } else { // pcntl_fork supported. Use routine two
 
-            if(!isset($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
+            if(empty($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
                 $pid = pcntl_fork(); 
 
                 if ($pid == -1) {
@@ -1037,8 +1040,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $db->NConnect();
         configure_dbconnection();
 
+        // Handle SIGTERM so that can be killed without pain
+        declare(ticks = 1); // tick use required as of PHP 4.3.0
+        pcntl_signal(SIGTERM, 'sigterm_handler');
+
+        set_config('assignment_oj_daemon_pid' , posix_getpid());
+
         // Run forever until being killed
-        while(1){
+        while(!empty($CFG->assignment_oj_daemon_pid)){
             $this->judge_all_unjudged();
 
             //Check interval is 5 seconds
@@ -1049,13 +1058,19 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     // Judge all unjudged submissions
     function judge_all_unjudged()
     {
-        while ($submission = $this->get_unjudged_submission()) {
+        global $CFG;
+        while ($CFG->assignment_oj_daemon_pid != 0 and $submission = $this->get_unjudged_submission()) {
             $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
             $this->assignment_onlinejudge($cm->id);
 
             $this->judge($submission);
         }
     }
-
 }
+
+function sigterm_handler($signo)
+{
+    set_config('assignment_oj_daemon_pid' , '0');
+}
+
 ?>
