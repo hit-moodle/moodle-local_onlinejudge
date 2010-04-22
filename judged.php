@@ -19,7 +19,9 @@ if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
 if(!empty($CFG->assignment_oj_daemon_pid)) {
     mtrace('Kill old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
     posix_kill($CFG->assignment_oj_daemon_pid, SIGTERM);
-    set_config('assignment_oj_daemon_pid' , 0);
+    // Wait for its quit
+    while(posix_kill($CFG->assignment_oj_daemon_pid, 0))
+        ;
 }
 
 // Create daemon
