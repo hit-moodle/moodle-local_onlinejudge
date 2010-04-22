@@ -20,8 +20,9 @@ if(!empty($CFG->assignment_oj_daemon_pid)) {
     mtrace('Kill old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
     posix_kill($CFG->assignment_oj_daemon_pid, SIGTERM);
     // Wait for its quit
-    while(posix_kill($CFG->assignment_oj_daemon_pid, 0))
+    while(!posix_kill($CFG->assignment_oj_daemon_pid, 0))
         ;
+    $CFG->assignment_oj_daemon_pid = 0;
 }
 
 // Create daemon
