@@ -40,9 +40,6 @@ require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 
-//Whether the deamon has been killed by kill
-$killed = false;
-
 /**
  * Extends the uploadsingle assignment class
  * 
