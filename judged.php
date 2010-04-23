@@ -17,11 +17,12 @@ if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
 
 // Kill old daemon if it exists
 if(!empty($CFG->assignment_oj_daemon_pid)) {
-    mtrace('Kill old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
+    mtrace('Killing old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
     posix_kill($CFG->assignment_oj_daemon_pid, SIGTERM);
     // Wait for its quit
-    while(!posix_kill($CFG->assignment_oj_daemon_pid, 0))
-        ;
+    while(posix_kill($CFG->assignment_oj_daemon_pid, 0))
+        sleep(0);
+    mtrace('done');
     $CFG->assignment_oj_daemon_pid = 0;
 }
 
