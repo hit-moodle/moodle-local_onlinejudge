@@ -1061,7 +1061,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     function judge_all_unjudged()
     {
         global $CFG;
-        while ($CFG->assignment_oj_daemon_pid != 0 and $submission = $this->get_unjudged_submission()) {
+        while ($submission = $this->get_unjudged_submission()) {
             $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
             $this->assignment_onlinejudge($cm->id);
 
