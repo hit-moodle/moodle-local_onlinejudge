@@ -988,28 +988,33 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         } else { // pcntl_fork supported. Use routine two
 
-            if(empty($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
-                $pid = pcntl_fork(); 
+            $this->run_daemon();
+        }
+    }
 
-                if ($pid == -1) {
-                    mtrace('Could not fork');
-                } else if ($pid > 0){ //Parent process
-                    global $db;
+    function run_daemon() 
+    {
+        global $CFG, $db;
 
-                    //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-                    $db->Close();
-                    $db->NConnect();
-                    configure_dbconnection();
+        if(empty($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
+            $pid = pcntl_fork(); 
 
-                    set_config('assignment_oj_daemon_pid' , $pid);
-                } else { //Child process
-                    $this->run_daemon(); 
-                }
+            if ($pid == -1) {
+                mtrace('Could not fork');
+            } else if ($pid > 0){ //Parent process
+                //Reconnect db, so that the parent won't close the db connection shared with child after exit.
+                $db->Close();
+                $db->NConnect();
+                configure_dbconnection();
+
+                set_config('assignment_oj_daemon_pid' , $pid);
+            } else { //Child process
+                $this->daemon(); 
             }
         }
     }
 
-    function run_daemon()
+    function daemon()
     {
         global $CFG, $db;
 

@@ -27,6 +27,6 @@ if(!empty($CFG->assignment_oj_daemon_pid)) {
 
 // Create daemon
 $oj = new assignment_onlinejudge();
-$oj->cron();
+$oj->run_daemon();
 
 ?>
