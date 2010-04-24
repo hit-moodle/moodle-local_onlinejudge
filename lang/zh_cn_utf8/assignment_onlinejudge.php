@@ -30,6 +30,8 @@
     $string['infowa'] = '请仔细检查您的代码。不要在输出中有手误或任何未要求的字符';
     $string['input'] = '输入';
     $string['judgetime'] = '评测时间';
+    $string['langc_warn2err'] = 'C (警告视为错误)';
+    $string['langcpp_warn2err'] = 'C++ (警告视为错误)';
     $string['maxcpuusage'] = '最长CPU运行时间';
     $string['maximumfilesize'] = '源文件最大长度';
     $string['maxmemusage'] = '最大内存用量';

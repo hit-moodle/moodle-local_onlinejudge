@@ -31,7 +31,9 @@
     $string['input'] = 'Input';
     $string['judgetime'] = 'Judge time';
     $string['langc'] = 'C';
+    $string['langc_warn2err'] = 'C (Warnings as Errors)';
     $string['langcpp'] = 'C++';
+    $string['langcpp_warn2err'] = 'C++ (Warnings as Errors)';
     $string['maxcpuusage'] = 'Maximum CPU usage';
     $string['maximumfilesize'] = 'Maximum source file size';
     $string['maxmemusage'] = 'Maximum memory usage';
