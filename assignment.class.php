@@ -950,7 +950,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         if ($ret = insert_record('assignment_oj_results', $result, false)) {
             $newsub = null;
             $newsub->id = $sub->id;
-            $newsub->teacher = 0;
+            $newsub->teacher = get_admin()->id;
             $newsub->mailed = 0;
             $newsub->timemarked = time();
             $newsub->grade = $result->grade;
