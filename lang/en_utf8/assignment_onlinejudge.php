@@ -12,10 +12,12 @@
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['cpulimit'] = 'Maximum CPU time';
+    $string['denytoreadfile'] = 'You have not the permission to read this file.';
     $string['descratiope'] = 'Grade of presentation error is equal to testcast\'s max grade times this ratio';
     $string['download'] = 'Download ';
     $string['duejudge'] = 'Judge after due date';
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
+    $string['filereaderror'] = 'Can not read this file';
     $string['info'] = 'Information';
     $string['infoat'] = 'A good program must "return 0 if no error occur.';
     $string['infocompileok'] = 'It seems that the compiler likes your code.';

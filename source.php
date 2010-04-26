@@ -33,7 +33,7 @@
     $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
     $e  = optional_param('a', 0, PARAM_INT);   // Epaile ID
     $userid = optional_param('userid', 0, PARAM_INT);   // User ID
-    $file = optional_param('file', NULL, PARAM_CLEANHTML); // File to show
+    $file = required_param('file', PARAM_CLEANHTML); // File to show
     
     if ($id) {
         if (!$cm = get_coursemodule_from_id('assignment', $id)) {
@@ -59,13 +59,15 @@
         }
     }
 
-    if(!$userid)
-        error(get_string('nouser','assignment'));
-
-    if(!$file)
-        error(get_string('nosuchfile','assignment'));
 
     require_login($course->id, false, $cm);
+
+    if(!$userid)
+        $userid = $USER->id;
+
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    if ($userid != $USER->id and !has_capability('mod/assignment:grade', $context))
+        print_error('denytoreadfile', 'assignment_onlinejudge');
 
     // Load up the required assignment code
     require('assignment.class.php');
@@ -86,7 +88,7 @@
         error(get_string('filereaderror','assignment_onlinejudge'));   
     }
 
-    $lang = $assignmentinstance->onlinejudge->language;
+    $lang = strtok($assignmentinstance->onlinejudge->language, '_');
     
     include('source.html');
 ?>
