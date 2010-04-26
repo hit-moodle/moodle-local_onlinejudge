@@ -951,7 +951,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $newsub = null;
             $newsub->id = $sub->id;
             $newsub->teacher = get_admin()->id;
-            $newsub->mailed = 0;
             $newsub->timemarked = time();
             $newsub->grade = $result->grade;
             $ret = update_record('assignment_submissions', $newsub);
