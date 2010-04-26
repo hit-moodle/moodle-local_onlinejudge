@@ -1,7 +1,20 @@
 #include <sandbox.h>
 #include <linux/unistd.h>
 
-int allowed_syscall [] = {
+/* syscall sequence for init code */
+int init_syscalls [] = {
+//    __NR_execve,
+    __NR_uname,
+    __NR_brk,
+    __NR_brk,
+    __NR_set_thread_area,
+    __NR_brk,
+    __NR_brk,
+    0
+};
+
+/* allowed syscalls after init */
+int allowed_syscalls [] = {
     __NR_read,
     __NR_write,
     __NR_mmap2,
@@ -12,22 +25,30 @@ int allowed_syscall [] = {
 
 int allow(const event_t * pevent)
 {
-    static initing = 1;
+    static int initing = 1;
+    static int init_step = 0;
 
     if (initing) 
     {
-        // mmap2() is the last init syscall
-        if (pevent->data._SYSCALL.scno == __NR_mmap2)
+        if (pevent->data._SYSCALL.scno == init_syscalls[init_step])
+            init_step++;
+        else {
+            printf("%d\n", pevent->data._SYSCALL.scno);
+            return 0;
+        }
+
+        if (init_syscalls[init_step] == 0)
             initing = 0;
+
         return 1;
     }
 
     int i;
 
-    for (i=0; allowed_syscall[i] && pevent->data._SYSCALL.scno != allowed_syscall[i]; i++)
+    for (i=0; allowed_syscalls[i] && pevent->data._SYSCALL.scno != allowed_syscalls[i]; i++)
         ;
 
-    return allowed_syscall[i];
+    return allowed_syscalls[i];
 }
 
 static void 

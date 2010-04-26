@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	optionsnu = options_counter(argc ,argv);
 	
 	sandbox_init(&sandbox, (const char**)argv+optionsnu);
-	
+
 	sandbox.task.quota[S_QUOTA_WALLCLOCK] = 1000*15;
 	sandbox.task.quota[S_QUOTA_CPU]       = 1000*30;
     sandbox.task.quota[S_QUOTA_MEMORY]    = 4096*512;
@@ -218,11 +218,12 @@ int main(int argc, char *argv[]) {
 		return(-1);
 	}
 	result = sandbox_execute(&sandbox);
-	syslog(LOG_USER | LOG_INFO, "------------result code:%d------------\n", *result);
-	//print(&sandbox);
    
 	returnvalue = *result;
 	
+    if (returnvalue != S_RESULT_OK) 
+        syslog(LOG_USER | LOG_INFO, "%s:%s", argv[optionsnu], s_result_name(returnvalue));
+
 	if (!sandbox_fini(&sandbox))
 	{
 		return returnvalue;
