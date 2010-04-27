@@ -20,6 +20,7 @@ int allowed_syscalls [] = {
     __NR_read,
     __NR_write,
     __NR_mmap2,
+    __NR_munmap,
     __NR_fstat64,
     __NR_exit_group,
     0
