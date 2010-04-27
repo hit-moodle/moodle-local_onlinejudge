@@ -1081,7 +1081,10 @@ function reconnect_db()
     global $db;
     // Reconnect db
     $db->Close();
-    $db->NConnect();
+
+    while (!$db->NConnect())
+        sleep(5);
+
     configure_dbconnection();
 }
 ?>
