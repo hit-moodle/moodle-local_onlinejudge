@@ -1002,9 +1002,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 mtrace('Could not fork');
             } else if ($pid > 0){ //Parent process
                 //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-                $db->Close();
-                $db->NConnect();
-                configure_dbconnection();
+                reconnect_db();
 
                 set_config('assignment_oj_daemon_pid' , $pid);
             } else { //Child process
@@ -1015,7 +1013,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
     function daemon()
     {
-        global $CFG, $db;
+        global $CFG;
 
         mtrace('Judge daemon created. PID = ' . posix_getpid());
 
@@ -1036,10 +1034,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         fclose(STDOUT);
         fclose(STDERR);
 
-        // Reconnect db
-        $db->Close();
-        $db->NConnect();
-        configure_dbconnection();
+        reconnect_db();
 
         // Handle SIGTERM so that can be killed without pain
         declare(ticks = 1); // tick use required as of PHP 4.3.0
@@ -1049,7 +1044,13 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         // Run forever until being killed
         while(!empty($CFG->assignment_oj_daemon_pid)){
+            global $db;
+
             $this->judge_all_unjudged();
+
+            // If error occured, reconnect db
+            if ($db->ErrorNo())
+                reconnect_db();
 
             //Check interval is 5 seconds
             sleep(5);
@@ -1067,6 +1068,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $this->judge($submission);
         }
     }
+
 }
 
 function sigterm_handler($signo)
@@ -1074,4 +1076,12 @@ function sigterm_handler($signo)
     set_config('assignment_oj_daemon_pid' , '0');
 }
 
+function reconnect_db()
+{
+    global $db;
+    // Reconnect db
+    $db->Close();
+    $db->NConnect();
+    configure_dbconnection();
+}
 ?>
