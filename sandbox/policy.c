@@ -1,9 +1,11 @@
 #include <sandbox.h>
 #include <linux/unistd.h>
 
+/* syscall no of the restricted syscall which is called */
+int last_rf_called = 0;
+
 /* syscall sequence for init code */
 int init_syscalls [] = {
-//    __NR_execve,
     __NR_uname,
     __NR_brk,
     __NR_brk,
@@ -33,7 +35,7 @@ int allow(const event_t * pevent)
         if (pevent->data._SYSCALL.scno == init_syscalls[init_step])
             init_step++;
         else {
-            printf("%d\n", pevent->data._SYSCALL.scno);
+            last_rf_called = pevent->data._SYSCALL.scno;
             return 0;
         }
 
@@ -41,14 +43,19 @@ int allow(const event_t * pevent)
             initing = 0;
 
         return 1;
+    } 
+    else 
+    {
+        int i;
+        for (i=0; allowed_syscalls[i]; i++) {
+            if (pevent->data._SYSCALL.scno == allowed_syscalls[i])
+                return 1;
+        }
+
+        /* a rf called */
+        last_rf_called = pevent->data._SYSCALL.scno;
+        return 0;
     }
-
-    int i;
-
-    for (i=0; allowed_syscalls[i] && pevent->data._SYSCALL.scno != allowed_syscalls[i]; i++)
-        ;
-
-    return allowed_syscalls[i];
 }
 
 static void 

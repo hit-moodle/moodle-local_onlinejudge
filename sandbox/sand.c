@@ -221,8 +221,13 @@ int main(int argc, char *argv[]) {
    
 	returnvalue = *result;
 	
-    if (returnvalue != S_RESULT_OK) 
-        syslog(LOG_USER | LOG_INFO, "%s:%s", argv[optionsnu], s_result_name(returnvalue));
+    if (returnvalue != S_RESULT_OK)
+    {
+        if (returnvalue == S_RESULT_RF) 
+            syslog(LOG_USER | LOG_INFO, "%s:S_RESULT_%s(%d)", argv[optionsnu], s_result_name(returnvalue), last_rf_called);
+        else
+            syslog(LOG_USER | LOG_INFO, "%s:S_RESULT_%s", argv[optionsnu], s_result_name(returnvalue));
+    }
 
 	if (!sandbox_fini(&sandbox))
 	{
