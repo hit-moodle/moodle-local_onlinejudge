@@ -84,11 +84,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
         
-        // Judge immediately or on due date
-        $mform->addElement('select', 'duejudge', get_string('duejudge', 'assignment_onlinejudge'), $ynoptions);
-        $mform->setHelpButton('duejudge', array('duejudge', get_string('duejudge', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
-        $mform->setDefault('duejudge', $onlinejudge ? $onlinejudge->duejudge : 0);
-        
         // Presentation error grade ratio
         unset($choices);
         $choices = get_grade_options()->gradeoptions; // Steal from question lib

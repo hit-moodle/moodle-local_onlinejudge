@@ -53,6 +53,30 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
         $result = $result && add_index($table, $index);
     }
 
+    if ($result && $oldversion < 2010042800) {
+
+    /// Define field duejudge to be dropped from assignment_oj
+        $table = new XMLDBTable('assignment_oj');
+        $field = new XMLDBField('duejudge');
+
+    /// Launch drop field duejudge
+        $result = $result && drop_field($table, $field);
+
+    /// Define key test (foreign) to be dropped form assignment_oj_results
+        $table = new XMLDBTable('assignment_oj_results');
+        $key = new XMLDBKey('test');
+        $key->setAttributes(XMLDB_KEY_FOREIGN, array('test'), 'assignment_oj_tests', array('id'));
+
+    /// Launch drop key test
+        $result = $result && drop_key($table, $key);
+
+    /// Define field test to be dropped from assignment_oj_results
+        $field = new XMLDBField('test');
+
+    /// Launch drop field test
+        $result = $result && drop_field($table, $field);
+    }
+
     return $result;
 }
 
