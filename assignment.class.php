@@ -35,6 +35,11 @@ if (!isset($CFG->assignment_oj_max_mem)) {
     set_config('assignment_oj_max_mem', 16 * 1024 *1024);
 }
 
+// Judge everytime when cron is running if set to true. Default is false. Use daemon is recommanded
+if (!isset($CFG->assignment_oj_judge_in_cron)) {
+    set_config('assignment_oj_judge_in_cron', 0);
+}
+
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
@@ -976,13 +981,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         //  2. After installation, the first cron running will fork a daemon to be judger.
         // Routine two works only when the cron job is executed by php cli
         //
-        if (!function_exists('pcntl_fork')) { // pcntl_fork is not supported. So use routine one.
-
-            $this->judge_all_unjudged();
-
-        } else { // pcntl_fork supported. Use routine two
-
+        if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
             $this->run_daemon();
+        } else if ($CFG->assignment_oj_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
+            $this->judge_all_unjudged();
         }
     }
 
