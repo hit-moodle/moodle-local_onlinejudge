@@ -507,7 +507,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $submission = $this->get_submission();
 
         // Status
-        $item_name = get_string('status').':';
+        $item_name = get_string('status').helpbutton('status', get_string('status'), 'assignment_onlinejudge', true, false, '', true).':';
         $item = get_string('notavailable');
         if (!empty($submission->status)) {
             $item = get_string('status' . $submission->status, 'assignment_onlinejudge');
