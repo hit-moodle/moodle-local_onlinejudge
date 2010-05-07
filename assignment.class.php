@@ -705,7 +705,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
         foreach ($names as $name) {
-            $lang[$name.'_local'] = get_string('lang' . $name, 'assignment_onlinejudge');
+            $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
         }
 
         $names_ideone = array('java_ideone'); 
@@ -940,12 +940,12 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $ret = false;
 
-        $lang_array = explode('_', $this->onlinejudge->language);
+        $judge_type = substr($this->onlinejudge->language, strrpos($this->onlinejudge->language, '_'));
 
-        if($lang_array[1] == 'local') {
-            $result = $this->judge_local($sub);
-        } else if ($lang_array[1] == 'ideone') {
+        if($judge_type == 'ideone') {
             $result = $this->judge_ideone($sub);
+        } else {
+            $result = $this->judge_local($sub);
         }
 
         $result->submission = $sub->id;
