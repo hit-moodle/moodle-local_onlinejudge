@@ -856,9 +856,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $grades[$status];
     }
 
+    // Compile submission $sub in temp_dir
+    // return result class on success, false on error
     function compile($sub, $temp_dir) {
         global $CFG;
-        $result = null;
+        $result = false;
 
         if ($basedir = $this->file_area($sub->userid)) {
             if ($files = get_directory_list($basedir)) {
@@ -948,29 +950,30 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $result = $this->judge_local($sub);
         }
 
-        $result->submission = $sub->id;
-        $result->judgetime = time();
-        $result->info = addslashes($result->info);
-        $result->output = addslashes($result->output);
-        if ($ret = insert_record('assignment_oj_results', $result, false)) {
-            $newsub = null;
-            $newsub->id = $sub->id;
-            $newsub->teacher = get_admin()->id;
-            $newsub->timemarked = time();
-            $newsub->grade = $result->grade;
-            $ret = update_record('assignment_submissions', $newsub);
-            $this->update_grade($sub);
+        if ($result) {
+            $result->submission = $sub->id;
+            $result->judgetime = time();
+            $result->info = addslashes($result->info);
+            $result->output = addslashes($result->output);
+            if ($ret = insert_record('assignment_oj_results', $result, false)) {
+                $newsub = null;
+                $newsub->id = $sub->id;
+                $newsub->teacher = get_admin()->id;
+                $newsub->timemarked = time();
+                $newsub->grade = $result->grade;
+                $ret = update_record('assignment_submissions', $newsub);
+                $this->update_grade($sub);
+            }
         }
 
         return $ret;
     }
 
-    // Judge in local
+    // Judge submission $sub in local
+    // return result object on success, false on error
     function judge_local($sub) {
 
         global $CFG;
-
-        $ret = false;
 
         // Make temp dir
         $temp_dir = $CFG->dataroot.'/temp/assignment_onlinejudge/'.$sub->id;
@@ -979,19 +982,20 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             return false;
         }
 
-        $result = $this->compile($sub, $temp_dir);
-        $result->grade = -1;
-        if ($result->status === 'compileok' && !$this->onlinejudge->compileonly) { //Run and test!
-            $results = array();
-            $cases = $this->get_tests();
-            foreach ($cases as $case) {
-                $results[] = $this->run_in_sandbox($temp_dir.'/a.out', $case);
-            }
+        if ($result = $this->compile($sub, $temp_dir)) {
+            $result->grade = -1;
+            if ($result->status === 'compileok' && !$this->onlinejudge->compileonly) { //Run and test!
+                $results = array();
+                $cases = $this->get_tests();
+                foreach ($cases as $case) {
+                    $results[] = $this->run_in_sandbox($temp_dir.'/a.out', $case);
+                }
 
-            $result = $this->merge_results($results, $cases);
-        } else if ($result->status === 'ce') {
-            $result->grade = $this->grade_marker('ce', $this->assignment->grade);
-            $result->output = '';
+                $result = $this->merge_results($results, $cases);
+            } else if ($result->status === 'ce') {
+                $result->grade = $this->grade_marker('ce', $this->assignment->grade);
+                $result->output = '';
+            }
         }
 
         // Clean temp dir
