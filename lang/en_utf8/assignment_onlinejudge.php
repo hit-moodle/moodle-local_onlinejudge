@@ -32,10 +32,11 @@
     $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
     $string['input'] = 'Input';
     $string['judgetime'] = 'Judge time';
-    $string['langc'] = 'C';
+    $string['langc_local'] = 'C';
     $string['langc_warn2err'] = 'C (Warnings as Errors)';
-    $string['langcpp'] = 'C++';
+    $string['langcpp_local'] = 'C++';
     $string['langcpp_warn2err'] = 'C++ (Warnings as Errors)';
+    $string['langjava_ideone'] = 'JAVA(ideone.com)';
     $string['maxcpuusage'] = 'Maximum CPU usage';
     $string['maximumfilesize'] = 'Maximum source file size';
     $string['maxmemusage'] = 'Maximum memory usage';

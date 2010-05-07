@@ -705,11 +705,17 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
         foreach ($names as $name) {
+            $lang[$name.'_local'] = get_string('lang' . $name, 'assignment_onlinejudge');
+        }
+
+        $names_ideone = array('java_ideone'); 
+
+        foreach ($names_ideone as $name) {
             $lang[$name] = get_string('lang' . $name, 'assignment_onlinejudge');
         }
-        
+
         asort($lang);
-        
+
         return $lang;
     }
 
@@ -927,9 +933,41 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $result;
     }
 
-    // Judge in local
+    // Judge begins here
     function judge($sub) {
         
+        global $CFG;
+
+        $ret = false;
+
+        $lang_array = explode('_', $this->onlinejudge->language);
+
+        if($lang_array[1] == 'local') {
+            $result = $this->judge_local($sub);
+        } else if ($lang_array[1] == 'ideone') {
+            $result = $this->judge_ideone($sub);
+        }
+
+        $result->submission = $sub->id;
+        $result->judgetime = time();
+        $result->info = addslashes($result->info);
+        $result->output = addslashes($result->output);
+        if ($ret = insert_record('assignment_oj_results', $result, false)) {
+            $newsub = null;
+            $newsub->id = $sub->id;
+            $newsub->teacher = get_admin()->id;
+            $newsub->timemarked = time();
+            $newsub->grade = $result->grade;
+            $ret = update_record('assignment_submissions', $newsub);
+            $this->update_grade($sub);
+        }
+
+        return $ret;
+    }
+
+    // Judge in local
+    function judge_local($sub) {
+
         global $CFG;
 
         $ret = false;
@@ -956,25 +994,80 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $result->output = '';
         }
 
-        $result->submission = $sub->id;
-        $result->judgetime = time();
-        $result->info = addslashes($result->info);
-        $result->output = addslashes($result->output);
-        if ($ret = insert_record('assignment_oj_results', $result, false)) {
-            $newsub = null;
-            $newsub->id = $sub->id;
-            $newsub->teacher = get_admin()->id;
-            $newsub->timemarked = time();
-            $newsub->grade = $result->grade;
-            $ret = update_record('assignment_submissions', $newsub);
-            $this->update_grade($sub);
-        }
-
         // Clean temp dir
         fulldelete($temp_dir);
 
-        return $ret;
+        return $result;
     }
+
+
+
+    function judge_ideone($sub){
+        global $CFG;
+        /*
+
+        if ($basedir = $this->file_area($sub->userid)) {
+            if ($files = get_directory_list($basedir)) {
+                foreach ($files as $key => $file) {
+
+                    copy($basedir.'/'.$file, $temp_dir.'/'.$file);
+
+
+
+         */
+
+
+        // creating soap client
+
+
+        $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
+
+
+
+        if (!isset($CFG->assignment_oj_username)) {
+            set_config('assignment_oj_username' , 'test');
+        }
+
+        if (!isset($CFG->assignment_oj_password)) {
+            set_config('assignment_oj_password' , 'test');
+        }
+
+
+        $user = $CFG->assignment_oj_username;                                               
+        $pass = $CFG->assignment_oj_password;
+
+
+        if ($basedir = $this->file_area($sub->userid)) {
+            if ($files = get_directory_list($basedir)) {
+                foreach ($files as $key => $file) {
+                    $sourse = file_get_contents($basedir.'/'.$file);
+                }
+            }
+        }
+
+        if ($this->onlinejudge->language == 'java_ideone') {
+            $langid = 10;
+        } 
+
+        $link = $client->createSubmission($user,$pass,/*'import java.io.*;
+        import java.util.*;
+        public class Main
+        {
+            public static void main(String args[]) throws Exception
+        {
+            Scanner cin=new Scanner(System.in);
+            int a=cin.nextInt(),b=cin.nextInt();
+            System.out.println(a+b);
+    }
+    }'*/$sourse,$langid,'1 2',true,true);     
+    for($status = $client-> getSubmissionStatus($user,$pass,$link['link']);$status['status'] != 0;){
+        $status =  $client->getSubmissionStatus($user,$pass,$link['link']);
+        sleep(1);  
+    }
+
+    $details = $client->getSubmissionDetails($user,$pass,$link['link'],false,true,true,true,true,false);         
+    print_r($details);       
+    }       
 
     /**
      * Evaluate student submissions
