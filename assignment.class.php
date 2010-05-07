@@ -397,8 +397,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     function print_student_answer($userid, $return = false) {
         global $CFG, $USER;
 
-        $filearea = $this->file_area_name($userid);
-
         $output = '';
 
         if ($basedir = $this->file_area($userid)) {
