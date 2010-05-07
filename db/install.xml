@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20100407" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
+<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20100507" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -10,9 +10,8 @@
         <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="language"/>
         <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Assignment programming language" PREVIOUS="assignment" NEXT="memlimit"/>
         <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" ENUM="false" PREVIOUS="language" NEXT="cpulimit"/>
-        <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" ENUM="false" PREVIOUS="memlimit" NEXT="duejudge"/>
-        <FIELD NAME="duejudge" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="cpulimit" NEXT="compileonly"/>
-        <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="duejudge" NEXT="ratiope"/>
+        <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" ENUM="false" PREVIOUS="memlimit" NEXT="compileonly"/>
+        <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="cpulimit" NEXT="ratiope"/>
         <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0.0" SEQUENCE="false" ENUM="false" DECIMALS="10" COMMENT="How much grade can earn when get a presentation error." PREVIOUS="compileonly"/>
       </FIELDS>
       <KEYS>
@@ -23,17 +22,15 @@
     <TABLE NAME="assignment_oj_results" COMMENT="Submission test results" PREVIOUS="assignment_oj" NEXT="assignment_oj_submissions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="submission"/>
-        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="test"/>
-        <FIELD NAME="test" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="submission" NEXT="status"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pending" SEQUENCE="false" ENUM="true" ENUMVALUES="'pending', 'ac', 'wa', 'pe', 're', 'tle', 'mle', 'ole', 'ce', 'badfile', 'ie', 'rf', 'at', 'compileok', 'multiple'" COMMENT="Possible values: 'Accepted', 'Wrong answer', 'Internal error'" PREVIOUS="test" NEXT="output"/>
+        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="status"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pending" SEQUENCE="false" ENUM="true" ENUMVALUES="'pending', 'ac', 'wa', 'pe', 're', 'tle', 'mle', 'ole', 'ce', 'badfile', 'ie', 'rf', 'at', 'compileok', 'multiple'" COMMENT="Possible values: 'Accepted', 'Wrong answer', 'Internal error'" PREVIOUS="submission" NEXT="output"/>
         <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Compiler/program output" PREVIOUS="status" NEXT="info"/>
         <FIELD NAME="info" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Program runtime/compiler error" PREVIOUS="output" NEXT="judgetime"/>
         <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="The time when judgment finished" PREVIOUS="info"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
-        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="test"/>
-        <KEY NAME="test" TYPE="foreign" FIELDS="test" REFTABLE="assignment_oj_tests" REFFIELDS="id" COMMENT="assignment_oj_tests foreign key" PREVIOUS="submission"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="judgetime" UNIQUE="false" FIELDS="judgetime" COMMENT="For performance when looking up latest judge result"/>
