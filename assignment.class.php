@@ -595,7 +595,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $submission->judged = 0; //It is been judging
                     $submission->status = 'pending';
                 }
-            } else if ($onlinejudge) { // Submitted but unjudged
+            } else if ($files = get_directory_list($this->file_area_name($userid)) && count(files) != 0) { // Submitted but unjudged
                 $submission->status = 'pending';
             }
         }
