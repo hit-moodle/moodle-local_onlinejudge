@@ -560,6 +560,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     function get_submission($userid=0, $createnew=false, $teachermodified=false) {
+        global $CFG;
+
         $submission = parent::get_submission($userid, $createnew, $teachermodified);
 
         if ($submission) {
@@ -595,7 +597,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $submission->judged = 0; //It is been judging
                     $submission->status = 'pending';
                 }
-            } else if ($files = get_directory_list($this->file_area_name($userid)) && count(files) != 0) { // Submitted but unjudged
+            } else if (($files = get_directory_list($CFG->dataroot.'/'.$this->file_area_name($userid))) && count($files) != 0) { // Submitted but unjudged
                 $submission->status = 'pending';
             }
         }
