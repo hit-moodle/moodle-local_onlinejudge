@@ -597,8 +597,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     $submission->judged = 0; //It is been judging
                     $submission->status = 'pending';
                 }
-            } else {
-                $submission->status = 'pending';
             }
         }
 
