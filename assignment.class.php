@@ -25,6 +25,14 @@
 
 define('NUMTESTS', 5); // Default number of test cases
 
+if (!isset($CFG->assignment_oj_ideone_username)) {
+	set_config('assignment_oj_ideone_username' , 'test');
+}
+
+if (!isset($CFG->assignment_oj_ideone_password)) {
+	set_config('assignment_oj_ideone_password' , 'test');
+}
+
 // Default maximum cpu time (seconds) for all assignments
 if (!isset($CFG->assignment_oj_max_cpu)) {
     set_config('assignment_oj_max_cpu', 10);
@@ -40,6 +48,7 @@ if (!isset($CFG->assignment_oj_judge_in_cron)) {
     set_config('assignment_oj_judge_in_cron', 0);
 }
 
+
 require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
@@ -53,6 +62,57 @@ require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 class assignment_onlinejudge extends assignment_uploadsingle {
 
     var $onlinejudge;
+
+    // ideone.com supports the following languages.
+    // id_in_moodle => id_in_ideone
+    var $ideone_langs = array(
+        'ada_ideone'                     => 7,                      
+        'assembler_ideone'               => 13,                  
+        'awk_gawk_ideone'                => 104,            
+        'awk_mawk_ideone'                => 105,             
+        'bash_ideone'                    => 28,             
+        'bc_ideone'                      => 110,                        
+        'brainfxxk_ideone'               => 12,            
+        'c_ideone'                       => 11,                     
+        'csharp_ideone'                  => 27,                        
+        'cpp_ideone'                     => 1,                  
+        'c99_strict_ideone'              => 34,             
+        'clojure_ideone'                 => 111,                
+        'cobol_ideone'                   => 106,                      
+        'common_lisp_clisp_ideone'       => 32,    
+        'd_dmd_ideone'                   => 102,                 
+        'erlang_ideone'                  => 36,                     
+        'forth_ideone'                   => 107,                     
+        'fortran_ideone'                 => 5,                 
+        'go_ideone'                      => 114,                
+        'haskell_ideone'                 => 21,                   
+        'icon_ideone'                    => 16,             
+        'intercal_ideone'                => 9,                 
+        'java_ideone'                    => 10,                    
+        'javascript_rhino_ideone'        => 35,         
+        'javascript_spidermonkey_ideone' => 112,  
+        'lua_ideone'                     => 26,                       
+        'nemerle_ideone'                 => 30,                  
+        'nice_ideone'                    => 25,                     
+        'ocaml_ideone'                   => 8,                      
+        'pascal_fpc_ideone'              => 22,             
+        'pascal_gpc_ideone'              => 2,            
+        'perl_ideone'                    => 3,              
+        'php_ideone'                     => 29,            
+        'pike_ideone'                    => 19,            
+        'prolog_gnu_ideone'              => 108,   
+        'prolog_swi_ideone'              => 15,      
+        'python_ideone'                  => 4,             
+        'ruby_ideone'                    => 17,             
+        'scala_ideone'                   => 39,             
+        'scheme_guile_ideone'            => 33,    
+        'smalltalk_ideone'               => 23,          
+        'tcl_ideone'                     => 38,              
+        'text_ideone'                    => 62,               
+        'unlambda_ideone'                => 115,         
+        'vbdotnet_ideone'                => 101, 
+        'whitespace_ideone'              => 6
+    );
 
     function assignment_onlinejudge($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
         parent::assignment_uploadsingle($cmid, $assignment, $cm, $course);
@@ -700,22 +760,20 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $lang = array ();
         
+        // Get local languages
         $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
         $files = get_directory_list($dir);
-        
         $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
         foreach ($names as $name) {
             $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
         }
 
-        $names_ideone = array('java_ideone'); 
-
-        foreach ($names_ideone as $name) {
-            $lang[$name] = get_string('lang' . $name, 'assignment_onlinejudge');
+        // Get ideone.com languages
+        foreach ($this->ideone_langs as $name => $id) {
+            $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
         }
 
         asort($lang);
-
         return $lang;
     }
 
@@ -944,7 +1002,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         $judge_type = substr($this->onlinejudge->language, strrpos($this->onlinejudge->language, '_'));
 
-        if($judge_type == 'ideone') {
+        if($judge_type == '_ideone') {
             $result = $this->judge_ideone($sub);
         } else {
             $result = $this->judge_local($sub);
@@ -1008,69 +1066,63 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
     function judge_ideone($sub){
         global $CFG;
-        /*
-
-        if ($basedir = $this->file_area($sub->userid)) {
-            if ($files = get_directory_list($basedir)) {
-                foreach ($files as $key => $file) {
-
-                    copy($basedir.'/'.$file, $temp_dir.'/'.$file);
-
-
-
-         */
-
 
         // creating soap client
 
 
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
 
-
-
-        if (!isset($CFG->assignment_oj_username)) {
-            set_config('assignment_oj_username' , 'test');
-        }
-
-        if (!isset($CFG->assignment_oj_password)) {
-            set_config('assignment_oj_password' , 'test');
-        }
-
-
-        $user = $CFG->assignment_oj_username;                                               
-        $pass = $CFG->assignment_oj_password;
-
+        $user = $CFG->assignment_oj_ideone_username;                                               
+        $pass = $CFG->assignment_oj_ideone_password;
 
         if ($basedir = $this->file_area($sub->userid)) {
             if ($files = get_directory_list($basedir)) {
                 foreach ($files as $key => $file) {
-                    $sourse = file_get_contents($basedir.'/'.$file);
+                    $source = file_get_contents($basedir.'/'.$file);
                 }
             }
         }
 
-        if ($this->onlinejudge->language == 'java_ideone') {
-            $langid = 10;
-        } 
+        if (!isset($source)) {
+            $results = array();
+            $cases = $this->get_tests();
 
-        $link = $client->createSubmission($user,$pass,/*'import java.io.*;
-        import java.util.*;
-        public class Main
-        {
-            public static void main(String args[]) throws Exception
-        {
-            Scanner cin=new Scanner(System.in);
-            int a=cin.nextInt(),b=cin.nextInt();
-            System.out.println(a+b);
-    }
-    }'*/$sourse,$langid,'1 2',true,true);     
-    for($status = $client-> getSubmissionStatus($user,$pass,$link['link']);$status['status'] != 0;){
-        $status =  $client->getSubmissionStatus($user,$pass,$link['link']);
-        sleep(1);  
-    }
+            $status_ideone = array(
+                11  => 'ce',
+                12  => 're',
+                13  => 'tle',
+                15  => 'compileok',
+                17  => 'mle',
+                19  => 'rf',
+                20  => 'ie'
+            );
 
-    $details = $client->getSubmissionDetails($user,$pass,$link['link'],false,true,true,true,true,false);         
-    print_r($details);       
+            foreach ($cases as $case) {
+                $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
+                while(1){
+                    sleep(2); 
+                    $status =  $client->getSubmissionStatus($user,$pass,$webid['link']);
+                    if(!$status['status'])
+                        break;
+                }
+
+                $details = $client->getSubmissionDetails($user,$pass,$webid['link'],false,true,true,true,true,false);         
+
+                $result->status = $status_ideone[$details['result']];
+                $result->info = $details['cmpinfo'];
+                if ($result->status == 'ce' || $this->onlinejudge->compileonly)
+                    return $result;
+
+                $ret = new Object();
+                $ret->output = $details['output'];
+                $ret->status = $this->diff($case->output, $ret->output);
+                $results[] = $ret;
+            }
+
+            return $this->merge_results($results, $cases);
+        } else {
+            return false;
+        }
     }       
 
     /**
