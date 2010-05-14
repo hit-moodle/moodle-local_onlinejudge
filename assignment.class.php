@@ -25,14 +25,6 @@
 
 define('NUMTESTS', 5); // Default number of test cases
 
-if (!isset($CFG->assignment_oj_ideone_username)) {
-	set_config('assignment_oj_ideone_username' , 'test');
-}
-
-if (!isset($CFG->assignment_oj_ideone_password)) {
-	set_config('assignment_oj_ideone_password' , 'test');
-}
-
 // Default maximum cpu time (seconds) for all assignments
 if (!isset($CFG->assignment_oj_max_cpu)) {
     set_config('assignment_oj_max_cpu', 10);
@@ -46,6 +38,18 @@ if (!isset($CFG->assignment_oj_max_mem)) {
 // Judge everytime when cron is running if set to true. Default is false. Use daemon is recommanded
 if (!isset($CFG->assignment_oj_judge_in_cron)) {
     set_config('assignment_oj_judge_in_cron', 0);
+}
+
+
+// IDEONE.com configure
+if (!isset($CFG->assignment_oj_ideone_username)) {
+	set_config('assignment_oj_ideone_username' , 'test');
+}
+if (!isset($CFG->assignment_oj_ideone_password)) {
+	set_config('assignment_oj_ideone_password' , 'test');
+}
+if (!isset($CFG->assignment_oj_ideone_delay)) { //delay between submitting and getting result
+	set_config('assignment_oj_ideone_delay' , 3);
 }
 
 
@@ -1089,7 +1093,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             foreach ($cases as $case) {
                 $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
                 while(1){
-                    sleep(2); 
+                    sleep($CFG->assignment_oj_ideone_delay); 
                     $status =  $client->getSubmissionStatus($user,$pass,$webid['link']);
                     if(!$status['status'])
                         break;
