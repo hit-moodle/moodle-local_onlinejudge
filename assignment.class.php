@@ -920,38 +920,34 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
         $result = false;
 
-        if ($basedir = $this->file_area($sub->userid)) {
-            if ($files = get_directory_list($basedir)) {
-                foreach ($files as $key => $file) {
+        if ($content = $this->get_submission_file_content($sub->userid)) {
 
-                    copy($basedir.'/'.$file, $temp_dir.'/'.$file);
-                    $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
-                    if (!is_executable($compiler)) {
-                        $result->status = 'ie';
-                        $result->info = get_string('cannotruncompiler', 'assignment_onlinejudge');
-                        break;
-                    }
-
-                    $output = null;
-                    $return = null;
-                    $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
-                    exec($command, $output, $return);
-
-                    if ($return) { //Compile error
-                        $result->status = 'ce';
-                    } else { 
-                        $result->status = 'compileok';
-                    }
-
-                    //strip path info
-                    $output = str_replace($temp_dir.'/', '', $output);
-                    $error = htmlspecialchars(implode("\n", $output));
-                    $result->info = addslashes($error);
-
-                    //Compile the first file only
-                    return $result;
-                }  
+            file_put_contents("$temp_dir/$file", $content);
+            $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
+            if (!is_executable($compiler)) {
+                $result->status = 'ie';
+                $result->info = get_string('cannotruncompiler', 'assignment_onlinejudge');
+                break;
             }
+
+            $output = null;
+            $return = null;
+            $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
+            exec($command, $output, $return);
+
+            if ($return) { //Compile error
+                $result->status = 'ce';
+            } else { 
+                $result->status = 'compileok';
+            }
+
+            //strip path info
+            $output = str_replace($temp_dir.'/', '', $output);
+            $error = htmlspecialchars(implode("\n", $output));
+            $result->info = addslashes($error);
+
+            //Compile the first file only
+            return $result;
         }          
 
         return $result;
@@ -1063,7 +1059,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
 
-
+    // Judge submission $sub in ideone.com
+    // return result object on success, false on error
     function judge_ideone($sub){
         global $CFG;
 
@@ -1075,15 +1072,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $user = $CFG->assignment_oj_ideone_username;                                               
         $pass = $CFG->assignment_oj_ideone_password;
 
-        if ($basedir = $this->file_area($sub->userid)) {
-            if ($files = get_directory_list($basedir)) {
-                foreach ($files as $key => $file) {
-                    $source = file_get_contents($basedir.'/'.$file);
-                }
-            }
-        }
-
-        if (!isset($source)) {
+        if ($source = $this->get_submission_file_content($sub->userid)) {
             $results = array();
             $cases = $this->get_tests();
 
@@ -1091,7 +1080,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 11  => 'ce',
                 12  => 're',
                 13  => 'tle',
-                15  => 'compileok',
+                15  => 'ok',
                 17  => 'mle',
                 19  => 'rf',
                 20  => 'ie'
@@ -1109,14 +1098,22 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $details = $client->getSubmissionDetails($user,$pass,$webid['link'],false,true,true,true,true,false);         
 
                 $result->status = $status_ideone[$details['result']];
-                $result->info = $details['cmpinfo'];
-                if ($result->status == 'ce' || $this->onlinejudge->compileonly)
-                    return $result;
 
-                $ret = new Object();
-                $ret->output = $details['output'];
-                $ret->status = $this->diff($case->output, $ret->output);
-                $results[] = $ret;
+                // If got ce or compileonly, don't need to test other case
+                if ($result->status == 'ce' || $this->onlinejudge->compileonly) {
+                    if ($result->status != 'ce' && $result->status != 'ie')
+                        $result->status = 'compileok';
+                    $result->info = $details['cmpinfo'];
+                    return $result;
+                }
+
+                // Check for wa, pe or accept
+                if ($result->status == 'ok') {
+                    $result->output = $details['output'];
+                    $result->status = $this->diff($case->output, $result->output);
+                }
+
+                $results[] = $result;
             }
 
             return $this->merge_results($results, $cases);
@@ -1228,6 +1225,20 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         }
     }
 
+    // Return the content of the file submitted by userid. The charset of the content is translated into UTF8.
+    // If the file doesn't exist, return false
+    function get_submission_file_content($userid)
+    {
+        if ($basedir = $this->file_area($userid)) {
+            if ($files = get_directory_list($basedir)) {
+                foreach ($files as $key => $file) {
+                    return mb_convert_encoding(file_get_contents($basedir.'/'.$file), 'UTF-8', 'UTF-8, GBK');
+                }
+            }
+        }
+
+        return false;
+    }
 }
 
 function sigterm_handler($signo)
