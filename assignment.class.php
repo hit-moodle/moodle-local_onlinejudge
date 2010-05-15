@@ -1094,17 +1094,39 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 20  => 'ie'
             );
 
+            $result->grade = -1;
+
+            // Submit all cases first to save time.
+            $links = array();
             foreach ($cases as $case) {
                 $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
+                if ($webid['error'] == 'OK')
+                    $links[] = $webid['link'];
+                else {
+                    $result->status = 'ie';
+                    $result->info = $webid['error'];
+                    return $result;
+                }
+            }
 
+            // Get ideone results
+            $delay = $CFG->assignment_oj_ideone_delay;
+            $i = 0;
+            foreach ($cases as $case) {
                 while(1){
-                    sleep($CFG->assignment_oj_ideone_delay); 
-                    $status =  $client->getSubmissionStatus($user, $pass, $webid['link']);
-                    if(!$status['status'])
+                    if ($delay > 0) {
+                        sleep($delay); 
+                        $delay = ceil($delay / 2);
+                    }
+                    debugging('call getSubmissionStatus()', DEBUG_DEVELOPER);
+                    $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
+                    if(!$status['status']) {
+                        $delay = 0;
                         break;
+                    }
                 }
 
-                $details = $client->getSubmissionDetails($user,$pass,$webid['link'],false,true,true,true,true,false);         
+                $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
 
                 $result->status = $status_ideone[$details['result']];
 
@@ -1124,6 +1146,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 }
 
                 $results[] = $result;
+                $i++;
             }
 
             $result = $this->merge_results($results, $cases);
