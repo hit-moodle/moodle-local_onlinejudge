@@ -1118,9 +1118,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         sleep($delay); 
                         $delay = ceil($delay / 2);
                     }
-                    debugging('call getSubmissionStatus()', DEBUG_DEVELOPER);
                     $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
-                    if(!$status['status']) {
+                    if($status['status'] == 0) {
                         $delay = 0;
                         break;
                     }
@@ -1139,10 +1138,18 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     return $result;
                 }
 
-                // Check for wa, pe or accept
+                // Check for wa, pe, tle, mle or accept
                 if ($result->status == 'ok') {
-                    $result->output = $details['output'];
-                    $result->status = $this->diff($case->output, $result->output);
+                    debugging($details['time']);
+                    debugging($details['memory']);
+                    if ($details['time'] > $this->onlinejudge->cpulimit)
+                        $result->status = 'tle';
+                    else if ($details['memory']*1024*1024 > $this->onlinejudge->memlimit)
+                        $result->status = 'mle';
+                    else {
+                        $result->output = $details['output'];
+                        $result->status = $this->diff($case->output, $result->output);
+                    }
                 }
 
                 $results[] = $result;
