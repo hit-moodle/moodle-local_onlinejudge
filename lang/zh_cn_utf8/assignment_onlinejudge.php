@@ -18,6 +18,7 @@
     $string['duejudge'] = '到截止时间后才评测';
     $string['feedbackforwa'] = '给错误答案的反馈';
     $string['filereaderror'] = '此文件不可读';
+    $string['ideonelogo'] = '<a href=\"http://ideone.com\">ideone.com</a>提供部分结果。';
     $string['info'] = '信息';
     $string['infoat'] = '一个好程序在没遇到错误的时候，必须“return 0”。';
     $string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';

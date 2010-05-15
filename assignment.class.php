@@ -926,6 +926,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         if ($content = $this->get_submission_file_content($sub->userid)) {
 
+            $file = 'prog.c';
             file_put_contents("$temp_dir/$file", $content);
             $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
             if (!is_executable($compiler)) {
@@ -957,7 +958,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $result;
     }
 
-    function merge_results($results, $testcases) {
+    function merge_results($results, $testcases, $appends = null) {
         $result = null;
         $result->output = '';
         $result->info = '';
@@ -976,6 +977,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $result->info .= '('.get_string('info'.$one->status, 'assignment_onlinejudge').')';
             }
             $result->info .= '<br />';
+
+            if (!empty($appends))
+                $result->info .= $appends[$i];
 
             $grade = $this->grade_marker($one->status, $testcase['value']->subgrade);
             if ($grade != -1)
@@ -1092,9 +1096,10 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
             foreach ($cases as $case) {
                 $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
+
                 while(1){
                     sleep($CFG->assignment_oj_ideone_delay); 
-                    $status =  $client->getSubmissionStatus($user,$pass,$webid['link']);
+                    $status =  $client->getSubmissionStatus($user, $pass, $webid['link']);
                     if(!$status['status'])
                         break;
                 }
@@ -1107,7 +1112,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 if ($result->status == 'ce' || $this->onlinejudge->compileonly) {
                     if ($result->status != 'ce' && $result->status != 'ie')
                         $result->status = 'compileok';
-                    $result->info = $details['cmpinfo'];
+                    $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+                    $result->grade = $this->grade_marker('ce', $this->assignment->grade);
                     return $result;
                 }
 
@@ -1120,7 +1126,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 $results[] = $result;
             }
 
-            return $this->merge_results($results, $cases);
+            $result = $this->merge_results($results, $cases);
+            $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+            return $result;
         } else {
             return false;
         }
