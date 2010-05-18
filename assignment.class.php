@@ -1144,7 +1144,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                     debugging($details['memory']);
                     if ($details['time'] > $this->onlinejudge->cpulimit)
                         $result->status = 'tle';
-                    else if ($details['memory']*1024*1024 > $this->onlinejudge->memlimit)
+                    else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
                         $result->status = 'mle';
                     else {
                         $result->output = $details['output'];
