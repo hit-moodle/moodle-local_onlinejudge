@@ -966,6 +966,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         reset($testcases);
 
+        $result->output = '';
         foreach ($results as $i => $one) {
             $testcase = each($testcases);
             $result->output .= $one->output;
@@ -1081,7 +1082,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $pass = $CFG->assignment_oj_ideone_password;
 
         if ($source = $this->get_submission_file_content($sub->userid)) {
-            $results = array();
             $cases = $this->get_tests();
 
             $status_ideone = array(
@@ -1112,6 +1112,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             // Get ideone results
             $delay = $CFG->assignment_oj_ideone_delay;
             $i = 0;
+            $results = array();
             foreach ($cases as $case) {
                 while(1){
                     if ($delay > 0) {
@@ -1140,8 +1141,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
                 // Check for wa, pe, tle, mle or accept
                 if ($result->status == 'ok') {
-                    debugging($details['time']);
-                    debugging($details['memory']);
                     if ($details['time'] > $this->onlinejudge->cpulimit)
                         $result->status = 'tle';
                     else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
@@ -1153,6 +1152,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                 }
 
                 $results[] = $result;
+                unset($result);
                 $i++;
             }
 
