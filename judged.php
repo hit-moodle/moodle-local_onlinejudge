@@ -17,17 +17,29 @@ if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
 
 // Kill old daemon if it exists
 if(!empty($CFG->assignment_oj_daemon_pid)) {
-    mtrace('Killing old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
-    posix_kill($CFG->assignment_oj_daemon_pid, SIGTERM);
-    // Wait for its quit
-    while(posix_kill($CFG->assignment_oj_daemon_pid, 0))
-        sleep(0);
-    mtrace('done');
-    $CFG->assignment_oj_daemon_pid = 0;
+   if (function_exists('posix_kill')) { // Linux
+       mtrace('Killing old judged. PID = ' . $CFG->assignment_oj_daemon_pid);
+       posix_kill($CFG->assignment_oj_daemon_pid, SIGTERM);
+       // Wait for its quit
+       while(posix_kill($CFG->assignment_oj_daemon_pid, 0))
+           sleep(0);
+       mtrace('done');
+       $CFG->assignment_oj_daemon_pid = 0;
+   } else {
+       mtrace("It seems that a judged (PID: $CFG->assignment_oj_daemon_pid) is still running.");
+       mtrace("It must be killed manually.");
+       mtrace("If it has been killed, enter 'C' to continue.");
+       $input = trim(fgets(STDIN));
+       if ($input != 'C' && $input != 'c')
+           die;
+   }
 }
 
 // Create daemon
 $oj = new assignment_onlinejudge();
-$oj->run_daemon();
+if (function_exists('pcntl_fork')) // Linux
+    $oj->fork_daemon();
+else // Windows
+    $oj->daemon();
 
 ?>

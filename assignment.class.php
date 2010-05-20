@@ -1183,13 +1183,13 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         // Routine two works only when the cron job is executed by php cli
         //
         if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
-            $this->run_daemon();
+            $this->fork_daemon();
         } else if ($CFG->assignment_oj_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
             $this->judge_all_unjudged();
         }
     }
 
-    function run_daemon() 
+    function fork_daemon() 
     {
         global $CFG, $db;
 
@@ -1213,32 +1213,35 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     {
         global $CFG;
 
-        mtrace('Judge daemon created. PID = ' . posix_getpid());
+        $pid = getmypid();
+        mtrace('Judge daemon created. PID = ' . $pid);
 
-        // Start a new sesssion. So it works like a daemon
-        $sid = posix_setsid();
-        if ($sid < 0) {
-            mtrace('Can not setsid');
-            exit;
+        if (function_exists('pcntl_fork')) { // In linux, this is a new session
+            // Start a new sesssion. So it works like a daemon
+            $sid = posix_setsid();
+            if ($sid < 0) {
+                mtrace('Can not setsid');
+                exit;
+            }
+
+            //Redirect error output to php log
+            $CFG->debugdisplay = false;
+            @ini_set('display_errors', '0');
+            @ini_set('log_errors', '1');
+
+            // Close unused fd
+            fclose(STDIN);
+            fclose(STDOUT);
+            fclose(STDERR);
+
+            reconnect_db();
+
+            // Handle SIGTERM so that can be killed without pain
+            declare(ticks = 1); // tick use required as of PHP 4.3.0
+            pcntl_signal(SIGTERM, 'sigterm_handler');
         }
-        
-        //Redirect error output to php log
-        $CFG->debugdisplay = false;
-        @ini_set('display_errors', '0');
-        @ini_set('log_errors', '1');
 
-        // Close unused fd
-        fclose(STDIN);
-        fclose(STDOUT);
-        fclose(STDERR);
-
-        reconnect_db();
-
-        // Handle SIGTERM so that can be killed without pain
-        declare(ticks = 1); // tick use required as of PHP 4.3.0
-        pcntl_signal(SIGTERM, 'sigterm_handler');
-
-        set_config('assignment_oj_daemon_pid' , posix_getpid());
+        set_config('assignment_oj_daemon_pid' , $pid);
 
         // Run forever until being killed
         while(!empty($CFG->assignment_oj_daemon_pid)){
