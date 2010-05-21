@@ -764,12 +764,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         $lang = array ();
         
-        // Get local languages
-        $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
-        $files = get_directory_list($dir);
-        $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
-        foreach ($names as $name) {
-            $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
+        // Get local languages. Linux only
+        if ($CFG->ostype == 'WINDOWS') {
+            $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
+            $files = get_directory_list($dir);
+            $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
+            foreach ($names as $name) {
+                $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
+            }
         }
 
         // Get ideone.com languages
