@@ -32,7 +32,7 @@ if (!isset($CFG->assignment_oj_max_cpu)) {
 
 // Default memory usage (bytes) for all assignments
 if (!isset($CFG->assignment_oj_max_mem)) {
-    set_config('assignment_oj_max_mem', 16 * 1024 *1024);
+    set_config('assignment_oj_max_mem', 256 * 1024 * 1024);
 }
 
 // Judge everytime when cron is running if set to true. Default is false. Use daemon is recommanded
