@@ -765,7 +765,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $lang = array ();
         
         // Get local languages. Linux only
-        if ($CFG->ostype == 'WINDOWS') {
+        if ($CFG->ostype != 'WINDOWS') {
             $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
             $files = get_directory_list($dir);
             $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
