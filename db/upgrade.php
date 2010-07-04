@@ -77,6 +77,54 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
         $result = $result && drop_field($table, $field);
     }
 
+
+    if ($result && $oldversion < 2010070400) {
+
+    /// Define field usefile to be added to assignment_oj_tests
+        $table = new XMLDBTable('assignment_oj_tests');
+        $field = new XMLDBField('usefile');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'output');
+    /// Launch add field usefile
+        $result = $result && add_field($table, $field);
+
+    /// Define field inputfile to be added to assignment_oj_tests
+        $table = new XMLDBTable('assignment_oj_tests');
+        $field = new XMLDBField('inputfile');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'usefile');
+    /// Launch add field inputfile
+        $result = $result && add_field($table, $field);
+
+    /// Define field outputfile to be added to assignment_oj_tests
+        $table = new XMLDBTable('assignment_oj_tests');
+        $field = new XMLDBField('outputfile');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'inputfile');
+    /// Launch add field outputfile
+        $result = $result && add_field($table, $field);
+
+
+    /// Changing type of field subgrade on table assignment_oj_tests to number
+        $table = new XMLDBTable('assignment_oj_tests');
+        $field = new XMLDBField('subgrade');
+        $field->setAttributes(XMLDB_TYPE_NUMBER, '20, 10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'feedback');
+    /// Launch change of type for field subgrade
+        $result = $result && change_field_type($table, $field);
+
+    /// Upgrade the value in subgrade field
+        if ($result) {
+            $ojs = get_records('assignment_oj');
+            foreach ($ojs as $oj) {
+                $modgrade = get_field('assignment', 'grade', 'id', $oj->assignment); 
+                if ($modgrade) {
+                    $sql = 'UPDATE '.$CFG->prefix.'assignment_oj_tests '.
+                           'SET subgrade=subgrade/'.$modgrade.' '.
+                           'WHERE assignment='.$oj->assignment;
+                    $result = $result && execute_sql($sql);
+                }
+            }
+        }
+
+    }
+
     return $result;
 }
 

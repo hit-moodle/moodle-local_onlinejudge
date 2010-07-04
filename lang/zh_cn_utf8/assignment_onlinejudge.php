@@ -4,7 +4,7 @@
     $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
     $string['rejudgefailed'] = '无法提交重新评测请求。';
     $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
-    $string['addtestcases'] = '增加 $a 个测试用例';
+    $string['addtestcases'] = '增加 $a 组测试用例';
     $string['assignmentlangs'] = '编程语言';
     $string['cannotruncompiler'] = '无法执行编译器脚本';
     $string['case'] = '用例{$a}:';
@@ -35,6 +35,7 @@
     $string['judgetime'] = '评测时间';
     $string['langc_warn2err'] = 'C (警告视为错误)';
     $string['langcpp_warn2err'] = 'C++ (警告视为错误)';
+    $string['managetestcases'] = '管理测试用例';
     $string['maxcpuusage'] = '最长CPU运行时间';
     $string['maximumfilesize'] = '源文件最大长度';
     $string['maxmemusage'] = '最大内存用量';

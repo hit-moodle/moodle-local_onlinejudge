@@ -83,6 +83,7 @@
     $string['langunlambda_ideone'] = 'Unlambda (ideone.com)';         
     $string['langvbdotnet_ideone'] = 'Visual Basic .NET (ideone.com)'; 
     $string['langwhitespace_ideone'] = 'Whitespace (ideone.com)';         
+    $string['managetestcases'] = 'Manage testcases';
     $string['maxcpuusage'] = 'Maximum CPU usage';
     $string['maximumfilesize'] = 'Maximum source file size';
     $string['maxmemusage'] = 'Maximum memory usage';

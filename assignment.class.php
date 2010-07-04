@@ -194,37 +194,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
 
-        // Testcases form ----------------------------------------------------------------------------------------
-        $mform->addElement('header', 'testcases', get_string('testcases', 'assignment_onlinejudge'));
-        $mform->setHelpButton('testcases', array('testcases', get_string('testcases', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
-        $repeatarray = array();
-        $repeatarray[] = &$mform->createElement('modgrade', 'subgrade', get_string('grade'));
-        $repeatarray[] = &$mform->createElement('textarea', 'input', get_string('input', 'assignment_onlinejudge'), 'wrap="virtual" rows="1" cols="50"');
-        $mform->setType('input', PARAM_RAW);
-        $repeatarray[] = &$mform->createElement('textarea', 'output', get_string('output', 'assignment_onlinejudge'), 'wrap="virtual" rows="1" cols="50"');
-        $mform->setType('output', PARAM_RAW);
-        $repeatarray[] = &$mform->createElement('text', 'feedback', get_string('feedbackforwa', 'assignment_onlinejudge'), array('size' => 50));
-        $mform->setType('feedbacktext', PARAM_RAW);
-
-        $repeateloptions = array();
-        $repeateloptions['subgrade']['default'] = 0;
-
-        $tests = $this->get_tests($cm);
-        $numtestcases = max(count($tests) + 1, NUMTESTS);
-
-        $modform->repeat_elements($repeatarray, $numtestcases, $repeateloptions, 'boundary_repeats', 'add_testcases', 1, get_string('addtestcases', 'assignment_onlinejudge', 1), true);
-        $mform->setDefault('subgrade[0]', 100);
-
-        if ($tests) {
-            $i = 0;
-            foreach ($tests as $tstObj => $tstValue) {
-                $mform->setDefault("input[$i]", $tstValue->input);
-                $mform->setDefault("output[$i]", $tstValue->output);
-                $mform->setDefault("feedback[$i]", $tstValue->feedback);
-                $mform->setDefault("subgrade[$i]", $tstValue->subgrade);
-                $i++;
-            }
-        }
     }
 
     /**
@@ -315,29 +284,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @param object $assignment the onlinejudge object.
      */
     function after_add_update($assignment) {
-        // Delete actual tests
-        delete_records('assignment_oj_tests', 'assignment', $assignment->id);
-
-        // Insert new tests
-        for ($i = 0; $i < $assignment->boundary_repeats; $i++) {
-            // Check if tests is not empty
-            if(!empty($assignment->input[$i]) || !empty($assignment->output[$i])
-                || !empty($assignment->feedback[$i]) || !empty($assignment->subgrade[$i])) {
-                    $test = new Object();
-                    $test->assignment = $assignment->id;
-                    $test->input = str_replace("\r", "", $assignment->input[$i]);
-                    $test->output = $assignment->output[$i];
-                    $test->feedback = $assignment->feedback[$i];
-                    $test->subgrade = $assignment->subgrade[$i];
-
-                    if (!insert_record('assignment_oj_tests', $test)) {
-                        error('Can\'t insert testcase');
-                    }
-
-                    unset ($test);
-                }
-        }
-
         $onlinejudge = new Object();
         $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
         if ($onlinejudge) {
@@ -380,7 +326,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      */
     function submittedlink($allgroups=false) {
 
-        global $USER;
+        global $USER, $CFG;
 
         $parent_link = parent::submittedlink($allgroups);
 
@@ -390,7 +336,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $rejudge_link = element_to_popup_window ('link', '/mod/assignment/type/onlinejudge/rejudge.php?id='.$this->cm->id, null, 
                 get_string('rejudgeall','assignment_onlinejudge'), 
                 330, 500, null, null, true, null, null);
-            return $parent_link .'<br />'.$rejudge_link;
+            $testcase_link = '<a href = "'.$CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id.'">'.get_string('managetestcases','assignment_onlinejudge').'</a>';
+            return $parent_link .'<br />'.$rejudge_link.'<br />'.$testcase_link;
         } else {
             return $parent_link;
         }    
@@ -899,15 +846,15 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     /**
-     * return grage
+     * return grade
      * status means ac, wa, pe and etc.
-     * maxgrade means maxgrade, :-)
+     * fraction means max fraction in modgrade, :-)
      */
-    function grade_marker($status, $maxgrade) {
+    function grade_marker($status, $fraction) {
         $grades = array('pending' => -1,
-                        'ac'      => $maxgrade,
+                        'ac'      => $fraction * $this->assignment->grade,
                         'wa'      => 0,
-                        'pe'      => $maxgrade * $this->onlinejudge->ratiope,
+                        'pe'      => $fraction * $this->assignment->grade * $this->onlinejudge->ratiope,
                         're'      => 0,
                         'tle'     => 0,
                         'mle'     => 0,
