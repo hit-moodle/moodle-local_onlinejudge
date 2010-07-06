@@ -1,11 +1,7 @@
 <?php
-    $string['rejudge'] = 'Rejudge';
-    $string['rejudgeall'] = 'Rejudge all';
-    $string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in $a?';
-    $string['rejudgefailed'] = 'Can not submitted rejudge request.';
-    $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
+    $string['badtestcasefile'] = 'This file does not exist or can not be read';
     $string['cannotruncompiler'] = 'Can not execute the script of compiler';
     $string['case'] = 'Case $a:';
     $string['compileonly'] = 'Compile only';
@@ -32,6 +28,7 @@
     $string['infotle'] = 'The program has been running for a too long time.';
     $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
     $string['input'] = 'Input';
+    $string['inputfile'] = 'Input file';
     $string['judgetime'] = 'Judge time';
     $string['langc'] = 'C';
     $string['langc_warn2err'] = 'C (Warnings as Errors)';
@@ -89,7 +86,13 @@
     $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
     $string['output'] = 'Output';
+    $string['outputfile'] = 'Output file';
     $string['ratiope'] = 'Ratio for presentation error';
+    $string['rejudge'] = 'Rejudge';
+    $string['rejudgeall'] = 'Rejudge all';
+    $string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in $a?';
+    $string['rejudgefailed'] = 'Can not submitted rejudge request.';
+    $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
     $string['statusac'] = '<font color=red>Accepted</font>';
     $string['statusat'] = 'Abnormal Termination';
@@ -107,4 +110,5 @@
     $string['statuswa'] = 'Wrong answer';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
+    $string['usefile'] = 'Testcase from files';
 ?>

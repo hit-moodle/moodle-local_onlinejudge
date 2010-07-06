@@ -1,11 +1,7 @@
 <?php
-    $string['rejudge'] = '重新评测';
-    $string['rejudgeall'] = '全部重新评测';
-    $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
-    $string['rejudgefailed'] = '无法提交重新评测请求。';
-    $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
     $string['addtestcases'] = '增加 $a 组测试用例';
     $string['assignmentlangs'] = '编程语言';
+    $string['badtestcasefile'] = '此文件不存在，或不可读';
     $string['cannotruncompiler'] = '无法执行编译器脚本';
     $string['case'] = '用例{$a}:';
     $string['compileonly'] = '只编译';
@@ -32,6 +28,7 @@
     $string['infotle'] = '此程序运行得太久了。';
     $string['infowa'] = '请仔细检查您的代码。不要在输出中有手误或任何未要求的字符';
     $string['input'] = '输入';
+    $string['inputfile'] = '输入文件';
     $string['judgetime'] = '评测时间';
     $string['langc_warn2err'] = 'C (警告视为错误)';
     $string['langcpp_warn2err'] = 'C++ (警告视为错误)';
@@ -41,7 +38,13 @@
     $string['maxmemusage'] = '最大内存用量';
     $string['memlimit'] = '内存最多可用';
     $string['output'] = '输出';
+    $string['outputfile'] = '输出文件';
     $string['ratiope'] = '格式错误得分比例';
+    $string['rejudge'] = '重新评测';
+    $string['rejudgeall'] = '全部重新评测';
+    $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
+    $string['rejudgefailed'] = '无法提交重新评测请求。';
+    $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
     $string['statusat'] = '非正常结束';
     $string['statusce'] = '编译错误';
     $string['statuscompileok'] = '编译通过';
@@ -57,4 +60,5 @@
     $string['statuswa'] = '错误答案';
     $string['testcases'] = '测试用例';
     $string['typeonlinejudge'] = '在线评测';
+    $string['usefile'] = '测试用例来自文件';
 ?>

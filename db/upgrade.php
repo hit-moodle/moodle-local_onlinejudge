@@ -125,6 +125,9 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
 
     }
 
+    // Tell the daemon to exit
+    set_config('assignment_oj_daemon_pid' , '0');
+
     return $result;
 }
 

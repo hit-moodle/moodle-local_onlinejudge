@@ -307,18 +307,25 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     /**
      * Get tests data for current assignment.
      *
-     * @param object $cm Course module
-     * @return array tests An array of tests objects
+     * @return array tests An array of tests objects. All testcase files are read into memory
      */
-    function get_tests($cm=null) {
-        if (isset($cm->instance))
-            $instanceid = $cm->instance;
-        else if (isset($this->cm->instance))
-            $instanceid = $this->cm->instance;
-        else
-            return null;
+    function get_tests() {
+        global $CFG;
 
-        return get_records('assignment_oj_tests', 'assignment', $instanceid, 'id ASC');
+        $records = get_records('assignment_oj_tests', 'assignment', $this->assignment->id, 'id ASC');
+        $tests = array();
+
+        foreach ($records as $record) {
+            if ($record->usefile) {
+                if (! $record->input = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->inputfile"))
+                    continue; //Skip case whose file(s) can't be read
+                if (! $record->output = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->outputfile"))
+                    continue; //Skip case whose file(s) can't be read
+            }
+            $tests[] = $record;
+        }
+
+        return $tests;
     }
 
     /**
@@ -1192,7 +1199,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         set_config('assignment_oj_daemon_pid' , $pid);
 
-        // Run forever until being killed
+        // Run forever until be killed or plugin was upgraded
         while(!empty($CFG->assignment_oj_daemon_pid)){
             global $db;
 
@@ -1204,6 +1211,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
             //Check interval is 5 seconds
             sleep(5);
+
+            //renew the config value which could be modified by other processes
+            $CFG->assignment_oj_daemon_pid = get_config(NULL, 'assignment_oj_daemon_pid');
         }
     }
 
