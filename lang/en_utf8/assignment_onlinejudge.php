@@ -47,6 +47,7 @@
     $string['langc99_strict_ideone'] = 'C99 strict (ideone.com)';             
     $string['langclojure_ideone'] = 'Clojure (ideone.com)';                
     $string['langcobol_ideone'] = 'COBOL (ideone.com)';                      
+    $string['langcobol85_ideone'] = 'COBOL 85 (ideone.com)';                      
     $string['langcommon_lisp_clisp_ideone'] = 'Common Lisp (clisp, ideone.com)';    
     $string['langd_dmd_ideone'] = 'D (dmd, ideone.com)';                 
     $string['langerlang_ideone'] = 'Erlang (ideone.com)';                     
@@ -63,6 +64,7 @@
     $string['langnemerle_ideone'] = 'Nemerle (ideone.com)';                  
     $string['langnice_ideone'] = 'Nice (ideone.com)';                     
     $string['langocaml_ideone'] = 'Ocaml (ideone.com)';                      
+    $string['langoz_ideone'] = 'Oz (ideone.com)';                      
     $string['langpascal_fpc_ideone'] = 'Pascal (fpc, ideone.com)';             
     $string['langpascal_gpc_ideone'] = 'Pascal (gpc, ideone.com)';            
     $string['langperl_ideone'] = 'Perl (ideone.com)';              
@@ -71,6 +73,8 @@
     $string['langprolog_gnu_ideone'] = 'Prolog (gnu, ideone.com)';   
     $string['langprolog_swi_ideone'] = 'Prolog (swi, ideone.com)';      
     $string['langpython_ideone'] = 'Python (ideone.com)';             
+    $string['langpython3_ideone'] = 'Python3 (ideone.com)';             
+    $string['langr_ideone'] = 'R (ideone.com)';             
     $string['langruby_ideone'] = 'Ruby (ideone.com)';             
     $string['langscala_ideone'] = 'Scala (ideone.com)';             
     $string['langscheme_guile_ideone'] = 'Scheme (guile, ideone.com)';    
