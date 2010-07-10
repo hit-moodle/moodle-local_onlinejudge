@@ -38,6 +38,12 @@ class testcase_form extends moodleform {
 		$repeateloptions['inputfile']['type'] = PARAM_FILE;
 		$repeateloptions['outputfile']['type'] = PARAM_FILE;
 		$repeateloptions['testcases']['helpbutton'] =  array('testcases', get_string('testcases', 'assignment_onlinejudge'), 'assignment_onlinejudge');
+		$repeateloptions['input']['helpbutton'] =  array('input', get_string('input', 'assignment_onlinejudge'), 'assignment_onlinejudge');
+		$repeateloptions['output']['helpbutton'] =  array('output', get_string('output', 'assignment_onlinejudge'), 'assignment_onlinejudge');
+		$repeateloptions['inputfile']['helpbutton'] =  array('inputfile', get_string('inputfile', 'assignment_onlinejudge'), 'assignment_onlinejudge');
+		$repeateloptions['outputfile']['helpbutton'] =  array('outputfile', get_string('outputfile', 'assignment_onlinejudge'), 'assignment_onlinejudge');
+		$repeateloptions['subgrade']['helpbutton'] =  array('grade', get_string('grade'), 'assignment_onlinejudge');
+		$repeateloptions['feedback']['helpbutton'] =  array('feedback', get_string('feedbackforwa', 'assignment_onlinejudge'), 'assignment_onlinejudge');
         $repeateloptions['subgrade']['default'] = 0;
 		$repeateloptions['inputfile']['disabledif'] = array( 'usefile', 'notchecked');
         $repeateloptions['outputfile']['disabledif'] = array( 'usefile', 'notchecked');
