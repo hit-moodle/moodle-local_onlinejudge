@@ -86,16 +86,18 @@ class testcase_form extends moodleform {
 
         $errors = array();
 
-        foreach ($data['usefile'] as $key => $usefile) {
-            if ($usefile) {
-                $file = $data["inputfile[$key]"];
-                if (! is_readable("$CFG->dataroot/$COURSE->id/$file")) {
-                    $errors["inputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
-                }
+        if (isset($data['usefile'])) {
+            foreach ($data['usefile'] as $key => $usefile) {
+                if ($usefile) {
+                    $file = $data["inputfile[$key]"];
+                    if (! is_readable("$CFG->dataroot/$COURSE->id/$file")) {
+                        $errors["inputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
+                    }
 
-                $file = $data["outputfile[$key]"];
-                if (! is_readable("$CFG->dataroot/$COURSE->id/$file")) {
-                    $errors["outputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
+                    $file = $data["outputfile[$key]"];
+                    if (! is_readable("$CFG->dataroot/$COURSE->id/$file")) {
+                        $errors["outputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
+                    }
                 }
             }
         }
