@@ -47,7 +47,7 @@ if ($testform->is_cancelled()){
 	delete_records('assignment_oj_tests', 'assignment', $assignment->id);
 
 	for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
-        if ($fromform->subgrade[$i] == 0.0 && !isset($fromform->usefile[$i]) && empty($fromform->input[$i]) && empty($fromform->output[$i]))  //Ignore empty testcases
+        if (emptycase($fromform, $i))
             continue;
 
         if (isset($fromform->usefile[$i])) {
@@ -100,4 +100,13 @@ if ($testform->is_cancelled()){
 
 }
 
+function emptycase(&$form, $i) {
+    if ($form->subgrade[$i] != 0.0)
+        return false;
+
+    if (isset($form->usefile[$i]))
+        return empty($form->inputfile[$i]) && empty($form->outputfile[$i]);
+    else
+        return empty($form->input[$i]) && empty($form->output[$i]);
+}
 ?>
