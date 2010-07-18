@@ -16,7 +16,7 @@
     $string['filereaderror'] = 'Can not read this file';
     $string['ideonelogo'] = '<a href=\"http://code.google.com/p/sunner-projects/wiki/OnlineJudgeAssignmentType\">Moodle Online Judge</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
     $string['info'] = 'Information';
-    $string['infoat'] = 'A good program must "return 0 if no error occur.';
+    $string['infoat'] = 'A good program must return 0 if no error occur.';
     $string['infocompileok'] = 'It seems that the compiler likes your code.';
     $string['infoie'] = 'Sandbox error. Report to admin please.';
     $string['infomle'] = 'You ate too much memory.';
