@@ -1056,64 +1056,70 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
             $result->grade = -1;
 
-            // Submit all cases first to save time.
-            $links = array();
-            foreach ($cases as $case) {
-                $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
-                if ($webid['error'] == 'OK')
-                    $links[] = $webid['link'];
-                else {
-                    $result->status = 'ie';
-                    $result->info = $webid['error'];
-                    return $result;
-                }
-            }
-
-            // Get ideone results
-            $delay = $CFG->assignment_oj_ideone_delay;
-            $i = 0;
-            $results = array();
-            foreach ($cases as $case) {
-                while(1){
-                    if ($delay > 0) {
-                        sleep($delay); 
-                        $delay = ceil($delay / 2);
-                    }
-                    $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
-                    if($status['status'] == 0) {
-                        $delay = 0;
-                        break;
-                    }
-                }
-
-                $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
-
-                $result->status = $status_ideone[$details['result']];
-
-                // If got ce or compileonly, don't need to test other case
-                if ($result->status == 'ce' || $this->onlinejudge->compileonly) {
-                    if ($result->status != 'ce' && $result->status != 'ie')
-                        $result->status = 'compileok';
-                    $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
-                    $result->grade = $this->grade_marker('ce', $this->assignment->grade);
-                    return $result;
-                }
-
-                // Check for wa, pe, tle, mle or accept
-                if ($result->status == 'ok') {
-                    if ($details['time'] > $this->onlinejudge->cpulimit)
-                        $result->status = 'tle';
-                    else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
-                        $result->status = 'mle';
+            try { // Begin soap
+                // Submit all cases first to save time.
+                $links = array();
+                foreach ($cases as $case) {
+                    $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
+                    if ($webid['error'] == 'OK')
+                        $links[] = $webid['link'];
                     else {
-                        $result->output = $details['output'];
-                        $result->status = $this->diff($case->output, $result->output);
+                        $result->status = 'ie';
+                        $result->info = $webid['error'];
+                        return $result;
                     }
                 }
 
-                $results[] = $result;
-                unset($result);
-                $i++;
+                // Get ideone results
+                $delay = $CFG->assignment_oj_ideone_delay;
+                $i = 0;
+                $results = array();
+                foreach ($cases as $case) {
+                    while(1){
+                        if ($delay > 0) {
+                            sleep($delay); 
+                            $delay = ceil($delay / 2);
+                        }
+                        $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
+                        if($status['status'] == 0) {
+                            $delay = 0;
+                            break;
+                        }
+                    }
+
+                    $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
+
+                    $result->status = $status_ideone[$details['result']];
+
+                    // If got ce or compileonly, don't need to test other case
+                    if ($result->status == 'ce' || $this->onlinejudge->compileonly) {
+                        if ($result->status != 'ce' && $result->status != 'ie')
+                            $result->status = 'compileok';
+                        $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+                        $result->grade = $this->grade_marker('ce', $this->assignment->grade);
+                        return $result;
+                    }
+
+                    // Check for wa, pe, tle, mle or accept
+                    if ($result->status == 'ok') {
+                        if ($details['time'] > $this->onlinejudge->cpulimit)
+                            $result->status = 'tle';
+                        else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
+                            $result->status = 'mle';
+                        else {
+                            $result->output = $details['output'];
+                            $result->status = $this->diff($case->output, $result->output);
+                        }
+                    }
+
+                    $results[] = $result;
+                    unset($result);
+                    $i++;
+                }
+            } catch (SoapFault $ex) {
+                $result->status = 'ie';
+                $result->info = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
+                return $result;
             }
 
             $result = $this->merge_results($results, $cases);
