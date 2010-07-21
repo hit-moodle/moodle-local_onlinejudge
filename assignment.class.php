@@ -1065,7 +1065,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
                         $links[] = $webid['link'];
                     else {
                         $result->status = 'ie';
-                        $result->info = $webid['error'];
+                        $result->info = $webid['error']['error'];
                         return $result;
                     }
                 }
