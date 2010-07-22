@@ -1,4 +1,5 @@
 #include <sandbox.h>
+#include <symbols.h>
 #include <getopt.h>
 #include <sys/time.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <syslog.h>
+#include <unistd.h>
 #include "policy.c"
 
 #define MAX_NAME_LEN 20
@@ -227,6 +229,7 @@ int main(int argc, char *argv[]) {
             syslog(LOG_USER | LOG_INFO, "%s:S_RESULT_%s(%d)", argv[optionsnu], s_result_name(returnvalue), last_rf_called);
         else
             syslog(LOG_USER | LOG_INFO, "%s:S_RESULT_%s", argv[optionsnu], s_result_name(returnvalue));
+        print(&sandbox);
     }
 
 	if (!sandbox_fini(&sandbox))
@@ -241,8 +244,8 @@ int main(int argc, char *argv[]) {
 
 static void print (const sandbox_t * const sandbox) {
 	assert(sandbox);
-   	syslog(LOG_USER | LOG_INFO, "status:    % 10ld\n", sandbox->status);
-   	syslog(LOG_USER | LOG_INFO, "result:    % 10ld\n", sandbox->result);
+   	syslog(LOG_USER | LOG_INFO, "status:    % 10d\n", sandbox->status);
+   	syslog(LOG_USER | LOG_INFO, "result:    % 10d\n", sandbox->result);
 	syslog(LOG_USER | LOG_INFO, "elapsed:   % 10ld msec\n", sandbox->stat.stopped.tv_sec * 1000 -
 			sandbox->stat.started.tv_sec * 1000 +
 			sandbox->stat.stopped.tv_usec / 1000 -
@@ -258,7 +261,7 @@ static void print (const sandbox_t * const sandbox) {
 			sandbox->stat.ru.ru_utime.tv_usec / 1000 +
 			sandbox->stat.ru.ru_stime.tv_sec * 1000 +
 			sandbox->stat.ru.ru_stime.tv_usec / 1000);
-	syslog(LOG_USER | LOG_INFO, "cpu.tsc:   % 10llu\n", sandbox->stat.tsc);
+	syslog(LOG_USER | LOG_INFO, "cpu.tsc:   %10llu\n", sandbox->stat.tsc);
 	syslog(LOG_USER | LOG_INFO, "mem.vsize: % 10ld kB\n", (long)sandbox->stat.vsize / 1024);
 }
 
@@ -338,7 +341,7 @@ void print_deatails(sandbox_t *sandbox) {
 	syslog(LOG_USER | LOG_INFO, "ofd: %d\n", sandbox->task.ofd);
 	syslog(LOG_USER | LOG_INFO, "efd: %d\n", sandbox->task.efd);
 	for (i=0; i<4; i++) {
-		syslog(LOG_USER | LOG_INFO, "quota[%d]: %d\n", i, sandbox->task.quota[i]);
+		syslog(LOG_USER | LOG_INFO, "quota[%d]: %d\n", i, (int)sandbox->task.quota[i]);
 	}
 }
 
