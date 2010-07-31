@@ -567,6 +567,18 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $options->para = false;
         $table->data[] = array($item_name, format_text(stripslashes($item), FORMAT_MOODLE, $options));
 
+        // Statistics
+        $item_name = get_string('statistics','assignment_onlinejudge').':';
+        $item = get_string('notavailable');
+        if (isset($submission->id)) {
+            $item = '';
+            $ac_rate = $this->get_statistics($submission, &$item);
+            if (!empty($item)) {
+                $item .= '<br />'.get_string('successrate', 'assignment_onlinejudge').': '.round($ac_rate*100, 2).'%';
+            }
+        }
+        $table->data[] = array($item_name, $item);
+
         // Output (Show to teacher only)
         $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
         if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
@@ -579,6 +591,42 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             return $output;
             
         echo $output;
+    }
+
+    /**
+     * return success rate. return more details if $detail is set
+     */
+    function get_statistics($submission = null, &$detail = null) {
+        if (is_null($submission))
+            $submission = $this->get_submission();
+        if (isset($submission->id) && $results = get_records('assignment_oj_results', 'submission', $submission->id, 'judgetime ASC')) {
+            $statistics = array();
+            foreach ($results as $result) {
+                $status = $result->status;
+                if (!array_key_exists($status, $statistics))
+                    $statistics[$status] = 0;
+                $statistics[$status]++;
+            }
+
+            $judge_count = 0;
+            foreach($statistics as $status => $count) {
+                if (empty($detail))
+                    $detail = get_string('status'.$status, 'assignment_onlinejudge').': '.$count;
+                else
+                    $detail .= '<br />'.get_string('status'.$status, 'assignment_onlinejudge').': '.$count;
+                if ($status == 'ac') // all ac count as one
+                    $judge_count += 1;
+                else
+                    $judge_count += $count;
+            }
+
+            if (array_key_exists('ac', $statistics))
+                return 1/$judge_count;
+            else
+                return 0;
+        }
+        $detail = get_string('notavailable');
+        return 0;
     }
 
     function get_submission($userid=0, $createnew=false, $teachermodified=false) {

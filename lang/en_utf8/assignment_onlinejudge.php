@@ -98,6 +98,7 @@
     $string['rejudgefailed'] = 'Can not submitted rejudge request.';
     $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
+    $string['statistics'] = 'Statistics';
     $string['statusac'] = '<font color=red>Accepted</font>';
     $string['statusat'] = 'Abnormal Termination';
     $string['statusce'] = 'Compilation Error';
@@ -112,6 +113,7 @@
     $string['statusrf'] = 'Restricted Functions';
     $string['statustle'] = 'Time-Limit Exceed';
     $string['statuswa'] = 'Wrong answer';
+    $string['successrate'] = 'Success rate';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
     $string['usefile'] = 'Testcase from files';

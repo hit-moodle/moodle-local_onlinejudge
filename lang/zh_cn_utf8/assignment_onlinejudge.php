@@ -45,6 +45,7 @@
     $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
     $string['rejudgefailed'] = '无法提交重新评测请求。';
     $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
+    $string['statistics'] = '统计';
     $string['statusat'] = '非正常结束';
     $string['statusce'] = '编译错误';
     $string['statuscompileok'] = '编译通过';
@@ -58,6 +59,7 @@
     $string['statusrf'] = '受限函数';
     $string['statustle'] = '运行超时';
     $string['statuswa'] = '错误答案';
+    $string['successrate'] = '成功率';
     $string['testcases'] = '测试用例';
     $string['typeonlinejudge'] = '在线评测';
     $string['usefile'] = '测试用例来自文件';
