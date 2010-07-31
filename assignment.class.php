@@ -136,7 +136,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * 
      * @param $mform object Allready existant form
      */
-    function setup_elements(& $mform, & $modform) {
+    function setup_elements(& $mform ) {
         global $CFG, $COURSE;
 
         $add       = optional_param('add', '', PARAM_ALPHA);
