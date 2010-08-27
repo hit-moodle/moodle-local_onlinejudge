@@ -9,7 +9,6 @@
 #include <grp.h>
 #include <syslog.h>
 #include <unistd.h>
-#include "policy.c"
 
 #define MAX_NAME_LEN 20
 
@@ -26,6 +25,10 @@ struct option long_options[] = {
 	{"jail",    1, 0, 'j'},
 	{0,         0, 0,  0 }
 };
+
+extern void __sandbox_default_policy(const policy_t * ppolicy, const event_t * pevent, action_t * paction);
+extern int last_rf_called;
+extern const char * s_result_name(int result);
 
 int options_counter(int argc, char *argv[]);
 static void print (const sandbox_t * const sandbox);

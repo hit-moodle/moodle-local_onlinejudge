@@ -1,5 +1,7 @@
 #include <sandbox.h>
 #include <linux/unistd.h>
+#include <stdlib.h>
+#include <assert.h>
 
 /* syscall no of the restricted syscall which is called */
 int last_rf_called = 0;
@@ -50,7 +52,8 @@ int allowed_syscalls [] = {
 };
 #endif
 
-int allow(const event_t * pevent)
+static int
+allow(const event_t * pevent)
 {
     static int initing = 1;
     static int init_step = 0;
@@ -83,7 +86,7 @@ int allow(const event_t * pevent)
     }
 }
 
-static void 
+void 
 __sandbox_default_policy(const policy_t * ppolicy, const event_t * pevent, 
                          action_t * paction)
 {
