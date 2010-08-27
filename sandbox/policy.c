@@ -4,6 +4,29 @@
 /* syscall no of the restricted syscall which is called */
 int last_rf_called = 0;
 
+#ifdef POLICY1
+/* policy for kernel 2.6.9 ? */
+/* syscall sequence for init code */
+int init_syscalls [] = {
+    __NR_uname,
+    __NR_brk,
+    __NR_brk,
+    __NR_fstat64,
+    90,   // __NR_old_mmap
+    0
+};
+
+/* allowed syscalls after init */
+int allowed_syscalls [] = {
+    __NR_read,
+    __NR_write,
+    90,   // __NR_old_mmap
+    __NR_fstat64,
+    __NR_exit_group,
+    0
+};
+#else
+/* policy for normal kernel. Works on Debian 5, Ubuntu */
 /* syscall sequence for init code */
 int init_syscalls [] = {
     __NR_uname,
@@ -25,6 +48,7 @@ int allowed_syscalls [] = {
     __NR_exit_group,
     0
 };
+#endif
 
 int allow(const event_t * pevent)
 {
