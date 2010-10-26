@@ -27,6 +27,28 @@ int allowed_syscalls [] = {
     __NR_exit_group,
     0
 };
+#elif defined(POLICY2)
+/* policy for ??? */
+/* syscall sequence for init code */
+int init_syscalls [] = {
+    __NR_uname,
+    __NR_brk,
+    __NR_brk,
+    __NR_fstat64,
+    __NR_mmap2,
+    0
+};
+
+/* allowed syscalls after init */
+int allowed_syscalls [] = {
+    __NR_read,
+    __NR_write,
+    __NR_mmap2,
+    __NR_munmap,
+    __NR_fstat64,
+    __NR_exit_group,
+    0
+};
 #else
 /* policy for normal kernel. Works on Debian 5, Ubuntu */
 /* syscall sequence for init code */

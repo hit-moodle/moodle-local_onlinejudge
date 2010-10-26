@@ -37,16 +37,25 @@ CCFLAGS = -Wall -ansi -std=gnu99 -g0 -O3
 CCINCS = -I ./libsandbox/src
 CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
 
-# build branches
-.PHONY: all rhel clean
+all: policy0
 
-all:
+libsandbox: FORCE
 	$(MAKE) -C libsandbox libsandbox.a
+
+# default policy
+policy0: libsandbox
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
 
-rhel: 
-	$(MAKE) -C libsandbox libsandbox.a
+policy1: libsandbox
 	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY1 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+
+policy2: libsandbox
+	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY2 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+
+rhel: policy1
+
+# Force make run into subdirectories even no changes on source
+FORCE:
 
 clean:
 	$(MAKE) -C libsandbox clean
