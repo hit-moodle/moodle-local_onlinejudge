@@ -82,7 +82,11 @@
     $ffurl = get_file_url("$filearea/$file");
 
     if($gestor = fopen($fpath,'r')) {
-        $code = htmlentities(fread($gestor, filesize($fpath)));
+        $code = fread($gestor, filesize($fpath));
+        if ($charset = mb_detect_encoding($code, 'UTF-8, GBK')) {
+            $code = iconv($charset, 'utf-8', $code);
+        }
+        $code = htmlspecialchars($code);
         fclose($gestor);
     } else {
         error(get_string('filereaderror','assignment_onlinejudge'));   
