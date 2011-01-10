@@ -52,7 +52,12 @@ policy1: libsandbox
 policy2: libsandbox
 	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY2 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
 
+policy3: libsandbox
+	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY3 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+
 rhel: policy1
+
+suse: policy3
 
 # Force make run into subdirectories even no changes on source
 FORCE:
