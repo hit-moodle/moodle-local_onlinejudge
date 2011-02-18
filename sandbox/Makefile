@@ -37,7 +37,7 @@ CCFLAGS = -Wall -ansi -std=gnu99 -g0 -O3
 CCINCS = -I ./libsandbox/src
 CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
 
-all: sand
+all: test
 
 libsandbox: FORCE
 	$(MAKE) -C libsandbox libsandbox.a
