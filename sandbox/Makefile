@@ -37,31 +37,35 @@ CCFLAGS = -Wall -ansi -std=gnu99 -g0 -O3
 CCINCS = -I ./libsandbox/src
 CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
 
-all: policy0
+all: sand
 
 libsandbox: FORCE
 	$(MAKE) -C libsandbox libsandbox.a
 
-# default policy
-policy0: libsandbox
-	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+sand: policy.o sand.o libsandbox
+	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY3 $(CCINCS)  -o sand sand.o policy.o ./libsandbox/libsandbox.a
 
-policy1: libsandbox
-	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY1 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+policy.o: policy.c
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy.c
 
-policy2: libsandbox
-	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY2 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+policy.c: detect.sh detector 223
+	./detect.sh
 
-policy3: libsandbox
-	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY3 $(CCINCS)  -o sand sand.c policy.c ./libsandbox/libsandbox.a
+223: 223.c
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  --static -o 223 223.c
 
-rhel: policy1
+detector: libsandbox policy_print.o sand.o
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  -o detector sand.o policy_print.o ./libsandbox/libsandbox.a
 
-suse: policy3
+sand.o: sand.c
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c sand.c
+    
+policy_print.o: policy_print.c
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy_print.c
 
 # Force make run into subdirectories even no changes on source
 FORCE:
 
 clean:
 	$(MAKE) -C libsandbox clean
-	rm -f sand
+	rm -f *.o sand detector 223 policy.c

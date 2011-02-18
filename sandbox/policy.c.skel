@@ -6,15 +6,9 @@
 /* syscall no of the restricted syscall which is called */
 int last_rf_called = 0;
 
-#ifdef POLICY1
-/* policy for kernel 2.6.9 ? */
 /* syscall sequence for init code */
 int init_syscalls [] = {
-    __NR_uname,
-    __NR_brk,
-    __NR_brk,
-    __NR_fstat64,
-    90,   // __NR_old_mmap
+##INIT_SYSCALLS##
     0
 };
 
@@ -22,83 +16,11 @@ int init_syscalls [] = {
 int allowed_syscalls [] = {
     __NR_read,
     __NR_write,
-    90,   // __NR_old_mmap
-    __NR_fstat64,
-    __NR_exit_group,
+    __NR_brk,
+##ALLOWED_SYSCALLS##
+    /* Add specified allowed syscalls here */
     0
 };
-#elif defined(POLICY2)
-/* policy for ??? */
-/* syscall sequence for init code */
-int init_syscalls [] = {
-    __NR_uname,
-    __NR_brk,
-    __NR_brk,
-    __NR_fstat64,
-    __NR_mmap2,
-    0
-};
-
-/* allowed syscalls after init */
-int allowed_syscalls [] = {
-    __NR_read,
-    __NR_write,
-    __NR_mmap2,
-    __NR_munmap,
-    __NR_fstat64,
-    __NR_exit_group,
-    0
-};
-#elif defined(POLICY3)
-/* policy for SUSE */
-/* syscall sequence for init code */
-int init_syscalls [] = {
-    __NR_uname,
-    __NR_brk,
-    __NR_brk,
-    __NR_set_thread_area,
-    __NR_open,
-    __NR_read,
-    __NR_close,
-    __NR_brk,
-    __NR_brk,
-    0
-};
-
-/* allowed syscalls after init */
-int allowed_syscalls [] = {
-    __NR_read,
-    __NR_write,
-    __NR_mmap2,
-    __NR_munmap,
-    __NR_fstat64,
-    __NR_exit_group,
-    0
-};
-#else
-/* policy for normal kernel. Works on Debian 5, Ubuntu */
-/* syscall sequence for init code */
-int init_syscalls [] = {
-    __NR_uname,
-    __NR_brk,
-    __NR_brk,
-    __NR_set_thread_area,
-    __NR_brk,
-    __NR_brk,
-    0
-};
-
-/* allowed syscalls after init */
-int allowed_syscalls [] = {
-    __NR_read,
-    __NR_write,
-    __NR_mmap2,
-    __NR_munmap,
-    __NR_fstat64,
-    __NR_exit_group,
-    0
-};
-#endif
 
 static int
 allow(const event_t * pevent)
