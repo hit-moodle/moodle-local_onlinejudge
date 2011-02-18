@@ -1,3 +1,6 @@
 *.a
 *.o
 sandbox/sand
+sandbox/223
+sandbox/detector
+sandbox/policy.c
