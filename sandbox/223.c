@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define HEAP_ALLOC_SIZE     (1024 * 1024 * 1024)    /* 1GB */
 
@@ -14,6 +15,8 @@ int main(void)
     syscall(223);
 
     /* Since stdin/stdout normally call read/write, no need to detect */
+    getchar();
+    printf("IGNORE ");
 
     /* Some programs may use heap */
     p = malloc(HEAP_ALLOC_SIZE);

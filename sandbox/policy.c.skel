@@ -14,8 +14,6 @@ int init_syscalls [] = {
 
 /* allowed syscalls after init */
 int allowed_syscalls [] = {
-    __NR_read,
-    __NR_write,
     __NR_brk,
 ##ALLOWED_SYSCALLS##
     /* Add specified allowed syscalls here */
