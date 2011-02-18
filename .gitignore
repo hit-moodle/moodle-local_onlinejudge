@@ -1,5 +1,6 @@
 *.a
 *.o
+sandbox/*_test
 sandbox/sand
 sandbox/223
 sandbox/detector

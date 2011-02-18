@@ -48,11 +48,11 @@ sand: policy.o sand.o libsandbox
 policy.o: policy.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy.c
 
-policy.c: detect.sh detector 223
+policy.c: detect.sh detector 223 policy.c.skel
 	./detect.sh
 
 223: 223.c
-	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  --static -o 223 223.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
 
 detector: libsandbox policy_print.o sand.o
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  -o detector sand.o policy_print.o ./libsandbox/libsandbox.a
@@ -63,9 +63,63 @@ sand.o: sand.c
 policy_print.o: policy_print.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy_print.c
 
+test: stdin stdout fork open memlimit cpulimit sigsegv return1
+	@echo All testcases are OK
+
+stdin: stdin_test sand
+	./runtest.sh 1 $< < /dev/null
+
+stdin_test: testcase/stdin.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+stdout: stdout_test sand
+	./runtest.sh 1 $< > /dev/null
+	 
+stdout_test: testcase/stdout.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+fork: fork_test sand
+	./runtest.sh 2 $<
+
+fork_test: testcase/fork.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+open: open_test sand
+	./runtest.sh 2 $<
+
+open_test: testcase/open.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+memlimit: memlimit_test sand
+	./runtest.sh 3 -l memory=1048576 $<
+
+memlimit_test: testcase/memlimit.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+cpulimit: cpulimit_test sand
+	./runtest.sh 5 -l cpu=1000 $<
+
+cpulimit_test: testcase/cpulimit.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+sigsegv: sigsegv_test sand
+	./runtest.sh 6 $<
+
+sigsegv_test: testcase/sigsegv.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
+return1: return1_test sand
+	./runtest.sh 7 $<
+
+return1_test: testcase/return1.c
+	$(CC) $(CCFLAGS) --static -o $@ $+
+
 # Force make run into subdirectories even no changes on source
 FORCE:
 
-clean:
+interclean:
 	$(MAKE) -C libsandbox clean
-	rm -f *.o sand detector 223 policy.c
+	rm -f *.o *_test detector 223 policy.c
+
+clean: interclean
+	rm sand
