@@ -3,7 +3,7 @@ programming. It can automatically grade programming assignments by testing the
 submissions against customizable test cases (ACM-ICPC/Online Judge style).
 
 Home:
-    https://github.com/hit-moodle/
+    https://github.com/hit-moodle/onlinejudge
 Installation:
     https://github.com/hit-moodle/onlinejudge/wiki/Installation
 FAQ:
