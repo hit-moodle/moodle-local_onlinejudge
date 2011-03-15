@@ -33,7 +33,7 @@
 
 # initialization
 CC = cc
-CCFLAGS = -Wall -ansi -std=gnu99 -g0 -O3
+CCFLAGS = -m32 -Wall -ansi -std=gnu99 -g0 -O3
 CCINCS = -I ./libsandbox/src
 CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
 
@@ -122,4 +122,4 @@ interclean:
 	rm -f *.o *_test detector 223 policy.c
 
 clean: interclean
-	rm sand
+	rm -f sand
