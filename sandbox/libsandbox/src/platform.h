@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *
+ * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *
  * All rights reserved.                                                        *
  *                                                                             *
  * Redistribution and use in source and binary forms, with or without          *
@@ -68,14 +68,22 @@ typedef enum
 #endif /* __cplusplus */
 
 #ifdef __i386__
+#define KNOWN_PLATFORM_TYPE
 #define OPCODE(op) ((unsigned int)(op) & (~((unsigned int)(~0u << 16))))
 #define IS_INT80(op) (OPCODE(op) == 0x80cd)
 #define IS_RET(op) (OPCODE(op) == 0x00c3)
 #define IS_BREAKPOINT(op) (OPCODE(op) == 0xebcc)
 #define IS_NOP(op) (OPCODE(op) == 0x90cc)
-#else
-#error "this platform is not supported"
 #endif /* __i386__ */
+
+#ifdef __x86_64__
+/* TODO #define KNOWN_PLATFORM_TYPE */
+#error "x86_64"
+#endif /* __x86_64__ */
+
+#ifndef KNOWN_PLATFORM_TYPE
+#error "this platform is not supported"
+#endif /* KNOWN_PLATFORM_TYPE */
 
 /**
  * @brief Evict the existing blocks from the data caches.
@@ -111,6 +119,9 @@ typedef struct
     unsigned long vsize;       /**< virtual memory size (bytes) */
     long rss;                  /**< resident set size (pages) */
     #ifdef __linux__
+    unsigned long start_code;  /**< start address of the code segment */
+    unsigned long end_code;    /**< end address of the code segment */
+    unsigned long start_stack; /**< start address of the stack */
     struct user_regs_struct regs;
     struct user_fpregs_struct fpregs;
     #else

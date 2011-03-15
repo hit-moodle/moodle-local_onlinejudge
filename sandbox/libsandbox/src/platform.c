@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *
+ * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *
  * All rights reserved.                                                        *
  *                                                                             *
  * Redistribution and use in source and binary forms, with or without          *
@@ -158,8 +158,14 @@ proc_probe(pid_t pid, int opt, proc_t * const pproc)
             break;
         case 24:           /* rlim_rss */
         case 25:           /* start_code */
+            sscanf(token, "%lu", &pproc->start_code);
+            break;
         case 26:           /* end_code */
+            sscanf(token, "%lu", &pproc->end_code);
+            break;
         case 27:           /* start_stack */
+            sscanf(token, "%lu", &pproc->start_stack);
+            break;
         case 28:           /* esp */
         case 29:           /* eip */
         case 30:           /* pending_signal */
@@ -280,6 +286,20 @@ proc_dump(const proc_t * const pproc, const void * const addr,
     assert(addr);
     assert(pword);
 
+    #ifdef __linux__
+    /* Current instruction */
+    *pword = ptrace(PTRACE_PEEKDATA, pproc->pid, addr, NULL);
+    
+    if (errno != 0)
+    {
+        WARNING("ptrace:PTRACE_PEEKDATA");
+        FUNC_RET(false, "proc_dump()");
+    }
+    #else
+    #warning "proc_dump is not implemented for this platform"   
+    #endif
+
+#ifdef DELETED
     /* Access the memory of targeted process via procfs */
     char buffer[4096];
 
@@ -292,20 +312,21 @@ proc_dump(const proc_t * const pproc, const void * const addr,
 
     /* Copy a word from targeted address */
     int fd = open(buffer, O_RDONLY);
-    if (lseek(fd, (long)addr, SEEK_SET) < 0)
+    if (lseek(fd, (off_t)addr, SEEK_SET) < 0)
     {
-        WARNING("lseek");
+        extern int errno;
+        WARNING("lseek(%d, %p, SEEK_SET) failes, ERRNO %d", fd, addr, errno);
         FUNC_RET(false, "proc_dump()");
     }
-    if (read(fd, (void *)pword, sizeof(long)) < 0)
+    if (read(fd, (void *)pword, sizeof(unsigned long)) < 0)
     {
         WARNING("read");
         FUNC_RET(false, "proc_dump()");
     }
     close(fd);
-    
-    DBG("data.0x%08lx     0x%08lx", (unsigned long)addr, 
-                                    (unsigned long)*pword);
+#endif /* DELETED */
+
+    DBG("data.%p     0x%08lx", addr, *pword);
 
     FUNC_RET(true, "proc_dump()");
 }

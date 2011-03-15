@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *
+ * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *
  * All rights reserved.                                                        *
  *                                                                             *
  * Redistribution and use in source and binary forms, with or without          *
@@ -68,7 +68,7 @@ extern "C"
 #define WARNING(fmt,x...) ((void)0)
 #else
 #ifndef WARN_PREFIX
-#define WARN_PREFIX ""
+#define WARN_PREFIX "warning>"
 #endif /* WARN_PREFIX */
 #define WARNING(fmt,x...) \
 {{{ \
@@ -214,7 +214,9 @@ typedef struct
     struct timeval started;    /**< start time since Epoch */
     struct timeval stopped;    /**< stop time since Epoch */
     struct rusage ru;          /**< resource usage */
-    res_t vsize;               /**< peak virtual memory usage (bytes) */
+    res_t vsize;               /**< virtual memory usage (bytes) */
+    res_t vsize_peak;          /**< virtual memory peak usage (bytes) */
+    res_t rss;                 /**< resident set size (bytes) */
     int syscall;               /**< last syscall */
     long signal;               /**< last signal */
     int exitcode;              /**< exit code */
@@ -272,7 +274,7 @@ typedef union
      * instantiated with braced initializer. */
     struct
     {
-        int A, B, C, D, E, F, G;
+        unsigned long A, B, C, D, E, F, G;
     } __bitmap__;
     struct
     {
@@ -284,12 +286,12 @@ typedef union
     } _EXIT;
     struct
     {
-        int signo;
+        long signo;
     } _SIGNAL;
     struct
     {
         int scno;
-        int a, b, c, d, e, f;
+        unsigned long a, b, c, d, e, f;
     } _SYSCALL;
     struct
     {
@@ -329,11 +331,11 @@ typedef union
 {
     struct
     {
-        int A, B;
+        unsigned long A, B;
     } __bitmap__;
     struct
     {
-        int reserved;
+        unsigned long reserved;
     } _CONT;
     struct
     {
@@ -357,6 +359,20 @@ typedef struct
 
 /**
  * @brief Structure for sandbox policy object entry and private data.
+ *
+ * The design of *policy_t* is to facilitate high-level language extension.
+ *
+ * For example, if we are to extend / wrap *libsandbox* with Python, it is
+ * essential to be able to compile the real policies as Python modules or even
+ * more complex binary objects, and *libsandbox* must be able to invoke real
+ * policy objects written in high-level languages via a unified interface.
+ *
+ * In our design, the real policy object (address to the Python object) can be
+ * hooked at the *data* field of the *policy_t* object, and a corresponding
+ * *policy_entry_t* function is to be hooked at the *entry* field. In this
+ * manner, Python developers can design the real policy objects anyway they
+ * desire. And they only need to ensure that the *policy_entry_t* function knows
+ * how to invoke real policy objects properly.
  */
 typedef struct
 {

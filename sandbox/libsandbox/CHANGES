@@ -1,3 +1,23 @@
+[2009/11/27] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.h added a vsize_peak field in struct stat_t
+  * in sandbox.h changed data fields in event_t and action_t to unsigned long
+  * in sandbox.spec and Makefile update version to 0.2.17
+
+[2009/11/25] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c removed MLE detection code, sandbox now only updates stat_t 
+    within each tracing loop but depends on policies to determine ML
+  * in sandbox.spec and Makefile update version to 0.2.16
+
+[2009/10/31] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.spec and Makefile update version to 0.2.15
+
+[2009/10/28] LIU Yu, <pineapple.liu@gmail.com>
+  * updated copyright notice in source files
+  * in sandbox.spec and Makefile update version to 0.2.14-3
+
+[2009/09/18] LIU Yu, <pineapple.liu@gmail.com>
+  * converted delimiters of several source files to Unix form
+
 [2007/02/09] LIU Yu, <pineapple.liu@gmail.com>
   * in platform.h added a TFLAGS_IN_SYSCALL bit in the `tflags' field of proc_t
     as well as the {SET,CLR}_IN_SYSCALL macros for fliping the bit

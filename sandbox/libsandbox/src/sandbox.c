@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *
+ * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *
  * All rights reserved.                                                        *
  *                                                                             *
  * Redistribution and use in source and binary forms, with or without          *
@@ -41,8 +41,9 @@
 #include <sys/wait.h>           /* wait4() */
 #include <stdlib.h>             /* EXIT_{SUCCESS,FAILURE} */
 #include <string.h>             /* str{cpy,cmp,str}(), mem{set,cpy}() */
-#include <unistd.h>             /* fork(), access(), chroot(), getpid(),  
-                                   {R,X}_OK, STD{IN,OUT,ERR}_FILENO */
+#include <unistd.h>             /* fork(), access(), chroot(), getpid(),
+                                   getpagesize(), {R,X}_OK,
+                                   STD{IN,OUT,ERR}_FILENO */
 
 /* Local functions prototype */
 static void __sandbox_task_init(task_t *, const char * *);
@@ -62,13 +63,11 @@ static void * __sandbox_tracer(sandbox_t *);
 #define __sandbox_tracer (NULL)
 #endif /* WITH_NATIVE_TRACER */
 
-#ifdef DELETED
-#ifdef WITH_NATIVE_MONITOR
+#ifdef WITH_CUSTOM_MONITOR
 static void * __sandbox_monitor(sandbox_t *);
 #else
 #define __sandbox_monitor (NULL)
-#endif /* WITH_NATIVE_MONITOR */
-#endif /* DELETED */
+#endif /* WITH_CUSTOM_MONITOR */
 
 int 
 sandbox_init(sandbox_t * psbox, const char * argv[])
@@ -88,8 +87,13 @@ sandbox_init(sandbox_t * psbox, const char * argv[])
     pthread_cond_init(&psbox->update, NULL);
     __sandbox_task_init(&psbox->task, argv);
     __sandbox_stat_init(&psbox->stat);
-    __sandbox_ctrl_init(&psbox->ctrl, (thread_func_t)__sandbox_tracer, 
-                                      (thread_func_t)(NULL));
+    __sandbox_ctrl_init(&psbox->ctrl, (thread_func_t)__sandbox_tracer,
+#ifdef WITH_CUSTOM_MONITOR 
+                                      (thread_func_t)__sandbox_monitor
+#else
+                                      (thread_func_t)(NULL)
+#endif /* WITH_CUSTOM_MONITOR */
+);
     V(&psbox->mutex);
     
     P(&psbox->mutex);
@@ -183,14 +187,14 @@ sandbox_check(sandbox_t * psbox)
     }
     DBG("passed ctrl tracer validation");
     
-    #ifdef DELETED
+#ifdef WITH_CUSTOM_MONITOR
     if (psbox->ctrl.monitor == NULL)
     {
         V(&psbox->mutex);
         FUNC_RET(false, "sandbox_check()");
     }
     DBG("passed ctrl monitor validation");
-    #endif /* DELETED */
+#endif /* WITH_CUSTOM_MONITOR */
     
     /* Update status to RDY */
     if (psbox->status != S_STATUS_RDY)
@@ -222,7 +226,7 @@ sandbox_execute(sandbox_t * psbox)
         FUNC_RET(&psbox->result, "sandbox_execute()");
     }
     
-    #ifdef DELETED
+#ifdef WITH_CUSTOM_MONITOR
     pthread_t tid;
 
     if (pthread_create(&tid, NULL, psbox->ctrl.monitor, (void *)psbox) != 0)
@@ -231,7 +235,7 @@ sandbox_execute(sandbox_t * psbox)
         FUNC_RET(&psbox->result, "sandbox_execute()");
     }
     DBG("created the monitor thread");
-    #endif /* DELETED */
+#endif /* WITH_CUSTOM_MONITOR */
     
     /* Fork the prisoner process */
     psbox->ctrl.pid = fork();
@@ -250,7 +254,7 @@ sandbox_execute(sandbox_t * psbox)
         psbox->ctrl.tracer(psbox);
     }
     
-    #ifdef DELETED
+#ifdef WITH_CUSTOM_MONITOR
     if (pthread_join(tid, NULL) != 0)
     {
         WARNING("failed joining the monitor thread");
@@ -261,7 +265,7 @@ sandbox_execute(sandbox_t * psbox)
         }
     }
     DBG("joined the monitor thread");
-    #endif /* DELETED */
+#endif /* WITH_CUSTOM_MONITOR */
     
     FUNC_RET(&psbox->result, "sandbox_execute()");
 }
@@ -347,7 +351,7 @@ __sandbox_task_check(const task_t * ptask)
     /* 2. check uid, gid fields
      *   a) if user exists
      *   b) if group exists
-     *   c) current user's previlege to set{uid,gid}
+     *   c) current user's privilege to set{uid,gid}
      */
     struct passwd * pw = NULL;
     if ((pw = getpwuid(ptask->uid)) == NULL)
@@ -368,11 +372,11 @@ __sandbox_task_check(const task_t * ptask)
     {
         FUNC_RET(false, "__sandbox_task_check()");
     }
-    DBG("passed set{uid,gid} previlege test");
+    DBG("passed set{uid,gid} privilege test");
     
     /* 3. check jail field (if jail is not "/")
      *   a) only super user can chroot!
-     *   b) if jail path is accessable and readable
+     *   b) if jail path is accessible and readable
      *   c) if jail is a prefix to the target program command line
      */
     if (strcmp(ptask->jail, "/") != 0)
@@ -579,12 +583,7 @@ __sandbox_task_execute(task_t * ptask)
     }
     DBG("RLIMIT_FSIZE: %ld", rlimval.rlim_cur);
     
-    #ifdef DELETED
-    /* Virtual memory usage can be inspected by the corresponding fields in 
-     * /proc/#/stat, but if procfs is missing, we will have to depend on the 
-     * setrlimit() system call to impose virtual memory quota limit. 
-     * However, this may result in an unplesant side-effect that some of the 
-     * stack overrun will be reported as SIGSEGV.*/
+#ifdef DELETED
     /* Memory quota */
     if (getrlimit(RLIMIT_AS, &rlimval) < 0)
     {
@@ -596,10 +595,10 @@ __sandbox_task_execute(task_t * ptask)
         return EXIT_FAILURE;
     }
     DBG("RLIMIT_AS: %ld", rlimval.rlim_cur);
-    #endif /* DELETED */
-    
-    /* Time resource limits, these should be set last to recude overhead. Thus,
-     * no debug informaion is produced on success. */
+#endif /* DELETED */
+
+    /* Time resource limits, these should be set last to reduce overhead. Thus,
+     * no debug information is produced on success. */
     struct itimerval timerval;
     
     /* Wallclock quota */
@@ -769,6 +768,19 @@ __sandbox_tracer(sandbox_t * psbox)
         V(&((pctrl)->mutex)); \
     }}} /* POST_EVENT */
     
+#ifdef WITH_CUSTOM_MONITOR
+    #define SINK_EVENT(pctrl) \
+    {{{ \
+        P(&((pctrl)->mutex)); \
+        while (!IS_IDLE(pctrl)) \
+        { \
+            pthread_cond_wait(&((pctrl)->sched), &((pctrl)->mutex)); \
+        } \
+        V(&((pctrl)->mutex)); \
+    }}} /* SINK_EVENT */
+#endif /* WITH_CUSTOM_MONITOR */
+
+#ifdef WITH_NATIVE_MONITOR
     #define SINK_EVENT(pctrl) \
     {{{ \
         P(&((pctrl)->mutex)); \
@@ -780,7 +792,7 @@ __sandbox_tracer(sandbox_t * psbox)
         } \
         V(&((pctrl)->mutex)); \
         \
-        DBG("detected event: %s {%d %d %d %d %d %d %d}", \
+        DBG("detected event: %s {%lu %lu %lu %lu %lu %lu %lu}", \
             s_event_type_name((pctrl)->event.type), \
             (pctrl)->event.data.__bitmap__.A, \
             (pctrl)->event.data.__bitmap__.B, \
@@ -794,7 +806,7 @@ __sandbox_tracer(sandbox_t * psbox)
                                                 &(pctrl)->event, \
                                                 &(pctrl)->action); \
         \
-        DBG("decided action: %s {%d %d}", \
+        DBG("decided action: %s {%lu %lu}", \
             s_action_type_name((pctrl)->action.type), \
             (pctrl)->action.data.__bitmap__.A, \
             (pctrl)->action.data.__bitmap__.B); \
@@ -804,7 +816,8 @@ __sandbox_tracer(sandbox_t * psbox)
         pthread_cond_broadcast(&((pctrl)->sched)); \
         V(&((pctrl)->mutex)); \
     }}} /* SINK_EVENT */
-    
+#endif /* WITH_NATIVE_MONITOR */
+
     DBG("entering: the tracing thread");
     
     /* The controller should contain pid of the prisoner process */
@@ -861,54 +874,6 @@ __sandbox_tracer(sandbox_t * psbox)
     /* Clear cache in order to increase timing accuracy */
     flush_cache();
     flush_cache();
-    
-    #ifdef DELETED
-    /* Investigate the first system call. In case the prisoner process exited 
-     * before the first system call, report it as an internal error and skip 
-     * the tracing loop. Caution that, the prisoner process stops in *SYSRET* 
-     * mode rather than SYSCALL or SINGLESTEP mode regardless of the status of
-     * WITH_TSC_COUNTER directive. */
-    if (WIFSTOPPED(waitstatus) && (WSTOPSIG(waitstatus) == SIGTRAP))
-    {
-        /* Probe the prisoner process */
-        if (!proc_probe(pid, PROBE_REGS, &proc))
-        {
-            WARNING("failed to probe the prisoner process");
-            kill(-pid, SIGKILL);
-            UPDATE_RESULT(psbox, S_RESULT_IE);
-            goto done;
-        }
-        /* Detect memory usage */
-        if (proc.vsize > psbox->task.quota[S_QUOTA_MEMORY])
-        {
-            kill(-pid, SIGMLE);
-        }
-        /* Update sandbox stat with the process runtime info */
-        if (psbox->stat.vsize < proc.vsize)
-        {
-            psbox->stat.vsize = proc.vsize;
-        }
-        /* Check the type of pending system call */
-        #ifdef __linux__
-        if (THE_SYSCALL(&proc) != SYS_execve)
-        #endif /* __linux__ */
-        {
-            WARNING("unexpected behavior of the prisoner process");
-            kill(-pid, SIGKILL);
-            UPDATE_RESULT(psbox, S_RESULT_IE);
-            goto done;
-        }
-        DBG("initial SYS_execve() detected");
-        /* Everything looks fine, schedule for next wait */
-        goto next;
-    }
-    else if (WIFEXITED(waitstatus))
-    {
-        WARNING("the prisoner process exited during preparation phase");
-        UPDATE_RESULT(psbox, S_RESULT_IE);
-        goto done;
-    }
-    #endif /* DELETED */
     
     /* Entering the tracing loop */
     do
@@ -983,16 +948,23 @@ __sandbox_tracer(sandbox_t * psbox)
                     UPDATE_RESULT(psbox, S_RESULT_IE);
                     goto done;
                 }
-                /* Detect memory usage */
-                if (proc.vsize > psbox->task.quota[S_QUOTA_MEMORY])
+
+                /* Update sandbox stat with the process runtime info */
+                {
+                    psbox->stat.vsize = proc.vsize;
+                    if (psbox->stat.vsize_peak < proc.vsize)
+                    {
+                        psbox->stat.vsize_peak = proc.vsize;
+                    }
+                    psbox->stat.rss = proc.rss * getpagesize();
+                }
+
+                /* Detect memory usage against quota */
+                if (psbox->stat.vsize_peak > psbox->task.quota[S_QUOTA_MEMORY])
                 {
                     kill(-pid, SIGMLE);
                 }
-                /* Update sandbox stat with the process runtime info */
-                if (psbox->stat.vsize < proc.vsize)
-                {
-                    psbox->stat.vsize = proc.vsize;
-                }
+
                 /* For `single step' tracing mode, we have to probe the current
                  * op code (i.e. INT80 for i386 platforms) to tell whether the 
                  * prisoner process is invoking a system call. For `system call'
@@ -1073,7 +1045,7 @@ __sandbox_tracer(sandbox_t * psbox)
             UPDATE_RESULT(psbox, psbox->ctrl.action.data._FINI.result);
             break;
         case S_ACTION_KILL:
-            /* Using trace_kill can effectly prevent overrun of undesired 
+            /* Using trace_kill can effectively prevent overrun of undesired
              * behavior, i.e. illegal system call. */
             trace_kill(&proc, SIGKILL);
             UPDATE_RESULT(psbox, psbox->ctrl.action.data._KILL.result);
@@ -1110,8 +1082,7 @@ done:
 
 #endif /* WITH_NATIVE_TRACER */
 
-#ifdef DELETED
-#ifdef WITH_NATIVE_MONITOR 
+#ifdef WITH_CUSTOM_MONITOR 
 
 static void *
 __sandbox_monitor(sandbox_t * psbox)
@@ -1142,10 +1113,10 @@ __sandbox_monitor(sandbox_t * psbox)
         V(&psbox->mutex);
         
         /* An event might have already been posted */
-        if (pctrl->idle)
+        if (IS_IDLE(pctrl))
         {
             pthread_cond_wait(&pctrl->sched, &pctrl->mutex);
-            if (pctrl->idle)
+            if (IS_IDLE(pctrl))
             {
                 P(&psbox->mutex);
                 continue;
@@ -1153,7 +1124,7 @@ __sandbox_monitor(sandbox_t * psbox)
         }
         
         /* Start investigating the event */
-        DBG("detected event: %s {%d %d %d %d %d %d %d}",
+        DBG("detected event: %s {%lu %lu %lu %lu %lu %lu %lu}",
             s_event_type_name(pctrl->event.type),
             pctrl->event.data.__bitmap__.A,
             pctrl->event.data.__bitmap__.B,
@@ -1167,7 +1138,7 @@ __sandbox_monitor(sandbox_t * psbox)
         ((policy_entry_t)pctrl->policy.entry)(&pctrl->policy, &pctrl->event,
                                               &pctrl->action);
         
-        DBG("decided action: %s {%d %d}",
+        DBG("decided action: %s {%lu %lu}",
             s_action_type_name(pctrl->action.type),
             pctrl->action.data.__bitmap__.A,
             pctrl->action.data.__bitmap__.B);
@@ -1186,8 +1157,7 @@ __sandbox_monitor(sandbox_t * psbox)
     FUNC_RET((void *)&psbox->result, "sandbox_monitor()");
 }
 
-#endif /* WITH_NATIVE_MONITOR */
-#endif /* DELETED */
+#endif /* WITH_CUSTOM_MONITOR */
 
 static void 
 __sandbox_default_policy(const policy_t * ppolicy, const event_t * pevent, 

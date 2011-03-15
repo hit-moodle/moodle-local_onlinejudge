@@ -1,7 +1,7 @@
 ################################################################################
 # The Sandbox Libraries RPM Specification                                      #
 #                                                                              #
-# Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                      #
+# Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                      #
 # All rights reserved.                                                         #
 #                                                                              #
 # Redistribution and use in source and binary forms, with or without           #
@@ -31,8 +31,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                                  #
 ################################################################################
 %define name libsandbox
-%define version 0.2.14
-%define release 2
+%define version 0.2.17
+%define release 1
 
 Summary: The Sandbox Libraries
 Name: %{name}
