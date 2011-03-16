@@ -35,15 +35,10 @@ require_capability('local/onlinejudge2:stage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/onlinejudge2/view.php');
-$PAGE->set_title('onlinejudge2 ' . get_string('translatortool', 'local_onlinejudge2'));
-$PAGE->set_heading('onlinejudge2 ' . get_string('translatortool', 'local_onlinejudge2'));
-if (empty($CFG->googleapikey)) {
-    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi'));
-} else {
-    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi', array('key'=>$CFG->googleapikey)));
-}
-$PAGE->requires->js_init_call('M.local_onlinejudge2.init_translator', array(), true);
-$PAGE->requires->yui_module('moodle-local_onlinejudge2-timeline', 'M.local_onlinejudge2.init_timeline');
+$PAGE->set_title('onlinejudge2 ' . get_string('onlinejudge', 'local_onlinejudge2'));
+$PAGE->set_heading('onlinejudge2 ' . get_string('onlinejudge', 'local_onlinejudge2'));
+$PAGE->requires->js_init_call('M.local_onlinejudge2.init_tonlinejudge', array(), true);
+$PAGE->requires->yui_module('moodle-local_onlinejudge2-timeline', 'M.local_onlinejudge2.init_onlinejudge');
 
 $output = $PAGE->get_renderer('local_onlinejudge2');
 
@@ -65,5 +60,5 @@ $translator = new local_onlinejudge2_translator($filter, $USER);
 echo $output->header();
 echo $output->render($filter);
 echo $output->render($translator);
-echo $output->box('', 'googlebranding', 'googlebranding');
+echo $output->box('', 'onlinejudge', 'onlinejudge');
 echo $output->footer();
