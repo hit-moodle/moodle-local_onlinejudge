@@ -1,11 +1,14 @@
 <?php
 	define('NUMTESTS', 5) //Default number of test cases
-	
+	;
 	//default maximum cpu time (seconds) for all assignments
-	if(!isset($CFG->assignment_oj_max_cpu))
-		set_config('assignment_oj_max_cpu', 10);
 	
-f (!isset($CFG->assignment_oj_max_mem)) {
+	if(!isset($CFG->assignment_oj_max_cpu)) {
+		set_config('assignment_oj_max_cpu', 10);
+	}
+	
+	//default maxmim cpu memory for all assignments
+	if(!isset($CFG->assignment_oj_max_mem)) {
     set_config('assignment_oj_max_mem', 256 * 1024 * 1024);
 }
 

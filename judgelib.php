@@ -1,6 +1,7 @@
 <?php
 	global $CFG,$DB;
 	require_once($CFG->rootdir."/lib/dml/moodle_database.php");
+	require_once("./judge/ideone/ideone.php");
 	class judge_base 
 	{
 		public        $taskID;
