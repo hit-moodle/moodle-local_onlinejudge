@@ -1,6 +1,5 @@
 <?php
-	define('NUMTESTS', 5) //Default number of test cases
-	;
+	//define('NUMTESTS', 5); //Default number of test cases
 	//default maximum cpu time (seconds) for all assignments
 	
 	if(!isset($CFG->assignment_oj_max_cpu)) {
@@ -34,19 +33,9 @@ require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.p
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
-
-/**
- * Extends the uploadsingle assignment class
- * 
- * @author Arkaitz Garro, Sunner Sun
- */
-class assignment_onlinejudge extends assignment_uploadsingle {
-
-    var $onlinejudge;
-
     // ideone.com supports the following languages.
     // id_in_moodle => id_in_ideone
-    var $ideone_langs = array(
+        $ideone_langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
         'awk_gawk_ideone'                => 104,            

@@ -1,8 +1,11 @@
 <?php
 
-require_once("../../../../config.php");
-require_once("../../lib.php");
-require_once("../../../../lib/weblib.php");
+//require_once("../../../../config.php");
+require_once($CFG->dirroot.'/config.php');
+//require_once("../../lib.php");
+require_once($CFG->dirroot.'/mod/assignment/lib.php');
+//require_once("../../../../lib/weblib.php");
+require_once($CFG->dirroot.'/lib/weblib.php');
 
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
 $a  = optional_param('a', 0, PARAM_INT);   // Assignment ID

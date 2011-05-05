@@ -1,9 +1,9 @@
 <?php
 
-require_once('../../../../config.php');
+require_once($CFG->dirroot.'/config.php');
 require_once("$CFG->dirroot/mod/assignment/lib.php");
 require_once('testcase_form.php');
-
+global $DB;
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
 $a  = optional_param('a', 0, PARAM_INT);   // Assignment ID
 
@@ -13,18 +13,18 @@ if ($id) {
 		error("Course Module ID was incorrect");
 	}
 
-	if (! $assignment = get_record("assignment", "id", $cm->instance)) {
+	if (! $assignment = $DB->get_record("assignment", "id", $cm->instance)) {
 		error("assignment ID was incorrect");
 	}
 
-	if (! $course = get_record("course", "id", $assignment->course)) {
+	if (! $course = $DB->get_record("course", "id", $assignment->course)) {
 		error("Course is misconfigured");
 	}
 } else {
-	if (!$assignment = get_record("assignment", "id", $a)) {
+	if (!$assignment = $DB->get_record("assignment", "id", $a)) {
 		error("Course module is incorrect");
 	}
-	if (! $course = get_record("course", "id", $assignment->course)) {
+	if (! $course = $DB->get_record("course", "id", $assignment->course)) {
 		error("Course is misconfigured");
 	}
 	if (! $cm = get_coursemodule_from_instance("assignment", $assignment->id, $course->id)) {

@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    // Ability to set-up AMOS portal and assign translators of languages
+    // Ability to set-up Onlinejudge2 portal and assign translators of languages
     'local/onlinejudge2:manage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -43,7 +43,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to commit the stage into AMOS repository
+    // Ability to commit the stage into Onlinejudge2 repository
     'local/onlinejudge2:commit' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

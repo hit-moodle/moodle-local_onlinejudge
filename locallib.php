@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/mlanglib.php');
+//require_once(dirname(__FILE__).'/mlanglib.php');
 
 /**
  * Represent the OJ2 translator filter and its settings
@@ -365,7 +365,7 @@ class local_onlinejudge2_filter implements renderable {
 /**
  * Represents the translation tool
  */
-class local_amos_translator implements renderable {
+class local_onlinejudge2_translator implements renderable {
 
     /** @const int number of rows per page */
     const PERPAGE = 100;
@@ -386,7 +386,7 @@ class local_amos_translator implements renderable {
      * @param local_amos_filter $filter
      * @param stdclass $user working with the translator
      */
-    public function __construct(local_amos_filter $filter, stdclass $user) {
+    public function __construct(local_onlinejudge2_filter $filter, stdclass $user) {
         global $DB;
 
         // get the list of strings to display according the current filter values

@@ -22,7 +22,7 @@
 //          http://www.gnu.org/copyleft/gpl.html                         //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
-
+//测试中文注释
 define('NUMTESTS', 5); // Default number of test cases
 
 // Default maximum cpu time (seconds) for all assignments
@@ -258,21 +258,21 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
 
         // DELETE submissions results
-        $submissions = get_records('assignment_submissions', 'assignment', $assignment->id);
+        $submissions = $DB->get_records('assignment_submissions', 'assignment', $assignment->id);
         foreach ($submissions as $submission) {
-            if (!delete_records('assignment_oj_results', 'submission', $submission->id))
+            if (!$DB->delete_records('assignment_oj_results', 'submission', $submission->id))
                 return false;
-            if (!delete_records('assignment_oj_submissions', 'submission', $submission->id))
+            if (!$DB->delete_records('assignment_oj_submissions', 'submission', $submission->id))
                 return false;
         }
 
         // DELETE tests
-        if (!delete_records('assignment_oj_tests', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj_tests', 'assignment', $assignment->id)) {
             return false;
         }
 
         // DELETE programming language
-        if (!delete_records('assignment_oj', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj', 'assignment', $assignment->id)) {
             return false;
         }
 
@@ -289,14 +289,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      */
     function after_add_update($assignment) {
         $onlinejudge = new Object();
-        $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
+        $onlinejudge = $DB->get_record('assignment_oj', 'assignment', $assignment->id);
         if ($onlinejudge) {
             $onlinejudge->language = $assignment->lang;
             $onlinejudge->memlimit = $assignment->memlimit;
             $onlinejudge->cpulimit = $assignment->cpulimit;
             $onlinejudge->compileonly = $assignment->compileonly;
             $onlinejudge->ratiope = $assignment->ratiope;
-            update_record('assignment_oj', $onlinejudge);
+            $DB->update_record('assignment_oj', $onlinejudge);
         } else {
             $onlinejudge->assignment = $assignment->id;
             $onlinejudge->language = $assignment->lang;
@@ -304,7 +304,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $onlinejudge->cpulimit = $assignment->cpulimit;
             $onlinejudge->compileonly = $assignment->compileonly;
             $onlinejudge->ratiope = $assignment->ratiope;
-            insert_record('assignment_oj', $onlinejudge);
+            $DB->insert_record('assignment_oj', $onlinejudge);
         }
     }
 
@@ -316,7 +316,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     function get_tests() {
         global $CFG;
 
-        $records = get_records('assignment_oj_tests', 'assignment', $this->assignment->id, 'id ASC');
+        $records = $DB->get_records('assignment_oj_tests', 'assignment', $this->assignment->id, 'id ASC');
         $tests = array();
 
         foreach ($records as $record) {
