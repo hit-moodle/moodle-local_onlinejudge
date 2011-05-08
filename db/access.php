@@ -27,45 +27,33 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    // Ability to set-up Onlinejudge2 portal and assign translators of languages
+    // Ability to set-up Onlinejudge2
     'local/onlinejudge2:manage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
-    // Ability to stage translations using the translation tool
-    'local/onlinejudge2:stage' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
-            'user' => CAP_ALLOW,
-        )
-    ),
-
-    // Ability to commit the stage into Onlinejudge2 repository
-    'local/onlinejudge2:commit' => array(
+    // Ability to query the task.
+    'local/onlinejudge2:query' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
-    // Ability to stash a stage and to contribute
-    'local/onlinejudge2:stash' => array(
+    // Ability to delete the task
+    'local/onlinejudge2:delete' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
-            'user' => CAP_ALLOW,
-        )
+        'legacy' => array()
     ),
 
-    // Ability to import strings from uploaded file and stage them
-    'local/onlinejudge2:importfile' => array(
+    // Ability to ...
+    'local/onlinejudge2:othercap' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
-            'user' => CAP_ALLOW,
-        )
+        'legacy' => array()
     ),
+
 
 );

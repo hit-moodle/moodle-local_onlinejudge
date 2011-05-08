@@ -23,7 +23,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //测试中文注释
-define('NUMTESTS', 5); // Default number of test cases
+define('NUMTESTS', 5); // Default number of test casesY
 
 // Default maximum cpu time (seconds) for all assignments
 if (!isset($CFG->assignment_oj_max_cpu)) {
@@ -548,7 +548,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         if (isset($submission->status)) {
             if ($submission->status === 'pending') {
                 if (empty($CFG->assignment_oj_daemon_pid)) { //Judge from cron
-                    $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+                    $lastcron = $DB->get_field('modules', 'lastcron', 'name', 'assignment');
                     $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
                     $left = $left > 0 ? $left : 0;
                     $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
@@ -585,7 +585,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
-        $output = print_table($table, true);
+        $output = $DB->print_table($table, true);
 
         if($return)
             return $output;
@@ -636,17 +636,17 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         if ($submission) {
 
-            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
+            $onlinejudge = $DB->get_record('assignment_oj_submissions', 'submission', $submission->id);
             if (empty($onlinejudge) && $createnew) {
                 $newsubmission = new Object; 
                 $newsubmission->submission = $submission->id;
-                if (!insert_record("assignment_oj_submissions", $newsubmission)) {
+                if (!$DB->insert_record("assignment_oj_submissions", $newsubmission)) {
                     error("Could not insert a new empty onlinejudge submission");
                 }
                 unset($newsubmission);
             }
 
-            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
+            $onlinejudge = $DB->get_record('assignment_oj_submissions', 'submission', $submission->id);
             if ($onlinejudge) {
                 $submission->judged = $onlinejudge->judged;
                 $submission->oj_id = $onlinejudge->id;
@@ -677,14 +677,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
     function update_submission($submission, $new_oj=false) {
 
-        update_record('assignment_submission', $submission);
+        $DB->update_record('assignment_submission', $submission);
 
         if ($new_oj) {
             $submission->submission = $submission->id;
-            insert_record('assignment_oj_submissions', $submission);
+            $DB->insert_record('assignment_oj_submissions', $submission);
         } else {
             $submission->id = $submission->oj_id;
-            update_record('assignment_oj_submissions', $submission);
+            $DB->update_record('assignment_oj_submissions', $submission);
         }
     }
 
@@ -814,7 +814,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         if ($submissions) {
             $submission = array_pop($submissions);
             // Set judged mark
-            set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
+            $DB->set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
         }
 
         set_cron_lock('assignment_judging', null);
@@ -1026,13 +1026,13 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $result->judgetime = time();
             $result->info = addslashes($result->info);
             $result->output = addslashes($result->output);
-            if ($ret = insert_record('assignment_oj_results', $result, false)) {
+            if ($ret = $DB->insert_record('assignment_oj_results', $result, false)) {
                 $newsub = null;
                 $newsub->id = $sub->id;
                 $newsub->teacher = get_admin()->id;
                 $newsub->timemarked = time();
                 $newsub->grade = $result->grade;
-                $ret = update_record('assignment_submissions', $newsub);
+                $ret = $DB->update_record('assignment_submissions', $newsub);
                 $this->update_grade($sub);
             }
         }
@@ -1186,7 +1186,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
 
         // Detect the frequence of cron
-        $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+        $lastcron = $DB->get_field('modules', 'lastcron', 'name', 'assignment');
         if ($lastcron) {
             set_config('assignment_oj_cronfreq', time() - $lastcron);
         }
@@ -1317,6 +1317,6 @@ function reconnect_db()
     while (!$db->NConnect())
         sleep(5);
 
-    configure_dbconnection();
+    $DB->configure_dbconnection();
 }
 ?>

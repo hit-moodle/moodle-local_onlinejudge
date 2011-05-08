@@ -26,9 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Puts Onlinejudge2 into the global navigation tree.
- *
- * @param global_navigation $navigation
+ * add the onlinejudge plugin into navigation
  */
 function onlinejudge2_extends_navigation(global_navigation $navigation) {
     $onlinejudge2 = $navigation->add('Onlinejudge2', new moodle_url('/local/onlinejudge2/'));
