@@ -1,41 +1,10 @@
 <?php
-	//define('NUMTESTS', 5); //Default number of test cases
-	//default maximum cpu time (seconds) for all assignments
+global $DB,$CFG;
+require_once("../../judgelib.php");
+
+class judge_ideone extends judge_base {
 	
-	if(!isset($CFG->assignment_oj_max_cpu)) {
-		set_config('assignment_oj_max_cpu', 10);
-	}
-	
-	//default maxmim cpu memory for all assignments
-	if(!isset($CFG->assignment_oj_max_mem)) {
-    set_config('assignment_oj_max_mem', 256 * 1024 * 1024);
-}
-
-// Judge everytime when cron is running if set to true. Default is false. Use daemon is recommanded
-if (!isset($CFG->assignment_oj_judge_in_cron)) {
-    set_config('assignment_oj_judge_in_cron', 0);
-}
-
-
-// IDEONE.com configure
-if (!isset($CFG->assignment_oj_ideone_username)) {
-	set_config('assignment_oj_ideone_username' , 'test');
-}
-if (!isset($CFG->assignment_oj_ideone_password)) {
-	set_config('assignment_oj_ideone_password' , 'test');
-}
-if (!isset($CFG->assignment_oj_ideone_delay)) { //delay between submitting and getting result
-	set_config('assignment_oj_ideone_delay' , 3);
-}
-
-
-require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
-require_once($CFG->dirroot.'/lib/filelib.php');
-require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
-require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
-    // ideone.com supports the following languages.
-    // id_in_moodle => id_in_ideone
-        $ideone_langs = array(
+	var $ideone_langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
         'awk_gawk_ideone'                => 104,            
@@ -87,7 +56,118 @@ require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
         'vbdotnet_ideone'                => 101, 
         'whitespace_ideone'              => 6
     );
+    
+    /**
+     * Returns an array of installed programming languages indexed and sorted by name
+     */
+    function get_languages()
+    {
+    	$lang = array();
+        // Get ideone.com languages
+        foreach ($this->ideone_langs as $name => $id) {
+            $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
+        }
+        asort($lang);
+        return $lang;
+    }
+    function translator()
+    {
+        
+    }
+/**
+ * function getLanguages retrieve a list of available programming languages
+ * 
+ * function createSubmission create a paste
+ * 
+ * function getSubmissionStatus check whether ideone.com has finished 
+ * executing the program. If the program has finished, proceed to the 
+ * step no. 4. Otherwise wait 3­5 seconds and repeat step no. 3.
+ * 
+ * function getSubmissionDetails retrieve detailed information about 
+ * the execution of the program.
+ */
+$user = onlinejudge2;
+$pass = 123456;
 
-		
+$client = new SoapClient("http://ideone.com/api/1/service.wsdl");
+/**
+ *  0=>'nr' : not running – the paste has been created 
+        with run parameter set to false
+ * 11=>'ce' : compilation error – the program could not 
+        be executed due to compilation errors
+ * 12=>'re' : runtime error – the program finished 
+        because of  the runtime error, for example: 
+        division by zero,  array index out of bounds, uncaught exception
+ * 13=>‘tle’： time limit exceeded – the program didn't 
+        stop before the time limit
+ * 15=>'ok' : success – everything went ok
+ * 17=>'mle': memory limit exceeded – the program tried 
+        to use more memory than it is allowed
+ * 19=>'rf' : illegal system call – the program tried to call 
+          illegal system function
+ * 20=>'ie' : internal error – some problem occurred on 
+        ideone.com; try to submit the paste again and if that fails too, 
+        then please contact us at contact@ideone.com
+ */
 
+$source = null; // source code of the paste.
+$status = array(
+                0   => 'nr',
+                11  => 'ce',
+                12  => 're',
+                13  => 'tle',
+                15  => 'ok',
+                17  => 'mle',
+                19  => 'rf',
+                20  => 'ie'
+            );
+$result  = false;
+try { 
+	// Begin soap
+    // Submit all cases first to save time.
+    $links = array();
+    // loop: get data from database table onlinejudge_task.
+    global $DB;
+    $tasks = $DB->get_records($CFG->prefix.'onlinejudge_task');
+    foreach ($tasks as $task) 
+    {
+        /**
+         * function createSubmission create a paste.
+         * @param user is the user name.
+         * @param pass is the user's password.
+         * @param source is the source code of the paste.
+         * @param language is language identifier. these identifiers can be 
+         *     retrieved by using the getLanguages methods.
+         * @param input is the data that will be given to the program on the stdin
+         * @param run is the determines whether the source code should be executed.
+         * @param private is the determines whether the paste should be private.   
+         *     Private pastes do not appear on the recent pastes page on ideone.com. 
+         *     Notice: you can only set submission's visibility to public or private through
+         *     the API (you cannot set the user's visibility).
+         */
+    	$webid = $client->createSubmission($user,$pass,$source,translator($task['judgeName']),$task->input,true,true);     
+        if ($webid['error'] == 'OK')
+            $links[] = $webid['link'];
+        else 
+        {
+            $result->status = 'ie';
+            $result->info = $webid['error'];
+            return $result;
+        }
+        /**
+         * 
+         * function getSubmissionDetails retrieve detailed information about 
+         * the execution of the program.
+         */
+        $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);  
+    }
+}catch(SoapFault $sf)
+    {
+        $result->status = 'ie';
+        $result->info = 'faultcode='.$sf->faultcode.'|faultstring='.$sf->faultstring;
+        return $result;
+    }    
+}
+echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
+by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
 ?>

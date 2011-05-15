@@ -772,7 +772,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         
         // Get local languages. Linux only
         if ($CFG->ostype != 'WINDOWS') {
-            $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
+            $dir = $CFG->dirroot . '/local/onlinejudge2/languages/';
             $files = get_directory_list($dir);
             $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
             foreach ($names as $name) {
@@ -1104,7 +1104,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
             $result->grade = -1;
 
-            try { // Begin soap
+            try { 
+            	// Begin soap
                 // Submit all cases first to save time.
                 $links = array();
                 foreach ($cases as $case) {
