@@ -12,6 +12,27 @@ class judge_base
      */
 	function get_languages(){}
 	
+    function get_tests() 
+    {
+        global $CFG;
+        // 从数据库中读取任务，待完善。
+        $records = $DB->get_records('onlinejudge_task', 'assignment', $this->assignment->id, 'id ASC');
+        $tests = array();
+
+        foreach ($records as $record) {
+            if ($record->usefile) {
+                //if里的语句根据需要修改，这里原先使用的作业模块。
+                if (! $record->input = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->inputfile"))
+                    continue; //Skip case whose file(s) can't be read
+                if (! $record->output = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->outputfile"))
+                    continue; //Skip case whose file(s) can't be read
+            }
+            $tests[] = $record;
+        }
+
+        return $tests;
+    }
+	
       /**
      * Get one unjudged submission and set it as judged
      * If all submissions have been judged, return false

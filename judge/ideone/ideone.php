@@ -3,7 +3,17 @@ global $DB,$CFG;
 require_once("../../judgelib.php");
 
 class judge_ideone extends judge_base {
-	
+    //这里先记录下ideone接口的使用步骤
+    /**
+     * how to use ideone.com
+     * step1: 使用getLanguages方法获取可用的语言
+     * step2: 使用createSubmission方法创建一个数据包
+     * step3: 使用getSubmissionsStatus方法来检查ideone.com是否成功编译了程序
+     *        如果成功了，进入step4，如果失败了，等待3-5秒回到步骤3
+     * step4: 使用getSubmissionDetails方法来获取程序编译运行的详细信息
+     * step5: 返回step2来编译其他需要编译的程序.
+     */
+	var $cases = parent::get_tests();
 	var $ideone_langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
@@ -154,19 +164,82 @@ try {
             $result->info = $webid['error'];
             return $result;
         }
-        /**
-         * 
-         * function getSubmissionDetails retrieve detailed information about 
-         * the execution of the program.
-         */
-        $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);  
-    }
-}catch(SoapFault $sf)
+        // Get ideone results
+        //onlinejudge_ideone_delay在config.php文件中自己定义,他是表示ideone网站检测的延迟。
+        $delay = $CFG->onlinejudge_ideone_delay;
+        $i = 0;
+        $results = array();
+        foreach ($cases as $case) 
+        {
+            while(1)
+            {
+                if ($delay > 0) 
+                {
+                    sleep($delay); 
+                    $delay = ceil($delay / 2);
+                }
+                $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
+                if($status['status'] == 0) 
+                {
+                    $delay = 0;
+                    break;
+                }
+            }
+           /**
+            * 
+            * function getSubmissionDetails retrieve detailed information about 
+            * the execution of the program.
+            */
+            $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
+
+            $result->status = $status_ideone[$details['result']];
+            // If got ce or compileonly, don't need to test other case
+            if ($result->status == 'ce' || $this->onlinejudge->compileonly) 
+            {
+                if ($result->status != 'ce' && $result->status != 'ie')
+                    $result->status = 'compileok';
+                $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+                $result->grade = $this->grade_marker('ce', $this->assignment->grade);
+                return $result;
+            }
+
+            // Check for wa, pe, tle, mle or accept
+            if ($result->status == 'ok') 
+            {
+                if ($details['time'] > $this->onlinejudge->cpulimit)
+                    $result->status = 'tle';
+                else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
+                    $result->status = 'mle';
+                else 
+                {
+                    $result->output = $details['output'];
+                    $result->status = $this->diff($case->output, $result->output);
+                }
+            }
+
+            $results[] = $result;
+            unset($result);
+            $i++;
+        }
+} catch(SoapFault $sf)
     {
         $result->status = 'ie';
         $result->info = 'faultcode='.$sf->faultcode.'|faultstring='.$sf->faultstring;
         return $result;
-    }    
+    } 
+    //这里代码原先是用了作业模块，也需要修改
+    $result = $this->merge_results($results, $cases);
+    $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+    return $result;
+} 
+else 
+{
+    return false;
+}
+     
+}
+}
+       
 }
 echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
 by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
