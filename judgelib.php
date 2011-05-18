@@ -67,10 +67,24 @@ class judge_base
     }
     
     /**
+     * @param cases is the testcase for input and output.
+     * @param extra is the extra limit information, 
+     *        eg: runtime limit and cpu limit.
+     * @param compiler is the need of certain compiler,
+     *        eg: ideone.com need the username and password;
+     *            sandbox need the executable file(.o).
+     */
+    function judge($cases, $extra, $compiler)
+    {
+    	// TO DO
+    }
+    
+    /**
      * 
      * function diff() compare the output and the answer 
      */  
-    function diff($answer, $output) {
+    function diff($answer, $output) 
+    {
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
         $output = trim($output);
 
@@ -97,12 +111,6 @@ class judge_base
             return 'pe';
         }
     }
-    
-    /**
-	 * 
-	 * judge in sandbox or in ideone.
-	 */
-    function judge($sub){}
 }
     
 
