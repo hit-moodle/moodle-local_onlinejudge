@@ -20,15 +20,14 @@ class judge_sandbox extends judge_base
         return $lang;
     }
     
-    
     /**
-     * @param cases表示用例的输入输出
-     * @param extra表示额外的限制信息，比如运行时间限制，内存占用限制
-     * @param compiler表示编译器需要的参数,比如ideone需要用户名和密码，sandbox需要可执行程序.o文件
+     * there are still some problem in this function, 
+     * param extra should not be used here.
      */
     function judge($cases, $extra, $compiler)
     {
-    	
+    	$exec_file = $compiler->exec_file;//get the executable file.
+    	run_in_sandbox($exec_file, $cases);
     	
     }
     
@@ -38,25 +37,6 @@ class judge_sandbox extends judge_base
         //ret表示输出结果
         $ret = new Object();
         $ret->output = '';
-        /**
-         *  0=>'nr' : not running – the paste has been created 
-            with run parameter set to false
-         * 11=>'ce' : compilation error – the program could not 
-            be executed due to compilation errors
-         * 12=>'re' : runtime error – the program finished 
-            because of  the runtime error, for example: 
-            division by zero,  array index out of bounds, uncaught exception
-         * 13=>‘tle’： time limit exceeded – the program didn't 
-            stop before the time limit
-         * 15=>'ok' : success – everything went ok
-         * 17=>'mle': memory limit exceeded – the program tried 
-            to use more memory than it is allowed
-         * 19=>'rf' : illegal system call – the program tried to call 
-            illegal system function
-         * 20=>'ie' : internal error – some problem occurred on 
-            ideone.com; try to submit the paste again and if that fails too, 
-            then please contact us at contact@ideone.com
-         */
         $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
 
         $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/makefile/sand';
