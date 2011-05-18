@@ -88,10 +88,9 @@ class judge_ideone extends judge_base
     
     function judge($cases, $extra, $compiler)
     {
-        //onlinejudge_ideone_username and onlinejudge_ideone_password
-        //are defined in config.php file.
-        $user = $CFG->assignment_oj_ideone_username;                                               
-        $pass = $CFG->assignment_oj_ideone_password;
+    	//get the username and password form param compiler.
+    	$user = $compiler->username;
+    	$pass = $compiler->password;
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
         /**
          *  0=>'nr' : not running – the paste has been created 
@@ -113,7 +112,7 @@ class judge_ideone extends judge_base
             then please contact us at contact@ideone.com
          */
 
-        $source = null; // source code of the paste.
+        $source = $cases; // source code of the paste.
         $status = array(
                 0   => 'nr',
                 11  => 'ce',
