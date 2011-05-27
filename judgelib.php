@@ -20,13 +20,6 @@ class judge_base
         $tests = array();
 
         foreach ($records as $record) {
-            if ($record->usefile) {
-                //if里的语句根据需要修改，这里原先使用的作业模块。
-                if (! $record->input = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->inputfile"))
-                    continue; //Skip case whose file(s) can't be read
-                if (! $record->output = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->outputfile"))
-                    continue; //Skip case whose file(s) can't be read
-            }
             $tests[] = $record;
         }
 
