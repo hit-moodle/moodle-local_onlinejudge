@@ -1,0 +1,14 @@
+THIS PLUGIN IS STILL UNDER DEVELOPMENT
+
+Online Judge 2 is a local plugin for Moodle 2.x. It provides a base lib, called
+judgelib, to assess submitted source code automatically by testing them against
+customizable test cases (ACM-ICPC/Online Judge style). By calling this lib, 
+all kinds of moodle plugins can get the ability of online judge.
+
+Now, OJ2 includes an Online Judge Assignment Type which works like the offical
+Advanced Uploading of Files except the ability of online judge.
+
+Home:
+    https://github.com/hit-moodle/moodle-local_onlinejudge2
+Issues:
+    https://github.com/hit-moodle/moodle-local_onlinejudge2/issues
