@@ -67,7 +67,7 @@ class judge_base
      *        eg: ideone.com need the username and password;
      *            sandbox need the executable file(.o).
      */
-    function judge($cases, $extra, $compiler)
+    function judge($sub)
     {
     	// TO DO
     }
