@@ -289,15 +289,33 @@ class judge_factory
         }
         echo "<br><br><br>";
     }
+    
+    
+    /**
+     * 
+     * translator the param id into the language that  be available for compiler 
+     * @param unknown_type $id
+     */
+    function translator($id)
+    {
+        $lang_temp = array();
+        //将数组的键值调换，存入temp数组
+        $lang_temp = array_flip($this->judge_methods);
+        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
+        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
+        
+        
+        return $selected_lang;        
+    }
 	
     /*
      * 函数get_judge根据传入的数据来创建judge_ideone或者judge_sandbox对象
      * $sub数据包就是数据库中的一个数据,包括judgeName,memlimit,cpulimit,input,output等数据.
      * 
      */
-    function get_judge($sub)
+    function get_judge(& $sub)
     {	
-        //检测id值是否在支持的编译器以及语言里
+        //检测id值是否在支持的编译器语言里
         if(in_array($sub['judgeName'], $judge_methods))
         {
         	//获取编译器类型，结果表示 _ideone或者_sandbox
@@ -307,12 +325,14 @@ class judge_factory
             if($judge_type == "_sandbox" )
             {
                 $judge_obj = new judge_sandbox();
+                $sub['judgeName'] = $this->translator($sub['judgeName']);
                 $judge_obj->judge($sub);
             }
             //选择的为ideone的引擎以及语言
             else if($judge_type = "_ideone")
             {
                 $judge_obj = new judge_ideone();
+                $sub['judgeName'] = $this->translator($sub['judgeName']);
                 $judge_obj->judge($sub);
             }
             else 

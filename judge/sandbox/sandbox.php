@@ -61,18 +61,26 @@ class judge_sandbox extends judge_base
     }
     
     /**
-     * there are still some problem in this function, 
-     * @param extra should not be used here.
+     * @param sub is the data passed by get_judge method in class judge_factory in file judgelib.php
      */
 //    function judge($cases, $extra, $compiler)
     function judge($sub)
     {
-        //生成.o文件	
-    	$exec_file = compile($sub['inputfile'],"/var/www/moodle/local/onlinejudge/judge/sandbox/exec_file/");
+        //生成.o文件
+        if($sub['usefile'])
+        {
+            $exec_file = compile($sub['inputfile'],"/var/www/moodle/local/onlinejudge/judge/sandbox/exec_file/");	
+        }
+        else 
+        {
+            $exec_file = compile($sub['input'],"/var/www/moodle/local/onlinejudge/judge/sandbox/exec_file/");
+        }	
+    	
     	//用例
     	$case = new stdClass();
     	$case->input = $sub['inputfile'];
     	$case->output = $sub['outputfile'];
+        //利用sandbox引擎编译
     	run_in_sandbox($exec_file, $case);
     	
     }
