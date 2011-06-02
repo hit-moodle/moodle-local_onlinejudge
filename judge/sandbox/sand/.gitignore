@@ -1,0 +1,7 @@
+*_test
+*.o
+*.a
+detector
+223
+policy.c
+sand
