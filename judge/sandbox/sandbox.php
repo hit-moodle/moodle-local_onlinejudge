@@ -107,7 +107,7 @@ class judge_sandbox extends judge_base
         $ret->output = '空内容';
         $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
 
-        $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/makefile/sand';
+        $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/sand/sand';
         //这里sand不可执行
         //不可执行
         if (!is_executable($sand)){
