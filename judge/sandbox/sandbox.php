@@ -73,8 +73,8 @@ class judge_sandbox extends judge_base
     
     /**
      * @param sub is the data passed by get_judge method in class judge_factory in file judgelib.php
-     */
-    //function judge($cases, $extra, $compiler)
+     * returns the result of compiled.
+     */   
     function judge($sub)
     {
         //生成.o文件
@@ -95,20 +95,20 @@ class judge_sandbox extends judge_base
     		
         }
         //利用sandbox引擎编译
-    	$this->run_in_sandbox($exec_file, $case);
+    	return $this->run_in_sandbox($exec_file, $case);
     	
     }
     
     function run_in_sandbox($exec_file, $case) 
     {
-        //echo '开始执行run_in_sandbox函数';
         global $CFG;
         //ret表示输出结果
         $ret = new Object();
-        $ret->output = '';
+        $ret->output = '空内容';
         $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
 
         $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/makefile/sand';
+        //这里sand不可执行
         //不可执行
         if (!is_executable($sand)){
             $ret->status = 'ie';
@@ -125,7 +125,7 @@ class judge_sandbox extends judge_base
             1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file to write to
             2 => array('pipe', '$exec_file.err', 'w') // stderr is a file to write to
         );
-        
+        $ret->output = 'null';
         //打开进程，执行命令行，并且打开用于输入输出的文件指针
         $proc = proc_open($sand, $descriptorspec, $pipes);
         
