@@ -29,5 +29,5 @@ defined('MOODLE_INTERNAL') || die();
  * onlinejudge2 renderer class
  */
 class local_onlinejudge2_renderer extends plugin_renderer_base {
-
+    
 }

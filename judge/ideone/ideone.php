@@ -1,6 +1,6 @@
 <?php
 global $DB,$CFG;
-require_once("../../judgelib.php");
+require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
 class judge_ideone extends judge_base 
 {
