@@ -35,10 +35,10 @@
     $string['inputfile'] = 'Input file';
     $string['judgetime'] = 'Judge time';
     $string['judgemethods'] = 'the supported compiler language';
-    $string['langc'] = 'C';
-    $string['langc_warn2err'] = 'C (Warnings as Errors)';
-    $string['langcpp'] = 'C++';
-    $string['langcpp_warn2err'] = 'C++ (Warnings as Errors)';
+    $string['langc_sandbox'] = 'C';
+    $string['langc_warn2err_sandbox'] = 'C (Warnings as Errors)';
+    $string['langcpp_sandbox'] = 'C++';
+    $string['langcpp_warn2err_sandbox'] = 'C++ (Warnings as Errors)';
     $string['langada_ideone'] = 'Ada (ideone.com)';                      
     $string['langassembler_ideone'] = 'Assembler (ideone.com)';                  
     $string['langawk_gawk_ideone'] = 'AWK (gawk, ideone.com)';            

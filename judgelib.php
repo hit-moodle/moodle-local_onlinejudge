@@ -1,8 +1,7 @@
 <?php
 global $CFG,$DB;
 require_once($CFG->dirroot."/lib/dml/moodle_database.php");
-require_once("./judge/ideone/ideone.php");
-require_once($CFG->dirroot."/mod/assignment/type/onlinejudge/assignment.class.php");
+//require_once($CFG->dirroot."/mod/assignment/type/onlinejudge/assignment.class.php");
 
 class judge_base
 {
@@ -11,7 +10,7 @@ class judge_base
      * Returns an array of installed programming languages indexed and sorted by name
      */
 	function get_languages(){}
-	
+	/**
     function get_tests() 
     {
         global $CFG;
@@ -25,6 +24,7 @@ class judge_base
 
         return $tests;
     }
+    */
 	
       /**
      * Get one unjudged submission and set it as judged
@@ -205,7 +205,7 @@ class judge_base
         }
     }
 }
-    
+
 
 /*利用设计模式中的工厂模式来设计一个类，这个类根据id值的不同来选择创建不同
  *的ideone或sandbox实例
@@ -280,21 +280,32 @@ class judge_factory
     function get_judge_methods()
     {
         $lang = array();
-        echo "本系统支持的编译语言以及id值如下：<br>";
+        //echo "本系统支持的编译语言以及id值如下：<br>";
         foreach ($this->judge_methods as $name => $id) 
         {
             $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
             //这里需要使用表格来显示.
-            echo "$lang[$name] ====>  $id";
+            //echo get_string('lang'.$name, 'local_onlinejudge2') ;
+            //echo "====>  $id<br>";
         }
-        echo "<br><br><br>";
+        //echo "<br><br><br>";
+    }
+    
+    /**
+     * 
+     */
+    function translate_into_judge_methods($id)
+    {
+        $lang_temp = array();
+        $lang_temp = array_flip($this->judge_methods);
+        return $lang_temp[$id];
     }
     
     
     /**
      * 
      * translator the param id into the language that  be available for compiler 
-     * @param unknown_type $id
+     * @param integer $id
      */
     function translator($id)
     {
@@ -314,26 +325,33 @@ class judge_factory
      * 
      */
     function get_judge(& $sub)
-    {	
+    {
         //检测id值是否在支持的编译器语言里
-        if(in_array($sub['judgeName'], $judge_methods))
-        {
-        	//获取编译器类型，结果表示 _ideone或者_sandbox
-            $judge_type = substr($sub['judgeName'], strrpos($sub['judgeName'], '_'));
+        if(in_array($sub['judgeName'], $this->judge_methods))
+        {   
+            // test result -> ok  
+            $judgeName = $sub['judgeName']; //保存原先的id值  	
+            $sub['judgeName'] = $this->translate_into_judge_methods($sub['judgeName']);
             
+            //获取编译器类型，结果表示 _ideone或者_sandbox
+            $judge_type = substr($sub['judgeName'], strrpos($sub['judgeName'], '_'));
             //选择的为sandbox的引擎以及语言,
+            //还原原先的id值
+            $sub['judgeName'] = $judgeName;
             if($judge_type == "_sandbox" )
             {
+                require_once("./judge/sandbox/sandbox.php");
                 $judge_obj = new judge_sandbox();
-                $sub['judgeName'] = $this->translator($sub['judgeName']);
-                $judge_obj->judge($sub);
+                $sub['judgeName'] = $this->translator($sub['judgeName']);	
+                return $judge_obj->judge($sub);
             }
             //选择的为ideone的引擎以及语言
-            else if($judge_type = "_ideone")
+            else if($judge_type == "_ideone")
             {
+                require_once("./judge/ideone/ideone.php");
                 $judge_obj = new judge_ideone();
-                $sub['judgeName'] = $this->translator($sub['judgeName']);
-                $judge_obj->judge($sub);
+                $sub['judgeName'] = $this->translator($sub['judgeName']);	               
+                return $judge_obj->judge($sub);
             }
             else 
             {
@@ -345,6 +363,8 @@ class judge_factory
         {	
             echo "所选择的语言不支持，请重新选择.<br>";
         }
-    }	
+    }
+   
 }
+
 ?>
