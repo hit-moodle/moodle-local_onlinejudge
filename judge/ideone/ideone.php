@@ -82,15 +82,15 @@ class judge_ideone extends judge_base
         return $lang;
     }
     
-    function translator()
-    {     
-    }
     
-    function judge($cases, $extra, $compiler)
+    //function judge($cases, $extra, $compiler)
+    function judge($sub)
     {
     	//get the username and password form param compiler.
-    	$user = $compiler->username;
-    	$pass = $compiler->password;
+    	//onelinejude_ideone_username and onlinejudge_ideone_password
+    	//are defined in file config.php in the root. 
+    	$user = $CFG->onlinejudge_ideone_username;
+    	$pass = $CFG->onlinejudge_ideone_password;
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
         /**
          *  0=>'nr' : not running – the paste has been created 

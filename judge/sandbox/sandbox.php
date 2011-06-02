@@ -20,14 +20,68 @@ class judge_sandbox extends judge_base
         return $lang;
     }
     
+    // Compile submission $sub in temp_dir
+    // return result class on success, false on error
+    function compile($sub, $temp_dir) {
+        global $CFG;
+        $result = false;
+
+        $file = 'prog.c';
+        file_put_contents("$temp_dir/$file", get_submission_file_content($sub->id));
+        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$this->onlinejudge->language.'.sh';
+        if (!is_executable($compiler)) 
+        {
+            $result->status = 'ie';
+            $result->info = get_string('cannotruncompiler', 'assignment_onlinejudge');
+            break;
+        }
+
+        $output = null;
+        $return = null;
+        $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
+        exec($command, $output, $return);
+
+        if ($return) 
+        { 
+        	//Compile error
+            $result->status = 'ce';
+        } 
+        else 
+        { 
+            $result->status = 'compileok';
+        }
+
+        //strip path info
+        $output = str_replace($temp_dir.'/', '', $output);
+        $error = htmlspecialchars(implode("\n", $output));
+        $result->info = addslashes($error);
+
+        //Compile the first file only
+        return $result;         
+    }
+    
     /**
-     * there are still some problem in this function, 
-     * param extra should not be used here.
+     * @param sub is the data passed by get_judge method in class judge_factory in file judgelib.php
      */
-    function judge($cases, $extra, $compiler)
+//    function judge($cases, $extra, $compiler)
+    function judge($sub)
     {
-    	$exec_file = $compiler->exec_file;//get the executable file.
-    	run_in_sandbox($exec_file, $cases);
+        //生成.o文件
+        if($sub['usefile'])
+        {
+            $exec_file = compile($sub['inputfile'],"/var/www/moodle/local/onlinejudge/judge/sandbox/exec_file/");	
+        }
+        else 
+        {
+            $exec_file = compile($sub['input'],"/var/www/moodle/local/onlinejudge/judge/sandbox/exec_file/");
+        }	
+    	
+    	//用例
+    	$case = new stdClass();
+    	$case->input = $sub['inputfile'];
+    	$case->output = $sub['outputfile'];
+        //利用sandbox引擎编译
+    	run_in_sandbox($exec_file, $case);
     	
     }
     
