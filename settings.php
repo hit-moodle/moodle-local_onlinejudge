@@ -1,10 +1,8 @@
 <?php  
-global $CFG;
-//require($CFG->dirroot.'/mod/assignment/lib.php');
-//echo "ok";
 require_once(dirname(dirname(__FILE__)) . '/../config.php');
-require_once($CFG->dirroot.'/mod/assignment/type/onlinejudge/assignment.class.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
+
+//TODO: Make correct settings for judgelib. None of the following code is necessory.
 
 class config extends moodleform 
 {
