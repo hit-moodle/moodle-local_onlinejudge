@@ -17,10 +17,11 @@
 // The commands in here will all be database-neutral,
 // using the functions defined in lib/ddllib.php
 
-function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
+function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
-    global $CFG, $THEME, $db;
+    global $CFG, $THEME, $DB;
 
+    $dbman = $DB->get_manager();
     $result = true;
 
     if ($result && $oldversion < 2010032700) {
@@ -125,8 +126,46 @@ function xmldb_assignment_type_onlinejudge_upgrade($oldversion=0) {
 
     }
 
-    // Tell the daemon to exit
-    set_config('assignment_oj_daemon_pid' , '0');
+    if ($oldversion < 2011060200) {
+
+        // Define table assignment_oj_results to be dropped
+        $table = new xmldb_table('assignment_oj_results');
+
+        // Conditionally launch drop table for assignment_oj_results
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define index judged (not unique) to be dropped form assignment_oj_submissions
+        $table = new xmldb_table('assignment_oj_submissions');
+        $index = new xmldb_index('judged', XMLDB_INDEX_NOTUNIQUE, array('judged'));
+
+        // Conditionally launch drop index judged
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define field judged to be dropped from assignment_oj_submissions
+        $table = new xmldb_table('assignment_oj_submissions');
+        $field = new xmldb_field('judged');
+
+        // Conditionally launch drop field judged
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Define field taskid to be added to assignment_oj_submissions
+        $table = new xmldb_table('assignment_oj_submissions');
+        $field = new xmldb_field('task', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'submission');
+
+        // Conditionally launch add field taskid
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011060200, 'assignment', 'onlinejudge');
+    }
 
     return $result;
 }
