@@ -1,0 +1,10 @@
+.cdtproject
+.project
+dist
+autom4te.cache
+aclocal.m4
+config.status
+configure
+config.h.in
+config.h
+stamp-h1
