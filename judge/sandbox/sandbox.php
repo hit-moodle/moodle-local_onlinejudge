@@ -26,6 +26,7 @@ class judge_sandbox extends judge_base
     // Compile submission $sub in temp_dir
     // return result class on success, false on error
     function compile($sub, $temp_dir) {
+      //  echo "现在开始执行compile方法<br>";
         global $CFG;
         $result = false;
         //$file 是.c文件或者源代码
@@ -50,7 +51,7 @@ class judge_sandbox extends judge_base
         //output是一个数组，保存输出信息
         //return是命令行执行的状态
         exec($command, $output, $return);
-
+       // echo 'exec执行完毕';
         if ($return) 
         { 
         	//Compile error
@@ -67,7 +68,7 @@ class judge_sandbox extends judge_base
         $result->info = addslashes($error);
 
         //Compile the first file only
-        return $result;         
+        return $result;       
     }
     
     /**
@@ -77,14 +78,8 @@ class judge_sandbox extends judge_base
     function judge($sub)
     {
         //生成.o文件
-        if($sub['usefile'])
-        {
-            $exec_file = compile($sub['inputfile'],"～/exec_file/");	
-        }
-        else 
-        {
-            $exec_file = compile($sub['input'],"~/exec_file/");
-        }	
+       $this->compile($sub['source'], '/home/yu/exec_file');
+       $exec_file = '/home/yu/exec_file/a';
     	
     	//用例
         $case = new stdClass();
@@ -100,12 +95,13 @@ class judge_sandbox extends judge_base
     		
         }
         //利用sandbox引擎编译
-    	run_in_sandbox($exec_file, $case);
+    	$this->run_in_sandbox($exec_file, $case);
     	
     }
     
     function run_in_sandbox($exec_file, $case) 
     {
+        //echo '开始执行run_in_sandbox函数';
         global $CFG;
         //ret表示输出结果
         $ret = new Object();
@@ -113,14 +109,16 @@ class judge_sandbox extends judge_base
         $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
 
         $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/makefile/sand';
-        //可执行
+        //不可执行
         if (!is_executable($sand)){
             $ret->status = 'ie';
             return $ret;
         }
+       
         //命令行
         //$sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' -l disk=512000 '.$exec_file; 
         $sand .= ' -l cpu=1000'.' -l memory=1048576'.' -l disk=512000 '.$exec_file; 
+        
         //标准输入，标准输出和错误输出
         $descriptorspec = array(
             0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
@@ -130,7 +128,7 @@ class judge_sandbox extends judge_base
         
         //打开进程，执行命令行，并且打开用于输入输出的文件指针
         $proc = proc_open($sand, $descriptorspec, $pipes);
-
+        
         if (!is_resource($proc)) {
             $ret->status = 'ie';
             return $ret;
@@ -145,12 +143,15 @@ class judge_sandbox extends judge_base
         $ret->output = file_get_contents($exec_file.'.out');
 
         if ($return_value == 255) {
+            echo 'return_value==255';
             $ret->status = 'ie';
             return $ret;
         } else if ($return_value >= 2) {
+            echo 'return_value>=2';
             $ret->status = $result[$return_value];
             return $ret;
         } else if ($return_value == 0) {
+            echo 'return_value==0';
             mtrace('Pending? Why?');
             exit();
         }
