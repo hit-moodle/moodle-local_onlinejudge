@@ -14,7 +14,7 @@ class judge_ideone extends judge_base
      * step5: 返回step2来编译其他需要编译的程序.
      */
 	var $cases = parent::get_tests;
-	var $ideone_langs = array(
+	var $langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
         'awk_gawk_ideone'                => 104,            

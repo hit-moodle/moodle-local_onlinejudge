@@ -5,6 +5,14 @@ require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
 class judge_sandbox extends judge_base
 {
+    var $cases = parent::get_tests;
+    var $langs = array(
+        //sandbox languages
+        'c_warn2err_sandbox'                     =>300,
+        'c_sandbox'                              =>301,
+        'cpp_warn2err_sandbox'                   =>302,
+        'cpp_sandbox'                            =>303,
+	);
     function get_languages()
     {
     	$lang = array();
@@ -79,7 +87,7 @@ class judge_sandbox extends judge_base
     {
         //生成.o文件
        $this->compile($sub['source'], '/home/yu/exec_file');
-       $exec_file = '/home/yu/exec_file/a';
+       $exec_file = '/home/yu/exec_file/a.out';
     	
     	//用例
         $case = new stdClass();
