@@ -18,13 +18,13 @@ $sub['cpulimit'] = 1;
 $sub['memlimit'] = 1048576;
 $sub['judgeName'] = 301;
 $sub['source'] = '#include "stdio.h" 
-                   int main()
-                   {
-                       int a, b;
-                       scanf("%d,%d",&a,&b);
-                       printf("%d",a+b);
-                       return 0;
-                   }
+               int main()
+               {
+                   int a, b;
+                   scanf("%d,%d",&a,&b);
+                   printf("%d",a+b);
+                   return 0;
+               }
 ';
 $sub['input'] = '2,3';
 $sub['output'] = '5';
