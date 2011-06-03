@@ -28,7 +28,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
-        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="testcase"/>
+        <KEY NAME="testcase" TYPE="foreign" FIELDS="testcase" REFTABLE="assignment_oj_testcases" REFFIELDS="id" PREVIOUS="submission"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="assignment_oj_testcases" COMMENT="Testcases" PREVIOUS="assignment_oj_submissions">

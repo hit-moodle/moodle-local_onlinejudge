@@ -172,6 +172,13 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
+        // Define key testcase (foreign) to be added to assignment_oj_submissions
+        $table = new xmldb_table('assignment_oj_submissions');
+        $key = new xmldb_key('testcase', XMLDB_KEY_FOREIGN, array('testcase'), 'assignment_oj_testcases', array('id'));
+
+        // Launch add key testcase
+        $dbman->add_key($table, $key);
+
         // onlinejudge savepoint reached
         upgrade_plugin_savepoint(true, 2011060200, 'assignment', 'onlinejudge');
     }
