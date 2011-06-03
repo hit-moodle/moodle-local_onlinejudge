@@ -117,8 +117,11 @@ class judge_base
         global $CFG;
 
         // Detect the frequence of cron
-        //从数据库中获取还没有编译过的数据
-        $lastcron = $DB->get_field('onlinejudge_task', 'lastcron', 'status', '0');
+        //从数据库中获取还没有编译过的数据,onlinejudge_task表中的所有数据都是没有执行过的.
+        $tasks = $DB->get_records_list('onlinejudge_task');
+        //$lastcron = $tasks[0];
+        //foreach($tasks as task) 循环遍历？
+        
         if ($lastcron) {
             set_config('onlinejudge_cronfreq', time() - $lastcron);
         }
