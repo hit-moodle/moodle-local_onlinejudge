@@ -154,11 +154,20 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
             $dbman->drop_field($table, $field);
         }
 
-        // Define field taskid to be added to assignment_oj_submissions
+        // Define field testcase to be added to assignment_oj_submissions
         $table = new xmldb_table('assignment_oj_submissions');
-        $field = new xmldb_field('task', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'submission');
+        $field = new xmldb_field('testcase', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'submission');
 
-        // Conditionally launch add field taskid
+        // Conditionally launch add field testcase
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field task to be added to assignment_oj_submissions
+        $table = new xmldb_table('assignment_oj_submissions');
+        $field = new xmldb_field('task', XMLDB_TYPE_INTEGER, '20', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'testcase');
+
+        // Conditionally launch add field task
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
