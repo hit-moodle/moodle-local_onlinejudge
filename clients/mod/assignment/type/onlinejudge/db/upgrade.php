@@ -126,7 +126,7 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
     }
 
-    if ($oldversion < 2011060200) {
+    if ($oldversion < 2011060300) {
 
         // Define table assignment_oj_results to be dropped
         $table = new xmldb_table('assignment_oj_results');
@@ -180,7 +180,7 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         $dbman->add_key($table, $key);
 
         // onlinejudge savepoint reached
-        upgrade_plugin_savepoint(true, 2011060200, 'assignment', 'onlinejudge');
+        upgrade_plugin_savepoint(true, 2011060300, 'assignment', 'onlinejudge');
     }
 
     return $result;
