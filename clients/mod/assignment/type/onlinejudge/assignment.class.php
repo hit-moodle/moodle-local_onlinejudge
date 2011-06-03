@@ -53,17 +53,17 @@ if (!isset($CFG->assignment_oj_ideone_delay)) { //delay between submitting and g
 }
 
 
-require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
+require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 
 /**
- * Extends the uploadsingle assignment class
+ * Extends the upload assignment class
  * 
  * @author Arkaitz Garro, Sunner Sun
  */
-class assignment_onlinejudge extends assignment_uploadsingle {
+class assignment_onlinejudge extends assignment_upload {
 
     var $onlinejudge;
 
@@ -123,7 +123,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     );
 
     function assignment_onlinejudge($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
-        parent::assignment_uploadsingle($cmid, $assignment, $cm, $course);
+        parent::assignment_upload($cmid, $assignment, $cm, $course);
         $this->type = 'onlinejudge';
 
         if (isset($this->assignment->id)) {
