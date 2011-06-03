@@ -145,6 +145,12 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
             $dbman->drop_index($table, $index);
         }
 
+        // Define table assignment_oj_tests to be renamed to assignment_oj_testcases
+        $table = new xmldb_table('assignment_oj_tests');
+
+        // Launch rename table for assignment_oj_tests
+        $dbman->rename_table($table, 'assignment_oj_testcases');
+
         // Define field judged to be dropped from assignment_oj_submissions
         $table = new xmldb_table('assignment_oj_submissions');
         $field = new xmldb_field('judged');
