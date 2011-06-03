@@ -1,5 +1,6 @@
 <?php
 //require_once("../../judgelib.php");
+require_once(dirname(__FILE__) ."/../../../../config.php");
 global $CFG, $DB;
 require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
@@ -86,11 +87,11 @@ class judge_sandbox extends judge_base
     function judge($task)
     {
         //生成.o文件
-       $this->compile($task['source'], '/home/yu/exec_file');
-       $exec_file = '/home/yu/exec_file/a.out';
-    	
-    	//用例
-        $case = new stdClass();
+        $this->compile($task['source'], '/home/yu/exec_file');
+        $exec_file = '/home/yu/exec_file/a.out';
+        
+        //用例
+        $case = new stdClass();          
         if($task['usefile'])
     	{
     	    $case->input = $task['inputfile'];
@@ -99,12 +100,44 @@ class judge_sandbox extends judge_base
         else 
     	{
     	    $case->input = $task['input'];
-    	    $case->output = $task['output'];
-    		
+    	    $case->output = $task['output'];   		
         }
+        
+        //存入数据库的数据包
+        $record = new stdClass();
+        $record->judgeName = $task['judgeName'];
+        $record->memlimit = $task['memlimit'];
+        $record->cpulimit = $task['cpulimit'];    
+        $record->input = $task['input'];
+        $record->output = $task['output'];
+        $record->usefile = $task['usefile'];
+        $record->inputfile = $task['inputfile'];
+        $record->outputfile = $task['outputfile'];
+        //存入数据库,并获取id值
+        $id = $DB->insert_record('onlinejudge_task', $record, true);
+        
+        //结果对象
+        $ret = new stdClass();
         //利用sandbox引擎编译
-    	return $this->run_in_sandbox($exec_file, $case);
+        //这一块是重点要做的内容
+    	$ret = $this->run_in_sandbox($exec_file, $case);
+    	//保存结果数据包
+    	$result = new stdClass(); 
+    	$result = $record; //先保存原先数据
+    	$result->taskid = $id;
+    	$result->judged = 1; //已经编译运行完
+    	$result->status = $ret->status; //执行状态，'ac','ie'等
+    	$result->info = $ret->info; //描述,比如内存不足，程序不能运行等.
+    	$result->starttime = $ret->starttime;//开始时间
+    	$result->endtime = $ret->endtime; //结束时间
+    	//将结果存入数据库表onlinejudge_result中
+    	$DB->insert_record('onlinejudge_result',$result,false);
     	
+    	//删除原先的onlinejudge_task表格
+    	$DB->delete_records('onlinejudge_task',array('id'=>$id));
+    	
+    	//返回id值
+    	return $id;
     }
     
     function run_in_sandbox($exec_file, $case) 
