@@ -126,7 +126,7 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
     }
 
-    if ($oldversion < 2011060300) {
+    if ($oldversion < 2011060301) {
 
         // Define table assignment_oj_results to be dropped
         $table = new xmldb_table('assignment_oj_results');
@@ -185,19 +185,29 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         // Launch add key testcase
         $dbman->add_key($table, $key);
 
+        assignment_onlinejudge_clean_deleted_submissions();
+
         // onlinejudge savepoint reached
-        upgrade_plugin_savepoint(true, 2011060300, 'assignment', 'onlinejudge');
+        upgrade_plugin_savepoint(true, 2011060301, 'assignment', 'onlinejudge');
     }
 
     return $result;
 }
 
-function assignment_onlinejudge_clean_submissions() {
+/// Clean up old records related with deleted submissions
+function assignment_onlinejudge_clean_deleted_submissions() {
 
     global $DB;
 
-    $sql = 
-    $oj_submissions = $DB->get_records_sql('assignment_oj_submissions');
+    $sql = 'SELECT t1.id 
+            FROM {assignment_oj_submissions} t1
+            LEFT JOIN {assignment_submissions} t2
+            ON t1.submission = t2.id
+            WHERE t2.id IS NULL';
+    if ($oj_submissions = $DB->get_records_sql($sql)) {
+        $DB->delete_records_list('assignment_oj_submissions', 'submission', array_keys($oj_submissions));
+    }
+
 }
 
 ?>
