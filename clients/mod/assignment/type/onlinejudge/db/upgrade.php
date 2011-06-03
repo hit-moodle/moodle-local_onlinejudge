@@ -186,4 +186,12 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     return $result;
 }
 
+function assignment_onlinejudge_clean_submissions() {
+
+    global $DB;
+
+    $sql = 
+    $oj_submissions = $DB->get_records_sql('assignment_oj_submissions');
+}
+
 ?>
