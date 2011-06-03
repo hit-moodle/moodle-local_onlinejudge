@@ -31,16 +31,16 @@ class judge_sandbox extends judge_base
         return $lang;
     }
     
-    // Compile submission $sub in temp_dir
+    // Compile submission $task in temp_dir
     // return result class on success, false on error
-    function compile($sub, $temp_dir) {
+    function compile($task, $temp_dir) {
       //  echo "现在开始执行compile方法<br>";
         global $CFG;
         $result = false;
         //$file 是.c文件或者源代码
         $file = 'prog.c';
         //将代码写入文件里
-        file_put_contents("$temp_dir/$file", $sub['source']);
+        file_put_contents("$temp_dir/$file", $task['source']);
         //根据需要选择编译器，这里举例为c.sh
         //gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
         $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/c.sh';
@@ -81,25 +81,25 @@ class judge_sandbox extends judge_base
     
     /**
      * @param sub is the data passed by get_judge method in class judge_factory in file judgelib.php
-     * returns the result of compiled.
+     * returns the id of result in the database.
      */   
-    function judge($sub)
+    function judge($task)
     {
         //生成.o文件
-       $this->compile($sub['source'], '/home/yu/exec_file');
+       $this->compile($task['source'], '/home/yu/exec_file');
        $exec_file = '/home/yu/exec_file/a.out';
     	
     	//用例
         $case = new stdClass();
-        if($sub['usefile'])
+        if($task['usefile'])
     	{
-    	    $case->input = $sub['inputfile'];
-    	    $case->output = $sub['outputfile'];
+    	    $case->input = $task['inputfile'];
+    	    $case->output = $task['outputfile'];
         }
         else 
     	{
-    	    $case->input = $sub['input'];
-    	    $case->output = $sub['output'];
+    	    $case->input = $task['input'];
+    	    $case->output = $task['output'];
     		
         }
         //利用sandbox引擎编译
