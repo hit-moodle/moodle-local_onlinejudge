@@ -81,14 +81,15 @@ class judge_sandbox extends judge_base
     }
     
     /**
-     * @param sub is the data passed by get_judge method in class judge_factory in file judgelib.php
-     * returns the id of result in the database.
+     * @param task is an array, including the user's data.
+     * returns the id of onlinejudge_task table in the database, after compile,
+     *         the ide returned reference to the onlinejudge_result table in the database.
      */   
     function judge($task)
     {
         //生成.o文件
-        $this->compile($task['source'], '/home/yu/exec_file');
-        $exec_file = '/home/yu/exec_file/a.out';
+        $this->compile($task['source'], '/～/exec_file');
+        $exec_file = '/～/exec_file/a.out';
         
         //用例
         $case = new stdClass();          
@@ -118,90 +119,90 @@ class judge_sandbox extends judge_base
         
         //结果对象
         $ret = new stdClass();
-        //利用sandbox引擎编译
-        //这一块是重点要做的内容
-    	$ret = $this->run_in_sandbox($exec_file, $case);
-    	//保存结果数据包
-    	$result = new stdClass(); 
-    	$result = $record; //先保存原先数据
-    	$result->taskid = $id;
-    	$result->judged = 1; //已经编译运行完
-    	$result->status = $ret->status; //执行状态，'ac','ie'等
-    	$result->info = $ret->info; //描述,比如内存不足，程序不能运行等.
-    	$result->starttime = $ret->starttime;//开始时间
-    	$result->endtime = $ret->endtime; //结束时间
-    	//将结果存入数据库表onlinejudge_result中
-    	$DB->insert_record('onlinejudge_result',$result,false);
-    	
-    	//删除原先的onlinejudge_task表格
-    	$DB->delete_records('onlinejudge_task',array('id'=>$id));
-    	
-    	//返回id值
-    	return $id;
-    }
-    
-    function run_in_sandbox($exec_file, $case) 
-    {
-        global $CFG;
-        //ret表示输出结果
-        $ret = new Object();
-        $ret->output = '空内容';
-        $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
-
+        //利用sandbox引擎编译,这里需要用到后台进程，暂时还没添加。
+        $ret->output = null;
+        
+        $status = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
         $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/sand/sand';
-        //这里sand不可执行
-        //不可执行
+        
+        //目前sand不可执行
+        //如果sand不可执行，则返回空的结果对象
         if (!is_executable($sand)){
             $ret->status = 'ie';
             return $ret;
         }
-       
-        //命令行
+        
+        //原先命令命令行是注释掉的部分，这里为了方便测试直接指定数字了。
         //$sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' -l disk=512000 '.$exec_file; 
         $sand .= ' -l cpu=1000'.' -l memory=1048576'.' -l disk=512000 '.$exec_file; 
         
-        //标准输入，标准输出和错误输出
+        //描述符，包含标准输入，标准输出和标准错误输出
         $descriptorspec = array(
             0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
             1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file to write to
-            2 => array('pipe', '$exec_file.err', 'w') // stderr is a file to write to
+            2 => array('file', $exec_file.'err', 'w') // stderr is a file to write to
         );
-        $ret->output = 'null';
-        //打开进程，执行命令行，并且打开用于输入输出的文件指针
+        
+        //执行sand命令行，打开文件指针，用于输入输出,返回表示进程的资源
         $proc = proc_open($sand, $descriptorspec, $pipes);
         
+        //如果返回的不是资源，即不成功
         if (!is_resource($proc)) {
             $ret->status = 'ie';
             return $ret;
         }
         
+        //将用例输入写入到$pipes[0]指定的文件中。
         fwrite($pipes[0], $case->input);
         fclose($pipes[0]);
 
         //关闭proc_open打开的进程，并且返回进程的退出代码
         $return_value = proc_close($proc);
-        //将文件变成字符串流
+        
+        //将文件变成字符串，存入结果的输出中
         $ret->output = file_get_contents($exec_file.'.out');
 
-        if ($return_value == 255) {
-            echo 'return_value==255';
+        if ($return_value == 255) 
+        {
             $ret->status = 'ie';
             return $ret;
-        } else if ($return_value >= 2) {
-            echo 'return_value>=2';
+        } 
+        else if ($return_value >= 2) 
+        {
             $ret->status = $result[$return_value];
             return $ret;
-        } else if ($return_value == 0) {
-            echo 'return_value==0';
+        } 
+        else if($return_value == 0) 
+        {
             mtrace('Pending? Why?');
             exit();
         }
-
-        //$ret->status = $this->diff($case->output, $ret->output);
-        //test
-        $ret->status = 'ac';
+        else 
+        {
+            exit();	
+        }
         
-        return $ret;
+        //比较结果俞用例输出
+        $ret->status = $this->diff($case->output, $ret->output);
+    
+        //$ret应该还有很多其他属性，需要保存到下面的$result对象中。
+        //保存结果数据包
+        $result = new stdClass(); 
+        $result = $record; //先保存原先数据
+        $result->taskid = $id;
+        $result->judged = 1; //已经编译运行完
+        $result->status = $ret->status; //执行状态，'ac','ie'等
+        $result->info = $ret->info; //描述,比如内存不足，程序不能运行等.
+        $result->starttime = $ret->starttime;//开始时间
+        $result->endtime = $ret->endtime; //结束时间
+        //将结果存入数据库表onlinejudge_result中
+        $DB->insert_record('onlinejudge_result',$result,false);
+        
+        //删除原先的onlinejudge_task表格
+        $DB->delete_records('onlinejudge_task',array('id'=>$id));
+    	
+        //返回id值
+        return $id;
     }
 }
 
