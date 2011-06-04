@@ -83,32 +83,67 @@ class assignment_onlinejudge extends assignment_upload {
      * 
      * @param $mform object Allready existant form
      */
-    function setup_elements(& $mform ) {
+    function setup_elements(&$mform ) {
         global $CFG, $COURSE, $DB;
 
-        $add       = optional_param('add', '', PARAM_ALPHA);
-        $update    = optional_param('update', 0, PARAM_INT);
+        // Some code are copied from parent::setup_elements(). Keep sync please.
 
-        // Get course module instance
+        $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
+
+        $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
+        $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
+        $mform->addElement('select', 'maxbytes', get_string('maximumsize', 'assignment'), $choices);
+        $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
+
+        $mform->addElement('select', 'resubmit', get_string('allowdeleting', 'assignment'), $ynoptions);
+        $mform->addHelpButton('resubmit', 'allowdeleting', 'assignment');
+        $mform->setDefault('resubmit', 1);
+
+        $options = array();
+        for($i = 1; $i <= 20; $i++) {
+            $options[$i] = $i;
+        }
+        $mform->addElement('select', 'var1', get_string('allowmaxfiles', 'assignment'), $options);
+        $mform->addHelpButton('var1', 'allowmaxfiles', 'assignment');
+        $mform->setDefault('var1', 3);
+
+        $mform->addElement('select', 'var2', get_string('allownotes', 'assignment'), $ynoptions);
+        $mform->addHelpButton('var2', 'allownotes', 'assignment');
+        $mform->setDefault('var2', 0);
+
+        $mform->addElement('select', 'var3', get_string('hideintro', 'assignment'), $ynoptions);
+        $mform->addHelpButton('var3', 'hideintro', 'assignment');
+        $mform->setDefault('var3', 0);
+
+        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
+        $mform->addHelpButton('emailteachers', 'emailteachers', 'assignment');
+        $mform->setDefault('emailteachers', 0);
+
+        // Must trackdrafts since it is used as a trigger to judge
+        $mform->addElement('hidden', 'var4', 1);
+
+
+        // Get existing onlinejudge settings
         $cm = null;
         $onlinejudge = null;
+        $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
             $cm = $DB->get_record('course_modules', array('id' => $update));
             $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $cm->instance));
         }
 
-        $ynoptions = array(0 => get_string('no'), 1 => get_string('yes'));
-
         // Programming languages
+        unset($choices);
         $choices = $this->get_languages();
         $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
+        /// TODO: Set global default language
         $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
 
         // Presentation error grade ratio
         unset($choices);
         $choices = get_grade_options()->gradeoptions; // Steal from question lib
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('ratiope', array('ratiope', get_string('descratiope', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->addHelpButton('ratiope', 'ratiope', 'assignment_onlinejudge');
         $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
 
         // Max. CPU time
@@ -123,28 +158,13 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
 
-        // Allow resubmit
-        $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
-        $mform->setHelpButton('resubmit', array('resubmit',get_string('allowresubmit','assignment'), 'assignment'));
-        $mform->setDefault('resubmit', 1);
-
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
-        $mform->setHelpButton('compileonly', array('compileonly', get_string('compileonly', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
 
-        // Email teachers
-        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
-        $mform->setHelpButton('emailteachers', array('emailteachers',get_string('emailteachers','assignment'), 'assignment'));
-        $mform->setDefault('emailteachers', 0);
-
-        // Submission max bytes
-        $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
-        $choices[1] = get_string('uploadnotallowed');
-        $choices[0] = get_string('courseuploadlimit') . ' (' . display_size($COURSE->maxbytes) . ')';
-        $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
-
+        $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        plagiarism_get_form_elements_module($mform, $course_context);
     }
 
     /**
@@ -647,21 +667,9 @@ class assignment_onlinejudge extends assignment_upload {
         global $CFG;
         
         $lang = array ();
-        
-        // Get local languages. Linux only
-        if ($CFG->ostype != 'WINDOWS') {
-            $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
-            $files = get_directory_list($dir);
-            $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
-            foreach ($names as $name) {
-                $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
-            }
-        }
 
-        // Get ideone.com languages
-        foreach ($this->ideone_langs as $name => $id) {
-            $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
-        }
+        //TODO: Get languages from judgelib
+        $lang['example'] = 'Example';
 
         asort($lang);
         return $lang;

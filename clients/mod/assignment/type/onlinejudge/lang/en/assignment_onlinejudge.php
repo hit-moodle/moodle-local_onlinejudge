@@ -6,11 +6,11 @@ $string['badtestcasefile'] = 'This file does not exist or can not be read';
 $string['cannotruncompiler'] = 'Can not execute the script of compiler';
 $string['case'] = 'Case $a:';
 $string['compileonly'] = 'Compile only';
+$string['compileonly_help'] = 'If select yes, the submissions will be compiled but not executed. Teachers must grade manually.';
 $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
 $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
 $string['cpulimit'] = 'Maximum CPU time';
 $string['denytoreadfile'] = 'You have not the permission to read this file.';
-$string['descratiope'] = 'Grade of presentation error is equal to testcast\'s max grade times this ratio';
 $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
 $string['feedbackforwa'] = 'Feedback for Wrong Answer';
@@ -93,6 +93,9 @@ $string['memlimit'] = 'Maximum memory usage';
 $string['output'] = 'Output';
 $string['outputfile'] = 'Output file';
 $string['ratiope'] = 'Ratio for presentation error';
+$string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s max grade times this ratio.
+  
+Presentation error means the data outputted by the program is correct, but the seperators between each data tokens are mismatched with testcases. It is usually caused by extra white spaces or line breaks. If you want to be strict, set it to 0% and a presentation error will worth zero. If you don\'t mind such trival issues, set it to 100% and a presentation error will be equivalent to an accepted.';
 $string['rejudge'] = 'Rejudge';
 $string['rejudgeall'] = 'Rejudge all';
 $string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in $a?';
@@ -104,7 +107,7 @@ $string['status'] = 'Status';
 $string['status_help'] = 'Status indicates the results given by the online judge. The meanings are listed below:
 
 * Abnormal Termination - Your program did not return 0 after exiting. Grade is 0.
-* Accept - Pass. Grade is the sum of all grades got from all avaliable test cases.
+* Accepted - Pass. Grade is the sum of all grades got from all avaliable test cases.
 * Compilation Error - The compiler does not believe the code is correct. Grade is 0.
 * Compilation OK - If the assignment is set as <em>compile only</em>, and your code pass the compilation, then this status is returned. No grade.
 * Internal Error - The internal system is misconfigured or the judge does not work. Only administrator can solve this problem. No grade.

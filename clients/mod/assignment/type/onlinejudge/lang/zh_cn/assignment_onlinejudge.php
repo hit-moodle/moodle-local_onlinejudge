@@ -5,11 +5,11 @@ $string['badtestcasefile'] = '此文件不存在，或不可读';
 $string['cannotruncompiler'] = '无法执行编译器脚本';
 $string['case'] = '用例{$a}:';
 $string['compileonly'] = '只编译';
+$string['compileonly_help'] = '如选择是，提交的作业将只被编译，不被运行和测试。教师必须手工评分。';
 $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';
 $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
 $string['cpulimit'] = 'CPU使用时间上限';
 $string['denytoreadfile'] = '您没有访问此文件的权限。';
-$string['descratiope'] = '格式错误获得的分数等于用例最高分乘以这个比例';
 $string['download'] = '下载 ';
 $string['duejudge'] = '到截止时间后才评测';
 $string['feedbackforwa'] = '给错误答案的反馈';
@@ -40,6 +40,9 @@ $string['memlimit'] = '内存最多可用';
 $string['output'] = '输出';
 $string['outputfile'] = '输出文件';
 $string['ratiope'] = '格式错误得分比例';
+$string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例
+
+格式错误是指程序输出的数据都是正确的，但数据之间的分隔符存在错误。它通常是由多余的空格或者换行符导致的。如果严格要求，可以把比例设为0%，那么格式错误就得不到任何分数。如果不介意这些琐碎的问题，可以把比例设为100%，那么格式错误就相当于正确。';
 $string['rejudge'] = '重新评测';
 $string['rejudgeall'] = '全部重新评测';
 $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
