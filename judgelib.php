@@ -1,6 +1,7 @@
 <?php
-global $CFG,$DB;
 
+require_once(dirname(__FILE__).'/../../config.php');
+global $CFG,$DB;
 require_once($CFG->dirroot."/lib/dml/moodle_database.php");
 //require_once($CFG->dirroot."/mod/assignment/type/onlinejudge/assignment.class.php");
 
@@ -14,54 +15,22 @@ class judge_base
      * Returns an array of installed programming languages indexed and sorted by name
      */
 	function get_languages(){}
-	/**
-    function get_tests() 
-    {
-        global $CFG;
-        // 从数据库中读取任务，待完善。
-        $records = $DB->get_records('onlinejudge_task', 'assignment', $this->assignment->id, 'id ASC');
-        $tests = array();
-
-        foreach ($records as $record) {
-            $tests[] = $record;
-        }
-
-        return $tests;
-    }
-    */
+    
 	
-      /**
-     * Get one unjudged submission and set it as judged
-     * If all submissions have been judged, return false
-     * The function can be reentranced
-     */
-    function get_unjudged_submission() 
+	/**
+	 * 通过传递任务id值来查看评测的结果
+	 * @param id 是数据库表onlinejudge_result中的taskid
+	 * @return 返回结果对象
+	 */
+    function get_result($id)
     {
-        //try to obtain or release the cron lock.
-        while (!set_cron_lock('task_judging', time() + 10)) {}
-        //set_cron_lock('assignment_judging', time()+10);
-        //query the unjudged data from table.
-        $sql = 'SELECT 
-                    id, taskid, judged '.
-               'FROM '
-                    .$CFG->prefix.'onlinejudge_task AS task, '
-                    .$CFG->prefix.'onlinejudge_result AS result '.
-               'WHERE '.
-                    'task.id = result.taskid '.
-                    'AND result.judged = 0 ';
-
-        $taskmissions = $DB->get_records_sql($sql, '', 1);
-        $taskmission = null;
-        if ($taskmissions) {
-            $taskmission = array_pop($taskmissions);
-            // Set judged mark
-            $DB->set_field('onlinejudge_result', 'judged', 1, 'id', $taskmission->taskid);
-        }
-
-        set_cron_lock('task_judging', null);
-
-        return $taskmission;
+        $result = stdClass(); //结果对象
+        $result = $DB->get_record('onlinejudge_result', array('taskid'=>$id));
+        return $result;
     }
+    
+    //打印结果
+    function output_result($result){}
     
     /**
      * @param cases is the testcase for input and output.
