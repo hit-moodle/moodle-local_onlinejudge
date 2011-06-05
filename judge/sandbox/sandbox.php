@@ -63,6 +63,7 @@ class judge_sandbox extends judge_base
         
         //将id转换为可识别的语言
         $judgeName = $this->translator($task['judgeName']);
+        echo $judgeName.'<br>';
         //根据需要选择编译器
         //gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
         $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'sh';
@@ -71,7 +72,7 @@ class judge_sandbox extends judge_base
             echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
             $result->status = 'ie';
             $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
-            break;
+            //break;
         }
         
         //output是一个数组，保存输出信息
@@ -136,9 +137,12 @@ class judge_sandbox extends judge_base
         //得到结果对象
         if($result = $this->compile($task, $temp_dir))
         {
+            
             $result->grade = -1;
             if ($result->status === 'compileok') 
-            { //Run and test!
+            {
+                echo '运行成功，现在开始存入数据库';
+                //Run and test!
             	/*
                 $results = array();
                 $cases = $this->get_tests();
