@@ -349,7 +349,7 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Upload file
+     * TODO: Change to grade request
      */
     function upload() {
 
@@ -383,36 +383,11 @@ class assignment_onlinejudge extends assignment_upload {
      * @param boolean $return Return the link or print it directly
      */
     function print_student_answer($userid, $return = false) {
-        global $CFG, $USER;
+        $output = parent::print_student_answer($userid, $return);
 
-        $output = '';
-
-        if ($basedir = $this->file_area($userid)) {
-            if ($files = get_directory_list($basedir)) {
-                require_once($CFG->libdir.'/filelib.php');
-                foreach ($files as $key => $file) {
-
-                    $icon = mimeinfo('icon', $file);
-                    // Syntax Highlighert source code
-                    $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
-                        .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                        $file . 'sourcecode', $file, 500, 740, $file, 'none', true, 'button'.$userid);
-
-                    //died right here
-                    //require_once($ffurl);
-                    $output = '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.$viewlink.'<br />';
-                }
-            }
-        }
-
-        $submission = $this->get_submission($userid);
-        if ($submission->timemodified) {
-            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>'.$output;
-        }
-        $output = '<div class="files">'.$output.'</div>';
+        // TODO: Syntax Highlight source code link
 
         return $output;
-
     }
 
     /**
@@ -422,7 +397,6 @@ class assignment_onlinejudge extends assignment_upload {
         return parent::custom_feedbackform($submission, $return) . $this->view_summary($submission, true);
     }
 
-
     /**
      * Produces a list of links to the files uploaded by a user
      *
@@ -431,20 +405,27 @@ class assignment_onlinejudge extends assignment_upload {
      * @return string optional
      */
     function print_user_files($userid=0, $return=false) {
-        global $CFG, $USER;
+        $output = parent::print_user_files($userid, false);
 
         // TODO: Syntax Highlighert source code link
+
+        if ($return) {
+            return $output;
+        }
+        echo $output;
     }
 
     /**
-     * Display auto generated info about the assignment
+     * Display auto generated info about the submission
      */
     function view_summary($submission=null, $return = false) {
         global $USER, $CFG, $DB, $OUTPUT;
 
-        $table = new Object();
-        $table->id = 'summary';
-        $table->class = 'generaltable';
+        //TODO: links on testcases to show outputs
+
+        $table = new html_table();
+        $table->id = 'assignment_onlinejudge_summary';
+        $table->attributes['class'] = 'generaltable';
         $table->align = array ('right', 'left');
         $table->size = array('20%', '');
         $table->width = '100%';
@@ -516,7 +497,7 @@ class assignment_onlinejudge extends assignment_upload {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
-        $output = print_table($table, true);
+        $output = html_writer::table($table);
 
         if($return)
             return $output;
