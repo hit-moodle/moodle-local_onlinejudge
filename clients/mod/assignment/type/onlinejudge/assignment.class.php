@@ -119,10 +119,6 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addHelpButton('emailteachers', 'emailteachers', 'assignment');
         $mform->setDefault('emailteachers', 0);
 
-        // Must trackdrafts since it is used as a trigger to judge
-        $mform->addElement('hidden', 'var4', 1);
-
-
         // Get existing onlinejudge settings
         $cm = null;
         $onlinejudge = null;
