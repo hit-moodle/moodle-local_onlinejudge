@@ -141,23 +141,27 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
         $mform->addHelpButton('ratiope', 'ratiope', 'assignment_onlinejudge');
         $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
+        $mform->setAdvanced('ratiope');
 
         // Max. CPU time
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
+        $mform->setAdvanced('cpulimit');
 
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
+        $mform->setAdvanced('memlimit');
 
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
+        $mform->setAdvanced('compileonly');
 
         //ideone.com
         $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
