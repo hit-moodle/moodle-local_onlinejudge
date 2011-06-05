@@ -53,81 +53,28 @@ if (!isset($CFG->assignment_oj_ideone_delay)) { //delay between submitting and g
 }
 
 
-require_once($CFG->dirroot.'/mod/assignment/type/uploadsingle/assignment.class.php');
+require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 
 /**
- * Extends the uploadsingle assignment class
+ * Extends the upload assignment class
  * 
  * @author Arkaitz Garro, Sunner Sun
  */
-class assignment_onlinejudge extends assignment_uploadsingle {
+class assignment_onlinejudge extends assignment_upload {
 
     var $onlinejudge;
 
-    // ideone.com supports the following languages.
-    // id_in_moodle => id_in_ideone
-    var $ideone_langs = array(
-        'ada_ideone'                     => 7,                      
-        'assembler_ideone'               => 13,                  
-        'awk_gawk_ideone'                => 104,            
-        'awk_mawk_ideone'                => 105,             
-        'bash_ideone'                    => 28,             
-        'bc_ideone'                      => 110,                        
-        'brainfxxk_ideone'               => 12,            
-        'c_ideone'                       => 11,                     
-        'csharp_ideone'                  => 27,                        
-        'cpp_ideone'                     => 1,                  
-        'c99_strict_ideone'              => 34,             
-        'clojure_ideone'                 => 111,                
-        'cobol_ideone'                   => 118,                      
-        'cobol85_ideone'                 => 106,                      
-        'common_lisp_clisp_ideone'       => 32,    
-        'd_dmd_ideone'                   => 102,                 
-        'erlang_ideone'                  => 36,                     
-        'forth_ideone'                   => 107,                     
-        'fortran_ideone'                 => 5,                 
-        'go_ideone'                      => 114,                
-        'haskell_ideone'                 => 21,                   
-        'icon_ideone'                    => 16,             
-        'intercal_ideone'                => 9,                 
-        'java_ideone'                    => 10,                    
-        'javascript_rhino_ideone'        => 35,         
-        'javascript_spidermonkey_ideone' => 112,  
-        'lua_ideone'                     => 26,                       
-        'nemerle_ideone'                 => 30,                  
-        'nice_ideone'                    => 25,                     
-        'ocaml_ideone'                   => 8,                      
-        'oz_ideone'                      => 119,                      
-        'pascal_fpc_ideone'              => 22,             
-        'pascal_gpc_ideone'              => 2,            
-        'perl_ideone'                    => 3,              
-        'php_ideone'                     => 29,            
-        'pike_ideone'                    => 19,            
-        'prolog_gnu_ideone'              => 108,   
-        'prolog_swi_ideone'              => 15,      
-        'python_ideone'                  => 4,             
-        'python3_ideone'                 => 116,             
-        'r_ideone'                       => 117,             
-        'ruby_ideone'                    => 17,             
-        'scala_ideone'                   => 39,             
-        'scheme_guile_ideone'            => 33,    
-        'smalltalk_ideone'               => 23,          
-        'tcl_ideone'                     => 38,              
-        'text_ideone'                    => 62,               
-        'unlambda_ideone'                => 115,         
-        'vbdotnet_ideone'                => 101, 
-        'whitespace_ideone'              => 6
-    );
-
     function assignment_onlinejudge($cmid='staticonly', $assignment=NULL, $cm=NULL, $course=NULL) {
-        parent::assignment_uploadsingle($cmid, $assignment, $cm, $course);
+        global $DB;
+
+        parent::assignment_upload($cmid, $assignment, $cm, $course);
         $this->type = 'onlinejudge';
 
         if (isset($this->assignment->id)) {
-            $this->onlinejudge = get_record('assignment_oj', 'assignment', $this->assignment->id);
+            $this->onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->id));
         }
     }
 
@@ -136,32 +83,63 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * 
      * @param $mform object Allready existant form
      */
-    function setup_elements(& $mform ) {
-        global $CFG, $COURSE;
+    function setup_elements(&$mform ) {
+        global $CFG, $COURSE, $DB;
 
-        $add       = optional_param('add', '', PARAM_ALPHA);
-        $update    = optional_param('update', 0, PARAM_INT);
+        // Some code are copied from parent::setup_elements(). Keep sync please.
 
-        // Get course module instance
+        $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
+
+        $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
+        $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
+        $mform->addElement('select', 'maxbytes', get_string('maximumsize', 'assignment'), $choices);
+        $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
+
+        $mform->addElement('select', 'resubmit', get_string('allowdeleting', 'assignment'), $ynoptions);
+        $mform->addHelpButton('resubmit', 'allowdeleting', 'assignment');
+        $mform->setDefault('resubmit', 1);
+
+        $options = array();
+        for($i = 1; $i <= 20; $i++) {
+            $options[$i] = $i;
+        }
+        $mform->addElement('select', 'var1', get_string('allowmaxfiles', 'assignment'), $options);
+        $mform->addHelpButton('var1', 'allowmaxfiles', 'assignment');
+        $mform->setDefault('var1', 3);
+
+        $mform->addElement('select', 'var2', get_string('allownotes', 'assignment'), $ynoptions);
+        $mform->addHelpButton('var2', 'allownotes', 'assignment');
+        $mform->setDefault('var2', 0);
+
+        $mform->addElement('select', 'var3', get_string('hideintro', 'assignment'), $ynoptions);
+        $mform->addHelpButton('var3', 'hideintro', 'assignment');
+        $mform->setDefault('var3', 0);
+
+        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
+        $mform->addHelpButton('emailteachers', 'emailteachers', 'assignment');
+        $mform->setDefault('emailteachers', 0);
+
+        // Get existing onlinejudge settings
         $cm = null;
         $onlinejudge = null;
+        $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
-            $cm = get_record('course_modules', 'id', $update);
-            $onlinejudge = get_record('assignment_oj', 'assignment', $cm->instance);
+            $cm = $DB->get_record('course_modules', array('id' => $update));
+            $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $cm->instance));
         }
 
-        $ynoptions = array(0 => get_string('no'), 1 => get_string('yes'));
-
         // Programming languages
+        unset($choices);
         $choices = $this->get_languages();
-        $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
+        $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
+        /// TODO: Set global default language
+        $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
 
         // Presentation error grade ratio
         unset($choices);
         $choices = get_grade_options()->gradeoptions; // Steal from question lib
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
-        $mform->setHelpButton('ratiope', array('ratiope', get_string('descratiope', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->addHelpButton('ratiope', 'ratiope', 'assignment_onlinejudge');
         $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
 
         // Max. CPU time
@@ -176,28 +154,38 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
 
-        // Allow resubmit
-        $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'assignment'), $ynoptions);
-        $mform->setHelpButton('resubmit', array('resubmit',get_string('allowresubmit','assignment'), 'assignment'));
-        $mform->setDefault('resubmit', 1);
-
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
-        $mform->setHelpButton('compileonly', array('compileonly', get_string('compileonly', 'assignment_onlinejudge'), 'assignment_onlinejudge'));
+        $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
 
-        // Email teachers
-        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'assignment'), $ynoptions);
-        $mform->setHelpButton('emailteachers', array('emailteachers',get_string('emailteachers','assignment'), 'assignment'));
-        $mform->setDefault('emailteachers', 0);
+        //ideone.com
+        $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
+        $mform->setDefault('ideoneuser', $onlinejudge->ideoneuser);
+        $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
+        $mform->setDefault('ideonepass', $onlinejudge->ideonepass);
+        $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->setDefault('ideonepass2', $onlinejudge->ideonepass);
 
-        // Submission max bytes
-        $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
-        $choices[1] = get_string('uploadnotallowed');
-        $choices[0] = get_string('courseuploadlimit') . ' (' . display_size($COURSE->maxbytes) . ')';
-        $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
+        $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        plagiarism_get_form_elements_module($mform, $course_context);
+    }
 
+    /**
+     * Any extra validation checks needed for the settings
+     * form for this assignment type
+     *
+     */
+    function form_validation($data, $files) {
+        $errors = array();
+
+        if ($data['ideonepass'] != $data['ideonepass2']) {
+            $errors['ideonepass'] = $errors['ideonepass2'] = get_string('ideonepassmismatch', 'assignment_onlinejudge');
+        }
+
+        return $errors;
     }
 
     /**
@@ -208,7 +196,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * will create a new instance and return the id number
      * of the new instance.
      * The due data is added to the calendar
-     * Tests are added to assignment_oj_tests table
+     * Tests are added to assignment_oj_testcases table
      *
      * @param object $assignment The data from the form on mod.html
      * @return int The id of the assignment
@@ -255,24 +243,23 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @return boolean False indicates error
      */
     function delete_instance($assignment) {
-        global $CFG;
+        global $CFG, $DB;
 
         // DELETE submissions results
-        $submissions = get_records('assignment_submissions', 'assignment', $assignment->id);
+        $submissions = $DB->get_records('assignment_submissions', array('assignment' => $assignment->id));
         foreach ($submissions as $submission) {
-            if (!delete_records('assignment_oj_results', 'submission', $submission->id))
-                return false;
-            if (!delete_records('assignment_oj_submissions', 'submission', $submission->id))
+            // TODO: inform judgelib to delete related tasks
+            if (!$DB->delete_records('assignment_oj_submissions', 'submission', $submission->id))
                 return false;
         }
 
         // DELETE tests
-        if (!delete_records('assignment_oj_tests', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj_testcases', 'assignment', $assignment->id)) {
             return false;
         }
 
         // DELETE programming language
-        if (!delete_records('assignment_oj', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj', 'assignment', $assignment->id)) {
             return false;
         }
 
@@ -288,23 +275,17 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @param object $assignment the onlinejudge object.
      */
     function after_add_update($assignment) {
-        $onlinejudge = new Object();
-        $onlinejudge = get_record('assignment_oj', 'assignment', $assignment->id);
-        if ($onlinejudge) {
-            $onlinejudge->language = $assignment->lang;
-            $onlinejudge->memlimit = $assignment->memlimit;
-            $onlinejudge->cpulimit = $assignment->cpulimit;
-            $onlinejudge->compileonly = $assignment->compileonly;
-            $onlinejudge->ratiope = $assignment->ratiope;
-            update_record('assignment_oj', $onlinejudge);
+        global $DB;
+
+        $onlinejudge = $assignment;
+        $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
+        if ($old_onlinejudge) {
+            $onlinejudge->id = $old_onlinejudge->id;
+            print_object($onlinejudge);
+            $DB->update_record('assignment_oj', $onlinejudge);
         } else {
-            $onlinejudge->assignment = $assignment->id;
-            $onlinejudge->language = $assignment->lang;
-            $onlinejudge->memlimit = $assignment->memlimit;
-            $onlinejudge->cpulimit = $assignment->cpulimit;
-            $onlinejudge->compileonly = $assignment->compileonly;
-            $onlinejudge->ratiope = $assignment->ratiope;
-            insert_record('assignment_oj', $onlinejudge);
+            $onlinejudge->assignment = $onlinejudge->id;
+            $DB->insert_record('assignment_oj', $onlinejudge);
         }
     }
 
@@ -314,9 +295,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @return array tests An array of tests objects. All testcase files are read into memory
      */
     function get_tests() {
-        global $CFG;
+        global $CFG, $DB;
 
-        $records = get_records('assignment_oj_tests', 'assignment', $this->assignment->id, 'id ASC');
+        $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $this->assignment->id), 'id ASC');
         $tests = array();
 
         foreach ($records as $record) {
@@ -344,9 +325,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
         if (has_capability('mod/assignment:grade', $context))
         {
-            $rejudge_link = element_to_popup_window ('link', '/mod/assignment/type/onlinejudge/rejudge.php?id='.$this->cm->id, null, 
-                get_string('rejudgeall','assignment_onlinejudge'), 
-                330, 500, null, null, true, null, null);
+            $rejudge_link = get_string('rejudgeall','assignment_onlinejudge');
             $testcase_link = '<a href = "'.$CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id.'">'.get_string('managetestcases','assignment_onlinejudge').'</a>';
             return $parent_link .'<br />'.$rejudge_link.'<br />'.$testcase_link;
         } else {
@@ -359,7 +338,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * return bool Success
      */
     function rejudge_all() {
-        global $CFG;
+        global $CFG, $DB;
 
         $sql = 'UPDATE '.
             $CFG->prefix.'assignment_oj_submissions '.
@@ -370,7 +349,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             '(SELECT id FROM '.$CFG->prefix.'assignment_submissions '.
             'WHERE assignment = '.$this->assignment->id.')';
 
-        return execute_sql($sql, false);
+        return $DB->execute_sql($sql, false);
     }
 
     /**
@@ -378,12 +357,15 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      *
      */
     function view_intro() {
+        global $OUTPUT;
+
         parent::view_intro();
-        print_simple_box($this->view_summary(null, true), 'center', '', '', 5, 'generalbox', 'intro');
+
+        echo $OUTPUT->box($this->view_summary(null, true), 'generalbox boxaligncenter', 'intro');
     }
 
     /**
-     * Upload file
+     * TODO: Change to grade request
      */
     function upload() {
 
@@ -417,36 +399,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @param boolean $return Return the link or print it directly
      */
     function print_student_answer($userid, $return = false) {
-        global $CFG, $USER;
+        $output = parent::print_student_answer($userid, $return);
 
-        $output = '';
-
-        if ($basedir = $this->file_area($userid)) {
-            if ($files = get_directory_list($basedir)) {
-                require_once($CFG->libdir.'/filelib.php');
-                foreach ($files as $key => $file) {
-
-                    $icon = mimeinfo('icon', $file);
-                    // Syntax Highlighert source code
-                    $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
-                        .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                        $file . 'sourcecode', $file, 500, 740, $file, 'none', true, 'button'.$userid);
-
-                    //died right here
-                    //require_once($ffurl);
-                    $output = '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.$viewlink.'<br />';
-                }
-            }
-        }
-
-        $submission = $this->get_submission($userid);
-        if ($submission->timemodified) {
-            $output = '<strong>'.get_string('status'.$submission->status, 'assignment_onlinejudge') . ': </strong>'.$output;
-        }
-        $output = '<div class="files">'.$output.'</div>';
+        // TODO: Syntax Highlight source code link
 
         return $output;
-
     }
 
     /**
@@ -456,7 +413,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return parent::custom_feedbackform($submission, $return) . $this->view_summary($submission, true);
     }
 
-
     /**
      * Produces a list of links to the files uploaded by a user
      *
@@ -465,39 +421,9 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * @return string optional
      */
     function print_user_files($userid=0, $return=false) {
-        global $CFG, $USER;
+        $output = parent::print_user_files($userid, true);
 
-        if (!$userid) {
-            if (!isloggedin()) {
-                return '';
-            }
-            $userid = $USER->id;
-        }
-
-        $filearea = $this->file_area_name($userid);
-
-        $output = '';
-
-        if ($basedir = $this->file_area($userid)) {
-            if ($files = get_directory_list($basedir)) {
-                require_once($CFG->libdir.'/filelib.php');
-                foreach ($files as $key => $file) {
-
-                    $icon = mimeinfo('icon', $file);
-                    $ffurl = get_file_url("$filearea/$file", array('forcedownload'=>1));
-
-                    // Syntax Highlighert source code
-                    $viewlink = link_to_popup_window('/mod/assignment/type/onlinejudge/source.php?id='
-                        .$this->cm->id.'&amp;userid='.$userid.'&amp;file='.$file,
-                        $file . 'sourcecode', get_string('preview'), 500, 740, $file, 'none', true, 'button'.$userid);
-
-                    $output .= '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.
-                        '<a href="'.$ffurl.'" >'.$file.'</a> ('.$viewlink.')<br />';
-                }
-            }
-        }
-
-        $output = '<div class="files">'.$output.'</div>';
+        // TODO: Syntax Highlighert source code link
 
         if ($return) {
             return $output;
@@ -506,14 +432,16 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     /**
-     * Display auto generated info about the assignment
+     * Display auto generated info about the submission
      */
     function view_summary($submission=null, $return = false) {
-        global $USER, $CFG;
+        global $USER, $CFG, $DB, $OUTPUT;
 
-        $table = new Object();
-        $table->id = 'summary';
-        $table->class = 'generaltable';
+        //TODO: links on testcases to show outputs
+
+        $table = new html_table();
+        $table->id = 'assignment_onlinejudge_summary';
+        $table->attributes['class'] = 'generaltable';
         $table->align = array ('right', 'left');
         $table->size = array('20%', '');
         $table->width = '100%';
@@ -527,7 +455,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $submission = $this->get_submission();
 
         // Status
-        $item_name = get_string('status').helpbutton('status', get_string('status'), 'assignment_onlinejudge', true, false, '', true).':';
+        $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
         if (!empty($submission->status)) {
             $item = get_string('status' . $submission->status, 'assignment_onlinejudge');
@@ -548,7 +476,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         if (isset($submission->status)) {
             if ($submission->status === 'pending') {
                 if (empty($CFG->assignment_oj_daemon_pid)) { //Judge from cron
-                    $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
+                    $lastcron = $DB->get_field('modules', 'lastcron', 'name', 'assignment');
                     $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
                     $left = $left > 0 ? $left : 0;
                     $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
@@ -585,7 +513,7 @@ class assignment_onlinejudge extends assignment_uploadsingle {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
-        $output = print_table($table, true);
+        $output = html_writer::table($table);
 
         if($return)
             return $output;
@@ -597,9 +525,11 @@ class assignment_onlinejudge extends assignment_uploadsingle {
      * return success rate. return more details if $detail is set
      */
     function get_statistics($submission = null, &$detail = null) {
+        global $DB;
+
         if (is_null($submission))
             $submission = $this->get_submission();
-        if (isset($submission->id) && $results = get_records('assignment_oj_results', 'submission', $submission->id, 'judgetime ASC')) {
+        if (isset($submission->id) && true /*TODO: judged? */) {
             $statistics = array();
             foreach ($results as $result) {
                 $status = $result->status;
@@ -630,61 +560,26 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 
     function get_submission($userid=0, $createnew=false, $teachermodified=false) {
-        global $CFG;
+        global $CFG, $DB;
 
-        $submission = parent::get_submission($userid, $createnew, $teachermodified);
-
-        if ($submission) {
-
-            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
-            if (empty($onlinejudge) && $createnew) {
-                $newsubmission = new Object; 
-                $newsubmission->submission = $submission->id;
-                if (!insert_record("assignment_oj_submissions", $newsubmission)) {
-                    error("Could not insert a new empty onlinejudge submission");
-                }
-                unset($newsubmission);
-            }
-
-            $onlinejudge = get_record('assignment_oj_submissions', 'submission', $submission->id);
-            if ($onlinejudge) {
-                $submission->judged = $onlinejudge->judged;
-                $submission->oj_id = $onlinejudge->id;
-            } else {
-                $submission->judged = 0;
-            }
-
-            if ($submission->judged) {
-                $results = get_recordset_select('assignment_oj_results', 'submission = '.$submission->id.' AND judgetime >= '.$submission->timemodified, 'judgetime DESC', '*', '', '1');
-                $results = recordset_to_array($results);
-                if ($results) {
-                    $result = array_pop($results);
-                    $submission->info = $result->info;
-                    $submission->status = $result->status;
-                    $submission->judgetime = $result->judgetime;
-                    $submission->output = $result->output;
-                } else {
-                    $submission->judged = 0; //It is been judging
-                    $submission->status = 'pending';
-                }
-            } else if (($files = get_directory_list($CFG->dataroot.'/'.$this->file_area_name($userid))) && count($files) != 0) { // Submitted but unjudged
-                $submission->status = 'pending';
-            }
+        if ($submission = parent::get_submission($userid, $createnew, $teachermodified)) {
+            //TODO: Construct submission judge infos, such as status etc.
         }
 
         return $submission;
     }
 
     function update_submission($submission, $new_oj=false) {
+        global $DB;
 
-        update_record('assignment_submission', $submission);
+        $DB->update_record('assignment_submission', $submission);
 
         if ($new_oj) {
             $submission->submission = $submission->id;
-            insert_record('assignment_oj_submissions', $submission);
+            $DB->insert_record('assignment_oj_submissions', $submission);
         } else {
             $submission->id = $submission->oj_id;
-            update_record('assignment_oj_submissions', $submission);
+            $DB->update_record('assignment_oj_submissions', $submission);
         }
     }
 
@@ -769,140 +664,14 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         global $CFG;
         
         $lang = array ();
-        
-        // Get local languages. Linux only
-        if ($CFG->ostype != 'WINDOWS') {
-            $dir = $CFG->dirroot . '/mod/assignment/type/onlinejudge/languages/';
-            $files = get_directory_list($dir);
-            $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
-            foreach ($names as $name) {
-                $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
-            }
-        }
 
-        // Get ideone.com languages
-        foreach ($this->ideone_langs as $name => $id) {
-            $lang[$name] = get_string('lang'.$name, 'assignment_onlinejudge');
-        }
+        //TODO: Get languages from judgelib
+        $lang['example'] = 'Example';
 
         asort($lang);
         return $lang;
     }
 
-    /**
-     * Get one unjudged submission and set it as judged
-     * If all submissions have been judged, return false
-     * The function can be reentranced
-     */
-    function get_unjudged_submission() {
-        global $CFG;
-
-        while (!set_cron_lock('assignment_judging', time() + 10)) {}
-        //set_cron_lock('assignment_judging', time()+10);
-
-        $sql = 'SELECT 
-                    sub.*, epsub.judged, epsub.submission, epsub.id AS epsubid '.
-               'FROM '
-                    .$CFG->prefix.'assignment_submissions AS sub, '
-                    .$CFG->prefix.'assignment_oj_submissions AS epsub '.
-               'WHERE '.
-                    'sub.id = epsub.submission '.
-                    'AND epsub.judged = 0 ';
-
-        $submissions = get_records_sql($sql, '', 1);
-        $submission = null;
-        if ($submissions) {
-            $submission = array_pop($submissions);
-            // Set judged mark
-            set_field('assignment_oj_submissions', 'judged', 1, 'id', $submission->epsubid);
-        }
-
-        set_cron_lock('assignment_judging', null);
-
-        return $submission;
-    }
-
-    function diff($answer, $output) {
-        $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
-        $output = trim($output);
-
-        if (strcmp($answer, $output) == 0)
-            return 'ac';
-        else {
-            $tokens = Array();
-            $tok = strtok($answer, " \n\r\t");
-            while ($tok) {
-                $tokens[] = $tok;
-                $tok = strtok(" \n\r\t");
-            }
-
-            $tok = strtok($output, " \n\r\t");
-            foreach ($tokens as $anstok) {
-                if (!$tok || $tok !== $anstok)
-                    return 'wa';
-                $tok = strtok(" \n\r\t");
-            }
-
-            return 'pe';
-        }
-    }
-
-    function run_in_sandbox($exec_file, $case) {
-        global $CFG;
-
-        $ret = new Object();
-        $ret->output = '';
-        $result = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
-        /* Only root can chroot(set jail)
-        $jail = $CFG->dataroot.'/temp/sandbox_jail/';
-        if (!check_dir_exists($jail, true, true)) {
-            mtrace("Can't mkdir ".$jail);
-            return 'ie';
-        }
-         */
-
-        $sand = $CFG->dirroot . '/mod/assignment/type/onlinejudge/sandbox/sand';
-        if (!is_executable($sand)){
-            $ret->status = 'ie';
-            return $ret;
-        }
-
-        $sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' -l disk=512000 '.$exec_file; 
-
-        $descriptorspec = array(
-            0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
-            1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file to write to
-            2 => array('pipe', '$exec_file.err', 'w') // stderr is a file to write to
-        );
-
-        $proc = proc_open($sand, $descriptorspec, $pipes);
-
-        if (!is_resource($proc)) {
-            $ret->status = 'ie';
-            return $ret;
-        }
-
-        fwrite($pipes[0], $case->input);
-        fclose($pipes[0]);
-
-
-        $return_value = proc_close($proc);
-        $ret->output = file_get_contents($exec_file.'.out');
-
-        if ($return_value == 255) {
-            $ret->status = 'ie';
-            return $ret;
-        } else if ($return_value >= 2) {
-            $ret->status = $result[$return_value];
-            return $ret;
-        } else if ($return_value == 0) {
-            mtrace('Pending? Why?');
-            exit();
-        }
-
-        $ret->status = $this->diff($case->output, $ret->output);
-        return $ret;
-    }
 
     /**
      * return grade
@@ -926,45 +695,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $grades[$status];
     }
 
-    // Compile submission $sub in temp_dir
-    // return result class on success, false on error
-    function compile($sub, $temp_dir) {
-        global $CFG;
-        $result = false;
-
-        if ($content = $this->get_submission_file_content($sub->userid)) {
-
-            $file = 'prog.c';
-            file_put_contents("$temp_dir/$file", $content);
-            $compiler = $CFG->dirroot.'/mod/assignment/type/onlinejudge/languages/'.$this->onlinejudge->language.'.sh';
-            if (!is_executable($compiler)) {
-                $result->status = 'ie';
-                $result->info = get_string('cannotruncompiler', 'assignment_onlinejudge');
-                break;
-            }
-
-            $output = null;
-            $return = null;
-            $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
-            exec($command, $output, $return);
-
-            if ($return) { //Compile error
-                $result->status = 'ce';
-            } else { 
-                $result->status = 'compileok';
-            }
-
-            //strip path info
-            $output = str_replace($temp_dir.'/', '', $output);
-            $error = htmlspecialchars(implode("\n", $output));
-            $result->info = addslashes($error);
-
-            //Compile the first file only
-            return $result;
-        }          
-
-        return $result;
-    }
 
     function merge_results($results, $testcases, $appends = null) {
         $result = null;
@@ -1006,177 +736,6 @@ class assignment_onlinejudge extends assignment_uploadsingle {
         return $result;
     }
 
-    // Judge begins here
-    function judge($sub) {
-        
-        global $CFG;
-
-        $ret = false;
-
-        $judge_type = substr($this->onlinejudge->language, strrpos($this->onlinejudge->language, '_'));
-
-        if($judge_type == '_ideone') {
-            $result = $this->judge_ideone($sub);
-        } else {
-            $result = $this->judge_local($sub);
-        }
-
-        if ($result) {
-            $result->submission = $sub->id;
-            $result->judgetime = time();
-            $result->info = addslashes($result->info);
-            $result->output = addslashes($result->output);
-            if ($ret = insert_record('assignment_oj_results', $result, false)) {
-                $newsub = null;
-                $newsub->id = $sub->id;
-                $newsub->teacher = get_admin()->id;
-                $newsub->timemarked = time();
-                $newsub->grade = $result->grade;
-                $ret = update_record('assignment_submissions', $newsub);
-                $this->update_grade($sub);
-            }
-        }
-
-        return $ret;
-    }
-
-    // Judge submission $sub in local
-    // return result object on success, false on error
-    function judge_local($sub) {
-
-        global $CFG;
-
-        // Make temp dir
-        $temp_dir = $CFG->dataroot.'/temp/assignment_onlinejudge/'.$sub->id;
-        if (!check_dir_exists($temp_dir, true, true)) {
-            mtrace("Can't mkdir ".$temp_dir);
-            return false;
-        }
-
-        if ($result = $this->compile($sub, $temp_dir)) {
-            $result->grade = -1;
-            if ($result->status === 'compileok' && !$this->onlinejudge->compileonly) { //Run and test!
-                $results = array();
-                $cases = $this->get_tests();
-                foreach ($cases as $case) {
-                    $results[] = $this->run_in_sandbox($temp_dir.'/a.out', $case);
-                }
-
-                $result = $this->merge_results($results, $cases);
-            } else if ($result->status === 'ce') {
-                $result->grade = $this->grade_marker('ce', $this->assignment->grade);
-                $result->output = '';
-            }
-        }
-
-        // Clean temp dir
-        fulldelete($temp_dir);
-
-        return $result;
-    }
-
-
-    // Judge submission $sub in ideone.com
-    // return result object on success, false on error
-    function judge_ideone($sub){
-        global $CFG;
-
-        // creating soap client
-
-
-        $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
-
-        $user = $CFG->assignment_oj_ideone_username;                                               
-        $pass = $CFG->assignment_oj_ideone_password;
-
-        if ($source = $this->get_submission_file_content($sub->userid)) {
-            $cases = $this->get_tests();
-
-            $status_ideone = array(
-                11  => 'ce',
-                12  => 're',
-                13  => 'tle',
-                15  => 'ok',
-                17  => 'mle',
-                19  => 'rf',
-                20  => 'ie'
-            );
-
-            $result->grade = -1;
-
-            try { // Begin soap
-                // Submit all cases first to save time.
-                $links = array();
-                foreach ($cases as $case) {
-                    $webid = $client->createSubmission($user,$pass,$source,$this->ideone_langs[$this->onlinejudge->language],$case->input,true,true);     
-                    if ($webid['error'] == 'OK')
-                        $links[] = $webid['link'];
-                    else {
-                        $result->status = 'ie';
-                        $result->info = $webid['error'];
-                        return $result;
-                    }
-                }
-
-                // Get ideone results
-                $delay = $CFG->assignment_oj_ideone_delay;
-                $i = 0;
-                $results = array();
-                foreach ($cases as $case) {
-                    while(1){
-                        if ($delay > 0) {
-                            sleep($delay); 
-                            $delay = ceil($delay / 2);
-                        }
-                        $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
-                        if($status['status'] == 0) {
-                            $delay = 0;
-                            break;
-                        }
-                    }
-
-                    $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
-
-                    $result->status = $status_ideone[$details['result']];
-
-                    // If got ce or compileonly, don't need to test other case
-                    if ($result->status == 'ce' || $this->onlinejudge->compileonly) {
-                        if ($result->status != 'ce' && $result->status != 'ie')
-                            $result->status = 'compileok';
-                        $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
-                        $result->grade = $this->grade_marker('ce', $this->assignment->grade);
-                        return $result;
-                    }
-
-                    // Check for wa, pe, tle, mle or accept
-                    if ($result->status == 'ok') {
-                        if ($details['time'] > $this->onlinejudge->cpulimit)
-                            $result->status = 'tle';
-                        else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
-                            $result->status = 'mle';
-                        else {
-                            $result->output = $details['output'];
-                            $result->status = $this->diff($case->output, $result->output);
-                        }
-                    }
-
-                    $results[] = $result;
-                    unset($result);
-                    $i++;
-                }
-            } catch (SoapFault $ex) {
-                $result->status = 'ie';
-                $result->info = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
-                return $result;
-            }
-
-            $result = $this->merge_results($results, $cases);
-            $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
-            return $result;
-        } else {
-            return false;
-        }
-    }       
 
     /**
      * Evaluate student submissions
@@ -1185,107 +744,8 @@ class assignment_onlinejudge extends assignment_uploadsingle {
 
         global $CFG;
 
-        // Detect the frequence of cron
-        $lastcron = get_field('modules', 'lastcron', 'name', 'assignment');
-        if ($lastcron) {
-            set_config('assignment_oj_cronfreq', time() - $lastcron);
-        }
-
-        // There are two judge routines
-        //  1. Judge only when cron job is running. 
-        //  2. After installation, the first cron running will fork a daemon to be judger.
-        // Routine two works only when the cron job is executed by php cli
-        //
-        if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
-            $this->fork_daemon();
-        } else if ($CFG->assignment_oj_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
-            $this->judge_all_unjudged();
-        }
     }
 
-    function fork_daemon() 
-    {
-        global $CFG, $db;
-
-        if(empty($CFG->assignment_oj_daemon_pid) || !posix_kill($CFG->assignment_oj_daemon_pid, 0)){ // No daemon is running
-            $pid = pcntl_fork(); 
-
-            if ($pid == -1) {
-                mtrace('Could not fork');
-            } else if ($pid > 0){ //Parent process
-                //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-                reconnect_db();
-
-                set_config('assignment_oj_daemon_pid' , $pid);
-            } else { //Child process
-                $this->daemon(); 
-            }
-        }
-    }
-
-    function daemon()
-    {
-        global $CFG;
-
-        $pid = getmypid();
-        mtrace('Judge daemon created. PID = ' . $pid);
-
-        if (function_exists('pcntl_fork')) { // In linux, this is a new session
-            // Start a new sesssion. So it works like a daemon
-            $sid = posix_setsid();
-            if ($sid < 0) {
-                mtrace('Can not setsid');
-                exit;
-            }
-
-            //Redirect error output to php log
-            $CFG->debugdisplay = false;
-            @ini_set('display_errors', '0');
-            @ini_set('log_errors', '1');
-
-            // Close unused fd
-            fclose(STDIN);
-            fclose(STDOUT);
-            fclose(STDERR);
-
-            reconnect_db();
-
-            // Handle SIGTERM so that can be killed without pain
-            declare(ticks = 1); // tick use required as of PHP 4.3.0
-            pcntl_signal(SIGTERM, 'sigterm_handler');
-        }
-
-        set_config('assignment_oj_daemon_pid' , $pid);
-
-        // Run forever until be killed or plugin was upgraded
-        while(!empty($CFG->assignment_oj_daemon_pid)){
-            global $db;
-
-            $this->judge_all_unjudged();
-
-            // If error occured, reconnect db
-            if ($db->ErrorNo())
-                reconnect_db();
-
-            //Check interval is 5 seconds
-            sleep(5);
-
-            //renew the config value which could be modified by other processes
-            $CFG->assignment_oj_daemon_pid = get_config(NULL, 'assignment_oj_daemon_pid');
-        }
-    }
-
-    // Judge all unjudged submissions
-    function judge_all_unjudged()
-    {
-        global $CFG;
-        while ($submission = $this->get_unjudged_submission()) {
-            $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
-            $this->assignment_onlinejudge($cm->id);
-
-            $this->judge($submission);
-        }
-    }
 
     // Return the content of the file submitted by userid. The charset of the content is translated into UTF8.
     // If the file doesn't exist, return false
@@ -1303,20 +763,4 @@ class assignment_onlinejudge extends assignment_uploadsingle {
     }
 }
 
-function sigterm_handler($signo)
-{
-    set_config('assignment_oj_daemon_pid' , '0');
-}
-
-function reconnect_db()
-{
-    global $db;
-    // Reconnect db
-    $db->Close();
-
-    while (!$db->NConnect())
-        sleep(5);
-
-    configure_dbconnection();
-}
 ?>
