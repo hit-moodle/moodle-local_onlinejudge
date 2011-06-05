@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Link all files in $SRCPATH to $DSTPATH
+#
+# We can not link the upper directory only since moodle
+# only recognizes a real directory (not link) as a plugin
+
+
+SRCPATH="clients/mod/assignment/type/onlinejudge/"
+DSTPATH="../../mod/assignment/type/onlinejudge"
+
+if [ ! -e $DSTPATH ]; then
+    mkdir $DSTPATH
+fi
+
+for f in $SRCPATH/* ; do
+    f=`basename $f`
+    if [ ! -e $DSTPATH/$f ]; then
+        ln -s ../../../../local/onlinejudge2/$SRCPATH/$f $DSTPATH/$f
+    fi
+done
