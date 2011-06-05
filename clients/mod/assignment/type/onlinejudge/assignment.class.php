@@ -193,16 +193,9 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Create a new program type assignment activity
+     * Create a new onlinejudge type assignment activity
      *
-     * Given an object containing all the necessary data,
-     * (defined by the form in mod.html) this function
-     * will create a new instance and return the id number
-     * of the new instance.
-     * The due data is added to the calendar
-     * Tests are added to assignment_oj_testcases table
-     *
-     * @param object $assignment The data from the form on mod.html
+     * @param object $assignment The data from the form
      * @return int The id of the assignment
      */
     function add_instance($assignment) {
@@ -219,12 +212,7 @@ class assignment_onlinejudge extends assignment_upload {
     /**
      * Updates a program assignment activity
      *
-     * Given an object containing all the necessary data,
-     * (defined by the form in mod.html) this function
-     * will update the assignment instance and return the id number
-     * The due date is updated in the calendar
-     *
-     * @param object $assignment The data from the form on mod.html
+     * @param object $assignment The data from the form
      * @return int The assignment id
      */
     function update_instance($assignment) {
