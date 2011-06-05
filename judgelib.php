@@ -93,23 +93,31 @@ class judge_base
         // Detect the frequence of cron
         //从数据库中获取还没有编译过的数据,onlinejudge_task表中的所有数据都是没有执行过的.
         $tasks = $DB->get_records_list('onlinejudge_task');
-        //$lastcron = $tasks[0];
-        //foreach($tasks as task) 循环遍历？
-        
-        if ($lastcron) {
-            set_config('onlinejudge_cronfreq', time() - $lastcron);
+        foreach($tasks as $task) 
+        {
+            $lastcron = $task;
+            if ($lastcron) 
+            {
+                set_config('onlinejudge_cronfreq', time() - $lastcron);
+            }
+            
+            // There are two judge routines
+            //  1. Judge only when cron job is running. 
+            //  2. After installation, the first cron running will fork a daemon to be judger.
+            // Routine two works only when the cron job is executed by php cli
+            //
+            if (function_exists('pcntl_fork')) 
+            { 
+                // pcntl_fork supported. Use routine two
+                $this->fork_daemon();
+            } 
+            else if ($CFG->onlinejudge_judge_in_cron) 
+            { 
+                // pcntl_fork is not supported. So use routine one if configured.
+                $this->judge_all_unjudged();
+            }        
         }
-
-        // There are two judge routines
-        //  1. Judge only when cron job is running. 
-        //  2. After installation, the first cron running will fork a daemon to be judger.
-        // Routine two works only when the cron job is executed by php cli
-        //
-        if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
-            $this->fork_daemon();
-        } else if ($CFG->onlinejudge_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
-            $this->judge_all_unjudged();
-        }
+      
     }
     
     function fork_daemon() 
