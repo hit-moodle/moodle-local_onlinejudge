@@ -105,7 +105,7 @@ class assignment_onlinejudge extends assignment_upload {
         }
         $mform->addElement('select', 'var1', get_string('allowmaxfiles', 'assignment'), $options);
         $mform->addHelpButton('var1', 'allowmaxfiles', 'assignment');
-        $mform->setDefault('var1', 3);
+        $mform->setDefault('var1', 1);
 
         $mform->addElement('select', 'var2', get_string('allownotes', 'assignment'), $ynoptions);
         $mform->addHelpButton('var2', 'allownotes', 'assignment');
@@ -166,12 +166,12 @@ class assignment_onlinejudge extends assignment_upload {
         //ideone.com
         $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
-        $mform->setDefault('ideoneuser', $onlinejudge->ideoneuser);
+        $mform->setDefault('ideoneuser', $onlinejudge ? $onlinejudge->ideoneuser : '');
         $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
-        $mform->setDefault('ideonepass', $onlinejudge->ideonepass);
+        $mform->setDefault('ideonepass', $onlinejudge ? $onlinejudge->ideonepass : '');
         $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
-        $mform->setDefault('ideonepass2', $onlinejudge->ideonepass);
+        $mform->setDefault('ideonepass2', $onlinejudge ? $onlinejudge->ideonepass : '');
 
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
