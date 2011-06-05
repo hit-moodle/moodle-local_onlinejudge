@@ -82,6 +82,22 @@ class judge_ideone extends judge_base
         return $lang;
     }
     
+    /**
+     * 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
+     * @param integer $id
+     */
+    function translator($id)
+    {
+        $lang_temp = array();
+        //将数组的键值调换，存入temp数组
+        $lang_temp = array_flip($this->langs);
+        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
+        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
+        
+        
+        return $selected_lang;        
+    }
     
     //function judge($cases, $extra, $compiler)
     function judge($sub)

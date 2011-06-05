@@ -34,6 +34,23 @@ class judge_sandbox extends judge_base
         return $lang;
     }
     
+    /**
+     * 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
+     * @param integer $id
+     */
+    function translator($id)
+    {
+        $lang_temp = array();
+        //将数组的键值调换，存入temp数组
+        $lang_temp = array_flip($this->langs);
+        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
+        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
+        
+        
+        return $selected_lang;        
+    }
+    
     // Compile submission $task in temp_dir
     // return result class on success, false on error
     function compile($task, $temp_dir) 
@@ -43,9 +60,12 @@ class judge_sandbox extends judge_base
         $file = 'prog.c';
         //将代码写入文件里
         file_put_contents("$temp_dir/$file", $task['source']);
+        
+        //将id转换为可识别的语言
+        $judgeName = $this->translator($task['judgeName']);
         //根据需要选择编译器
         //gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
-        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$task['judgeName'].'sh';
+        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'sh';
         if (!is_executable($compiler)) 
         {
             echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
@@ -95,7 +115,7 @@ class judge_sandbox extends judge_base
         //存入数据库的数据包
         $record = new stdClass();
         $record->taskname = $task['taskname'];
-        $record->judgename = $task['judgeName'];
+        $record->judgename = $task['judgeName'];//这是编译器语言的数字id
         $record->memlimit = $task['memlimit'];
         $record->cpulimit = $task['cpulimit'];    
         $record->input = $task['input'];
@@ -114,7 +134,7 @@ class judge_sandbox extends judge_base
         }
         
         //得到结果对象
-        if($result = $this->compile($task, $path))
+        if($result = $this->compile($task, $temp_dir))
         {
             $result->grade = -1;
             if ($result->status === 'compileok') 

@@ -35,6 +35,21 @@ $task['inputfile'] = 0;
 $task['outputfile'] = 0; 
 $judge_obj = new object();
 $judge_obj = $jf->get_judge($task['judgeName']);
+/////////////////////// 测试向数据库中插入数据  /////////////////////
+//        $record = new stdClass();
+//        $record->taskname = $task['taskname'];
+//        $record->judgename = $task['judgeName'];
+//        $record->memlimit = $task['memlimit'];
+//        $record->cpulimit = $task['cpulimit'];    
+//        $record->input = $task['input'];
+//        $record->output = $task['output'];
+//        $record->usefile = $task['usefile'];
+//        $record->inputfile = $task['inputfile'];
+//        $record->outputfile = $task['outputfile'];
+//        //存入数据库,并获取id值
+//        $id = $DB->insert_record('onlinejudge_task', $record, true);
+//        echo $id;
+//////////////////////     结果：可以插入      ///////////////////////
 
 $taskid = $judge_obj->judge($task); //获取任务id
 $result = new stdClass(); //结果
@@ -42,8 +57,8 @@ $result = $judge_obj->get_result($taskid); //得到结果对象
 //输出结果，实际上是空内容，因为在sandbox.php的run_in_sandbox里面，sand不可执行,直接return了
 //两种方式输出结果
 //方式一
-//echo $result->status;
-//echo $result->info;
+echo $result->status;
+echo $result->info;
 //方式二
 //$judge_obj->output_result($result);
 
