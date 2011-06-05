@@ -340,8 +340,11 @@ class assignment_onlinejudge extends assignment_upload {
      *
      */
     function view_intro() {
+        global $OUTPUT;
+
         parent::view_intro();
-        print_simple_box($this->view_summary(null, true), 'center', '', '', 5, 'generalbox', 'intro');
+
+        echo $OUTPUT->box($this->view_summary(null, true), 'generalbox boxaligncenter', 'intro');
     }
 
     /**
