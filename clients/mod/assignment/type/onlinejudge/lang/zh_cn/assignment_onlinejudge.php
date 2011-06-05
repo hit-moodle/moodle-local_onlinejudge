@@ -14,7 +14,7 @@ $string['download'] = '下载 ';
 $string['duejudge'] = '到截止时间后才评测';
 $string['feedbackforwa'] = '给错误答案的反馈';
 $string['filereaderror'] = '此文件不可读';
-$string['ideonelogo'] = '<a href=\"http://code.google.com/p/sunner-projects/wiki/OnlineJudgeAssignmentType\">Moodle在线评测</a>使用了<a href=\"http://sphere-research.com\">Sphere Research Labs</a>的<a href=\"http://ideone.com\">Ideone API</a> &copy; ';
+$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle在线评测</a>使用了<a href="http://sphere-research.com">Sphere Research Labs</a>的<a href="http://ideone.com">Ideone API</a> &copy; ';
 $string['ideoneuser'] = 'Ideone用户名';
 $string['ideoneuser_help'] = '如果您选择了一个在ideone.com运行的语言，那么您就必须提供一个<a href="http://ideone.com">ideone.com</a>用户名。';
 $string['ideonepass'] = 'Ideone API密码';

@@ -15,7 +15,7 @@ $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
 $string['feedbackforwa'] = 'Feedback for Wrong Answer';
 $string['filereaderror'] = 'Can not read this file';
-$string['ideonelogo'] = '<a href=\"http://code.google.com/p/sunner-projects/wiki/OnlineJudgeAssignmentType\">Moodle Online Judge</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
+$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['ideoneuser'] = 'Ideone username';
 $string['ideoneuser_help'] = 'If you choose a language which is run in ideone.com, you must provide a <a href="http://ideone.com">ideone.com</a> username.';
 $string['ideonepass'] = 'Ideone API password';
