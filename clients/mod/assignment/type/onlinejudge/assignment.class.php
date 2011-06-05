@@ -199,11 +199,15 @@ class assignment_onlinejudge extends assignment_upload {
      * @return int The id of the assignment
      */
     function add_instance($assignment) {
+        global $DB;
+
         // Add assignment instance
         $assignment->id = parent::add_instance($assignment);
 
         if ($assignment->id) {
-            $this->after_add_update($assignment);
+            $onlinejudge = $assignment;
+            $onlinejudge->assignment = $onlinejudge->id;
+            $DB->insert_record('assignment_oj', $onlinejudge);
         }
 
         return $assignment->id;
@@ -216,11 +220,18 @@ class assignment_onlinejudge extends assignment_upload {
      * @return int The assignment id
      */
     function update_instance($assignment) {
+        global $DB;
+
         // Add assignment instance
         $returnid = parent::update_instance($assignment);
 
         if ($returnid) {
-            $this->after_add_update($assignment);
+            $onlinejudge = $assignment;
+            $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
+            if ($old_onlinejudge) {
+                $onlinejudge->id = $old_onlinejudge->id;
+                $DB->update_record('assignment_oj', $onlinejudge);
+            }
         }
 
         return $returnid;
@@ -241,44 +252,23 @@ class assignment_onlinejudge extends assignment_upload {
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $assignment->id));
         foreach ($submissions as $submission) {
             // TODO: inform judgelib to delete related tasks
-            if (!$DB->delete_records('assignment_oj_submissions', 'submission', $submission->id))
+            if (!$DB->delete_records('assignment_oj_submissions', array('submission' => $submission->id)))
                 return false;
         }
 
         // DELETE tests
-        if (!$DB->delete_records('assignment_oj_testcases', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj_testcases', array('assignment' => $assignment->id))) {
             return false;
         }
 
         // DELETE programming language
-        if (!$DB->delete_records('assignment_oj', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj', array('assignment' => $assignment->id))) {
             return false;
         }
 
         $result = parent::delete_instance($assignment);
 
         return $result;
-    }
-
-    /**
-     * This function is called at the end of add_instance
-     * and update_instance, to add or update tests and add or update programming language
-     * 
-     * @param object $assignment the onlinejudge object.
-     */
-    function after_add_update($assignment) {
-        global $DB;
-
-        $onlinejudge = $assignment;
-        $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
-        if ($old_onlinejudge) {
-            $onlinejudge->id = $old_onlinejudge->id;
-            print_object($onlinejudge);
-            $DB->update_record('assignment_oj', $onlinejudge);
-        } else {
-            $onlinejudge->assignment = $onlinejudge->id;
-            $DB->insert_record('assignment_oj', $onlinejudge);
-        }
     }
 
     /**
