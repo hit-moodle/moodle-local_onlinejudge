@@ -34,11 +34,10 @@ class judge_sandbox extends judge_base
     
     // Compile submission $task in temp_dir
     // return result class on success, false on error
-    function compile($task, $temp_dir) {
-      //  echo "现在开始执行compile方法<br>";
-        global $CFG;
+    function compile($task, $temp_dir) 
+    {
         $result = false;
-        //$file 是.c文件或者源代码
+        //创建存储源代码的.c文件
         $file = 'prog.c';
         //将代码写入文件里
         file_put_contents("$temp_dir/$file", $task['source']);
@@ -47,20 +46,21 @@ class judge_sandbox extends judge_base
         $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/c.sh';
         if (!is_executable($compiler)) 
         {
+            echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
             $result->status = 'ie';
             $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
             break;
         }
-
-        $output = null;
-        $return = null;
-        // $compiler后面第一个参数为$SOURCE,第二个参数为$DEST,2>&1表示将标准错误输出信息定向到标准输出里
-        $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
         
         //output是一个数组，保存输出信息
-        //return是命令行执行的状态
+        $output = null;
+        $return = null;
+        // $compiler后面第一个参数为source,第二个参数为dest,2>&1表示将标准错误输出信息定向到标准输出里
+        $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
+        
+        //return是命令行结果的最后一行
         exec($command, $output, $return);
-       // echo 'exec执行完毕';
+       
         if ($return) 
         { 
         	//Compile error
@@ -72,7 +72,9 @@ class judge_sandbox extends judge_base
         }
 
         //strip path info
+        //将output里面的$temp_dir.'/'替换为空
         $output = str_replace($temp_dir.'/', '', $output);
+        //将output数组结合为字符串，元素中间用\n换行符放置,并转换为html元素
         $error = htmlspecialchars(implode("\n", $output));
         $result->info = addslashes($error);
 
@@ -87,23 +89,6 @@ class judge_sandbox extends judge_base
      */   
     function judge($task)
     {
-        //生成.o文件
-        $this->compile($task['source'], '/～/exec_file');
-        $exec_file = '/～/exec_file/a.out';
-        
-        //用例
-        $case = new stdClass();          
-        if($task['usefile'])
-    	{
-    	    $case->input = $task['inputfile'];
-    	    $case->output = $task['outputfile'];
-        }
-        else 
-    	{
-    	    $case->input = $task['input'];
-    	    $case->output = $task['output'];   		
-        }
-        
         //存入数据库的数据包
         $record = new stdClass();
         $record->judgeName = $task['judgeName'];
@@ -117,7 +102,71 @@ class judge_sandbox extends judge_base
         //存入数据库,并获取id值
         $id = $DB->insert_record('onlinejudge_task', $record, true);
         
-        //结果对象
+        //创建存储目录
+        $temp_dir = './exec_file/'.$id;
+        if (!check_dir_exists($temp_dir, true, true)) {
+            mtrace("Can't mkdir ".$temp_dir);
+            return false;
+        }
+        
+        //得到结果对象
+        if($result = $this->compile($task, $path))
+        {
+            $result->grade = -1;
+            if ($result->status === 'compileok') 
+            { //Run and test!
+            	/*
+                $results = array();
+                $cases = $this->get_tests();
+                foreach ($cases as $case) 
+                {
+                    $results[] = $this->run_in_sandbox($temp_dir.'/a.out', $case);
+                }
+
+                $result = $this->merge_results($results, $cases);
+                */
+                $result = new stdClass();
+                //用例
+                $case = new stdClass();          
+                if($task['usefile'])
+                {
+                    $case->input = $task['inputfile'];
+                    $case->output = $task['outputfile'];
+                }
+                else 
+                {
+                    $case->input = $task['input'];
+                    $case->output = $task['output'];   		
+                }
+                $result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
+            } 
+            else if ($result->status === 'ce') 
+            {
+                $result->grade = 'ce';
+                $result->output = '';
+            }	
+        } 
+        //保存结果到数据库的数据包
+        $task_result = new stdClass(); 
+        $task_result = $record; //先保存原先数据
+        $task_result->taskid = $id;
+        $task_result->judged = 1; //已经编译运行完
+        $task_result->status = $result->status; //执行状态，'ac','ie'等
+        $task_result->info = $result->info; //描述,比如内存不足，程序不能运行等.
+        $task_result->starttime = $result->starttime;//开始时间
+        $task_result->endtime = $result->endtime; //结束时间
+        //将结果存入数据库表onlinejudge_result中
+        $DB->insert_record('onlinejudge_result',$task_result,false);
+       
+        //删除原先的onlinejudge_task表格
+        $DB->delete_records('onlinejudge_task',array('id'=>$id)); 	
+        //返回id值
+        return $id;
+    }
+    
+    function run_in_sandbox($exec_file, $case) 
+    {
+         //结果对象
         $ret = new stdClass();
         //利用sandbox引擎编译,这里需要用到后台进程，暂时还没添加。
         $ret->output = null;
@@ -184,25 +233,8 @@ class judge_sandbox extends judge_base
         
         //比较结果俞用例输出
         $ret->status = $this->diff($case->output, $ret->output);
-    
-        //$ret应该还有很多其他属性，需要保存到下面的$result对象中。
-        //保存结果数据包
-        $result = new stdClass(); 
-        $result = $record; //先保存原先数据
-        $result->taskid = $id;
-        $result->judged = 1; //已经编译运行完
-        $result->status = $ret->status; //执行状态，'ac','ie'等
-        $result->info = $ret->info; //描述,比如内存不足，程序不能运行等.
-        $result->starttime = $ret->starttime;//开始时间
-        $result->endtime = $ret->endtime; //结束时间
-        //将结果存入数据库表onlinejudge_result中
-        $DB->insert_record('onlinejudge_result',$result,false);
         
-        //删除原先的onlinejudge_task表格
-        $DB->delete_records('onlinejudge_task',array('id'=>$id));
-    	
-        //返回id值
-        return $id;
+        return $ret;
     }
 }
 
