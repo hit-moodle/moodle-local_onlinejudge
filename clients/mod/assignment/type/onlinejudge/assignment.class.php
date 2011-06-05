@@ -131,9 +131,9 @@ class assignment_onlinejudge extends assignment_upload {
         // Programming languages
         unset($choices);
         $choices = $this->get_languages();
-        $mform->addElement('select', 'lang', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
+        $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         /// TODO: Set global default language
-        $mform->setDefault('lang', $onlinejudge ? $onlinejudge->language : 'c');
+        $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
 
         // Presentation error grade ratio
         unset($choices);
@@ -159,8 +159,33 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
 
+        //ideone.com
+        $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
+        $mform->setDefault('ideoneuser', $onlinejudge->ideoneuser);
+        $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
+        $mform->setDefault('ideonepass', $onlinejudge->ideonepass);
+        $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
+        $mform->setDefault('ideonepass2', $onlinejudge->ideonepass);
+
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
+    }
+
+    /**
+     * Any extra validation checks needed for the settings
+     * form for this assignment type
+     *
+     */
+    function form_validation($data, $files) {
+        $errors = array();
+
+        if ($data['ideonepass'] != $data['ideonepass2']) {
+            $errors['ideonepass'] = $errors['ideonepass2'] = get_string('ideonepassmismatch', 'assignment_onlinejudge');
+        }
+
+        return $errors;
     }
 
     /**
@@ -252,22 +277,14 @@ class assignment_onlinejudge extends assignment_upload {
     function after_add_update($assignment) {
         global $DB;
 
-        $onlinejudge = new Object();
-        $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
-        if ($onlinejudge) {
-            $onlinejudge->language = $assignment->lang;
-            $onlinejudge->memlimit = $assignment->memlimit;
-            $onlinejudge->cpulimit = $assignment->cpulimit;
-            $onlinejudge->compileonly = $assignment->compileonly;
-            $onlinejudge->ratiope = $assignment->ratiope;
+        $onlinejudge = $assignment;
+        $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
+        if ($old_onlinejudge) {
+            $onlinejudge->id = $old_onlinejudge->id;
+            print_object($onlinejudge);
             $DB->update_record('assignment_oj', $onlinejudge);
         } else {
-            $onlinejudge->assignment = $assignment->id;
-            $onlinejudge->language = $assignment->lang;
-            $onlinejudge->memlimit = $assignment->memlimit;
-            $onlinejudge->cpulimit = $assignment->cpulimit;
-            $onlinejudge->compileonly = $assignment->compileonly;
-            $onlinejudge->ratiope = $assignment->ratiope;
+            $onlinejudge->assignment = $onlinejudge->id;
             $DB->insert_record('assignment_oj', $onlinejudge);
         }
     }
