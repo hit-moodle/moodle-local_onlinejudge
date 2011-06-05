@@ -13,7 +13,7 @@ class judge_ideone extends judge_base
      * step4: 使用getSubmissionDetails方法来获取程序编译运行的详细信息
      * step5: 返回step2来编译其他需要编译的程序.
      */
-	var $cases = parent::get_tests;
+	//var $cases = parent::get_tests;
 	var $langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
@@ -74,7 +74,7 @@ class judge_ideone extends judge_base
     {
     	$lang = array();
         // Get ideone.com languages
-        foreach ($this->ideone_langs as $name => $id) 
+        foreach ($this->langs as $name => $id) 
         {
             $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
         }
@@ -221,9 +221,9 @@ class judge_ideone extends judge_base
         $result = $this->merge_results($results, $cases);
         $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         return $result;    
+    echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
+by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
     }
     
 }
-echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
-by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
 ?>
