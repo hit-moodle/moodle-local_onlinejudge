@@ -13,7 +13,7 @@ class judge_ideone extends judge_base
      * step4: 使用getSubmissionDetails方法来获取程序编译运行的详细信息
      * step5: 返回step2来编译其他需要编译的程序.
      */
-	var $cases = parent::get_tests;
+	//var $cases = parent::get_tests;
 	var $langs = array(
         'ada_ideone'                     => 7,                      
         'assembler_ideone'               => 13,                  
@@ -74,7 +74,7 @@ class judge_ideone extends judge_base
     {
     	$lang = array();
         // Get ideone.com languages
-        foreach ($this->ideone_langs as $name => $id) 
+        foreach ($this->langs as $name => $id) 
         {
             $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
         }
@@ -82,6 +82,22 @@ class judge_ideone extends judge_base
         return $lang;
     }
     
+    /**
+     * 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
+     * @param integer $id
+     */
+    function translator($id)
+    {
+        $lang_temp = array();
+        //将数组的键值调换，存入temp数组
+        $lang_temp = array_flip($this->langs);
+        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
+        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
+        
+        
+        return $selected_lang;        
+    }
     
     //function judge($cases, $extra, $compiler)
     function judge($sub)
@@ -221,9 +237,9 @@ class judge_ideone extends judge_base
         $result = $this->merge_results($results, $cases);
         $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         return $result;    
+    echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
+by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
     }
     
 }
-echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
-by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
 ?>

@@ -16,7 +16,12 @@ class judge_base
      */
 	function get_languages(){}
     
-	
+    /**
+     * 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
+     * @param integer $id
+     */
+    function translator($id){}
 	/**
 	 * 通过传递任务id值来查看评测的结果
 	 * @param id 是数据库表onlinejudge_result中的taskid
@@ -196,21 +201,22 @@ class judge_factory
     
     function __construct()
     {
-        $sandbox_obj = new judge_sandbox();
-        $ideone_obj  = new judge_ideone(); 
-        $langs = array();
+        $this->sandbox_obj = new judge_sandbox();
+        $this->ideone_obj  = new judge_ideone(); 
+        $this->langs = array_merge($this->sandbox_obj->langs, $this->ideone_obj->langs);
     }
+    
     /**
      * 函数get_langs列出可以使用的编译器语言的id，
      * 然后用户通过提供id值来进行以后的编译操作。 
      */
-    function get_langs()
+    function get_langs_temp()
     {
-    	$langs = array_merge($sandbox_obj->get_languages(),$ideone_obj->get_languages());
+    	$this->langs = array_merge($this->sandbox_obj->get_languages(),$this->ideone_obj->get_languages());
     }
     
     /**
-     * 
+     * 将数字id转换为编译器语言名字，如301转换为c_sandbox
      */
     function translate_into_langs($id)
     {
@@ -222,7 +228,7 @@ class judge_factory
     
     /**
      * 
-     * translator the param id into the language that  be available for compiler 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
      * @param integer $id
      */
     function translator($id)
@@ -242,15 +248,15 @@ class judge_factory
      * $task数据包就是数据库中的一个数据,包括judgeName,memlimit,cpulimit,input,output等数据.
      * 
      */
-    function get_judge(& $judgeName)
+    function get_judge($judgeName)
     {
         //检测id值是否在支持的编译器语言里
         if(in_array($judgeName, $this->langs))
         {   
             // test result -> ok  
-            $judgeName_temp = $judgeName; //保存原先的id值  	
+            $judgeName_temp = $judgeName; //保存原先的id值
+            //将id翻译为c_sandbox这种形式的语言  	
             $judgeName = $this->translate_into_langs($judgeName);
-            
             //获取编译器类型，结果表示 _ideone或者_sandbox
             $judge_type = substr($judgeName, strrpos($judgeName, '_'));
             //选择的为sandbox的引擎以及语言,
@@ -258,10 +264,11 @@ class judge_factory
             $judgeName = $judgeName_temp;
             if($judge_type == "_sandbox" )
             {
+                //echo "sandbox compiler...<br>";
                 $judgeName = $this->translator($judgeName);
+                //echo "语言为".$judgeName;
                 $judge_obj = new judge_sandbox();
                 return $judge_obj;	
-                //return $judge_obj->judge($task);
             }
             //选择的为ideone的引擎以及语言
             else if($judge_type == "_ideone")
@@ -269,7 +276,6 @@ class judge_factory
                 $judgeName = $this->translator($judgeName);
                 $judge_obj = new judge_ideone(); 
                 return $judge_obj;              
-                //return $judge_obj->judge($task);
             }
             else 
             {
@@ -281,6 +287,20 @@ class judge_factory
         {	
             echo "所选择的语言不支持，请重新选择.<br>";
         }
+    }
+    
+    /**
+     * 查询数据库表onlinejudge_result,获取结果，存入结果对象中
+     * @param taskid是onlinejudge_result表中的taskid。
+     * @return 返回结果对象
+     */
+    function get_result($taskid)
+    {
+        global $DB;
+        $result = new stdClass();
+        $result = $DB->get_record('onlinejudge_result', array('taskid' => $taskid));
+        
+        return $result ;
     }
    
 }

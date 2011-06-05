@@ -1,12 +1,12 @@
 <?php
 //require_once("../../judgelib.php");
-require_once(dirname(__FILE__) ."/../../../../config.php");
+require_once(dirname(dirname(__FILE__))."/../../../config.php");
 global $CFG, $DB;
 require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
 class judge_sandbox extends judge_base
 {
-    var $cases = parent::get_tests;
+   // var $cases = parent::get_tests;
     var $langs = array(
         //sandbox languages
         'c_warn2err_sandbox'                     =>300,
@@ -16,6 +16,8 @@ class judge_sandbox extends judge_base
 	);
     function get_languages()
     {
+    	global $CFG;
+    	global $DB ;
     	$lang = array();
         // Get local languages. Linux only
         if ($CFG->ostype != 'WINDOWS') 
@@ -32,6 +34,23 @@ class judge_sandbox extends judge_base
         return $lang;
     }
     
+    /**
+     * 
+     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
+     * @param integer $id
+     */
+    function translator($id)
+    {
+        $lang_temp = array();
+        //将数组的键值调换，存入temp数组
+        $lang_temp = array_flip($this->langs);
+        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
+        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
+        
+        
+        return $selected_lang;        
+    }
+    
     // Compile submission $task in temp_dir
     // return result class on success, false on error
     function compile($task, $temp_dir) 
@@ -41,9 +60,12 @@ class judge_sandbox extends judge_base
         $file = 'prog.c';
         //将代码写入文件里
         file_put_contents("$temp_dir/$file", $task['source']);
-        //根据需要选择编译器，这里举例为c.sh
+        
+        //将id转换为可识别的语言
+        $judgeName = $this->translator($task['judgeName']);
+        //根据需要选择编译器
         //gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
-        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/c.sh';
+        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'sh';
         if (!is_executable($compiler)) 
         {
             echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
@@ -89,9 +111,11 @@ class judge_sandbox extends judge_base
      */   
     function judge($task)
     {
+        global $CFG, $DB;
         //存入数据库的数据包
         $record = new stdClass();
-        $record->judgeName = $task['judgeName'];
+        $record->taskname = $task['taskname'];
+        $record->judgename = $task['judgeName'];//这是编译器语言的数字id
         $record->memlimit = $task['memlimit'];
         $record->cpulimit = $task['cpulimit'];    
         $record->input = $task['input'];
@@ -110,7 +134,7 @@ class judge_sandbox extends judge_base
         }
         
         //得到结果对象
-        if($result = $this->compile($task, $path))
+        if($result = $this->compile($task, $temp_dir))
         {
             $result->grade = -1;
             if ($result->status === 'compileok') 
@@ -138,7 +162,8 @@ class judge_sandbox extends judge_base
                     $case->input = $task['input'];
                     $case->output = $task['output'];   		
                 }
-                $result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
+                $result = $this->run_for_test($temp_dir.'a.out', $case);
+                //$result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
             } 
             else if ($result->status === 'ce') 
             {
@@ -235,6 +260,33 @@ class judge_sandbox extends judge_base
         $ret->status = $this->diff($case->output, $ret->output);
         
         return $ret;
+    }
+    
+    //测试函数，测试是否可以运行
+    function run_for_test($exec_file, $case)
+    {
+        $ret = new stdClass(); //保存结果对象
+        $ret->output = null;
+        $output = array();
+        $return = null;
+        $command = $exec_file.' '.$case->input;
+        exec($command, $output, $return);
+        if($case->output == $output[0])
+        {
+            echo "执行成功！！！";
+            $result->status = 'ac';
+        }
+        else 
+        {
+            echo "执行失败";	
+            $result->status = 'ie';
+        }
+        $result->output = $output[0];
+        $result->info = null;
+        $result->starttime = time();
+        $result->endtime = time();
+        
+        return $result;
     }
 }
 
