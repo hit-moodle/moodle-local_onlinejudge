@@ -30,64 +30,56 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
     if ($oldversion < 2011060301) {
 
-        // Define table assignment_oj_results to be dropped
-        $table = new xmldb_table('assignment_oj_results');
+        // Define field ideoneuser to be added to assignment_oj
+        $table = new xmldb_table('assignment_oj');
+        $field = new xmldb_field('ideoneuser', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'ratiope');
+        // Conditionally launch add field ideoneuser
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
-        // Conditionally launch drop table for assignment_oj_results
+        // Define field ideonepass to be added to assignment_oj
+        $table = new xmldb_table('assignment_oj');
+        $field = new xmldb_field('ideonepass', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'ideoneuser');
+        // Conditionally launch add field ideonepass
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // define table assignment_oj_results to be dropped
+        $table = new xmldb_table('assignment_oj_results');
+        // conditionally launch drop table for assignment_oj_results
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
 
-        // Define index judged (not unique) to be dropped form assignment_oj_submissions
-        $table = new xmldb_table('assignment_oj_submissions');
-        $index = new xmldb_index('judged', XMLDB_INDEX_NOTUNIQUE, array('judged'));
-
-        // Conditionally launch drop index judged
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
         // Define table assignment_oj_tests to be renamed to assignment_oj_testcases
         $table = new xmldb_table('assignment_oj_tests');
-
         // Launch rename table for assignment_oj_tests
         $dbman->rename_table($table, 'assignment_oj_testcases');
 
-        // Define field judged to be dropped from assignment_oj_submissions
+        // define table assignment_oj_submissions to be dropped
         $table = new xmldb_table('assignment_oj_submissions');
-        $field = new xmldb_field('judged');
-
-        // Conditionally launch drop field judged
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
+        // conditionally launch drop table for assignment_oj_submissions
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
         }
 
-        // Define field testcase to be added to assignment_oj_submissions
+        // Define table assignment_oj_submissions to be created
         $table = new xmldb_table('assignment_oj_submissions');
-        $field = new xmldb_field('testcase', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'submission');
-
-        // Conditionally launch add field testcase
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+        // Adding fields to table assignment_oj_submissions
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('submission', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('testcase', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('task', XMLDB_TYPE_INTEGER, '20', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        // Adding keys to table assignment_oj_submissions
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('submission', XMLDB_KEY_FOREIGN, array('submission'), 'assignment_submissions', array('id'));
+        $table->add_key('testcase', XMLDB_KEY_FOREIGN, array('testcase'), 'assignment_oj_testcases', array('id'));
+        // Conditionally launch create table for assignment_oj_submissions
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
-
-        // Define field task to be added to assignment_oj_submissions
-        $table = new xmldb_table('assignment_oj_submissions');
-        $field = new xmldb_field('task', XMLDB_TYPE_INTEGER, '20', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'testcase');
-
-        // Conditionally launch add field task
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Define key testcase (foreign) to be added to assignment_oj_submissions
-        $table = new xmldb_table('assignment_oj_submissions');
-        $key = new xmldb_key('testcase', XMLDB_KEY_FOREIGN, array('testcase'), 'assignment_oj_testcases', array('id'));
-
-        // Launch add key testcase
-        $dbman->add_key($table, $key);
-
-        assignment_onlinejudge_clean_deleted_submissions();
 
         // onlinejudge savepoint reached
         upgrade_plugin_savepoint(true, 2011060301, 'assignment', 'onlinejudge');
@@ -107,22 +99,6 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     }
 
     return true;
-}
-
-/// Clean up old records related with deleted submissions
-function assignment_onlinejudge_clean_deleted_submissions() {
-
-    global $DB;
-
-    $sql = 'SELECT t1.id 
-            FROM {assignment_oj_submissions} t1
-            LEFT JOIN {assignment_submissions} t2
-            ON t1.submission = t2.id
-            WHERE t2.id IS NULL';
-    if ($oj_submissions = $DB->get_records_sql($sql)) {
-        $DB->delete_records_list('assignment_oj_submissions', 'submission', array_keys($oj_submissions));
-    }
-
 }
 
 ?>
