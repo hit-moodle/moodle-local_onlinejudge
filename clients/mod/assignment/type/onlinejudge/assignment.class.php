@@ -451,6 +451,18 @@ class assignment_onlinejudge extends assignment_upload {
         }
     }
 
+    function finalize($forcemode=null) {
+        global $USER, $DB, $OUTPUT;
+        $userid = optional_param('userid', $USER->id, PARAM_INT);
+        $submission = $this->get_submission($userid);
+
+        if ($this->can_finalize($submission)) {
+            $this->request_judge($submission);
+        }
+
+        parent::finalize($forcemode);
+    }
+
     /**
      * Display auto generated info about the submission
      */
@@ -674,7 +686,14 @@ class assignment_onlinejudge extends assignment_upload {
     
         return $cputime;
     }
-    
+
+    /**
+     * Send judge request to judgelib
+     */
+    function request_judge($submission) {
+        //TODO: final
+    }
+
     /**
      * Returns an array of installed programming languages indexed and sorted by name
      *
