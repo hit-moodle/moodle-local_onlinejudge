@@ -414,6 +414,44 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
+     * Print the request grade button
+     *
+     * This function is forked from upload type. Keep syncing if necessary
+     */
+    function view_final_submission() {
+        global $CFG, $USER, $OUTPUT;
+
+        $submission = $this->get_submission($USER->id);
+
+        if ($this->isopen() and $this->can_finalize($submission)) {
+            //print final submit button
+            echo $OUTPUT->heading(get_string('readytojudge','assignment_onlinejudge'), 3);
+            echo '<div style="text-align:center">';
+            echo '<form method="post" action="upload.php">';
+            echo '<fieldset class="invisiblefieldset">';
+            echo '<input type="hidden" name="id" value="'.$this->cm->id.'" />';
+            echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
+            echo '<input type="hidden" name="action" value="finalize" />';
+            echo '<input type="hidden" name="confirm" value="1" />';
+            echo '<input type="submit" name="formarking" value="'.get_string('requestjudge', 'assignment_onlinejudge').'" />';
+            echo '</fieldset>';
+            echo '</form>';
+            echo '</div>';
+        } else if (!$this->isopen()) {
+            echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
+
+        } else if ($this->drafts_tracked() and $state = $this->is_finalized($submission)) {
+            if ($state == ASSIGNMENT_STATUS_SUBMITTED) {
+                echo $OUTPUT->heading(get_string('waitingforjudge','assignment_onlinejudge'), 3);
+            } else {
+                echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
+            }
+        } else {
+            //no submission yet
+        }
+    }
+
+    /**
      * Display auto generated info about the submission
      */
     function view_summary($submission=null, $return = false) {

@@ -102,11 +102,13 @@ $string['ratiope'] = 'Ratio for presentation error';
 $string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s max grade times this ratio.
   
 Presentation error means the data outputted by the program is correct, but the seperators between each data tokens are mismatched with testcases. It is usually caused by extra white spaces or line breaks. If you want to be strict, set it to 0% and a presentation error will worth zero. If you don\'t mind such trival issues, set it to 100% and a presentation error will be equivalent to an accepted.';
+$string['readytojudge'] = 'Ready to be judged';
 $string['rejudge'] = 'Rejudge';
 $string['rejudgeall'] = 'Rejudge all';
 $string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in $a?';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';
 $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
+$string['requestjudge'] = 'Request judge';
 $string['runtimeout'] = 'Runtime output';
 $string['statistics'] = 'Statistics';
 $string['status'] = 'Status';
@@ -144,3 +146,4 @@ $string['successrate'] = 'Success rate';
 $string['testcases'] = 'Test Cases';
 $string['typeonlinejudge'] = 'Online Judge';
 $string['usefile'] = 'Testcase from files';
+$string['waitingforjudge'] = 'Waiting for judge';
