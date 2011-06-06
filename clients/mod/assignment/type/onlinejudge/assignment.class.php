@@ -406,6 +406,8 @@ class assignment_onlinejudge extends assignment_upload {
         $output = parent::print_user_files($userid, true);
 
         // TODO: Syntax Highlighert source code link
+        // TODO: replace '<input type="submit" name="unfinalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with get_string('waitingforjudge', 'assignment_onlinejudge')
+        // TODO: replace '<input type="submit" name="finalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with value=get_string('rejudge', 'assignment_onlinejudge')
 
         if ($return) {
             return $output;
