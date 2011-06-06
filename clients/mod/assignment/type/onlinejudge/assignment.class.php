@@ -105,7 +105,7 @@ class assignment_onlinejudge extends assignment_upload {
         }
         $mform->addElement('select', 'var1', get_string('allowmaxfiles', 'assignment'), $options);
         $mform->addHelpButton('var1', 'allowmaxfiles', 'assignment');
-        $mform->setDefault('var1', 3);
+        $mform->setDefault('var1', 1);
 
         $mform->addElement('select', 'var2', get_string('allownotes', 'assignment'), $ynoptions);
         $mform->addHelpButton('var2', 'allownotes', 'assignment');
@@ -141,33 +141,37 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
         $mform->addHelpButton('ratiope', 'ratiope', 'assignment_onlinejudge');
         $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
+        $mform->setAdvanced('ratiope');
 
         // Max. CPU time
         unset($choices);
         $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
+        $mform->setAdvanced('cpulimit');
 
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
+        $mform->setAdvanced('memlimit');
 
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
         $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
+        $mform->setAdvanced('compileonly');
 
         //ideone.com
         $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
-        $mform->setDefault('ideoneuser', $onlinejudge->ideoneuser);
+        $mform->setDefault('ideoneuser', $onlinejudge ? $onlinejudge->ideoneuser : '');
         $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
-        $mform->setDefault('ideonepass', $onlinejudge->ideonepass);
+        $mform->setDefault('ideonepass', $onlinejudge ? $onlinejudge->ideonepass : '');
         $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
-        $mform->setDefault('ideonepass2', $onlinejudge->ideonepass);
+        $mform->setDefault('ideonepass2', $onlinejudge ? $onlinejudge->ideonepass : '');
 
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
@@ -189,24 +193,21 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Create a new program type assignment activity
+     * Create a new onlinejudge type assignment activity
      *
-     * Given an object containing all the necessary data,
-     * (defined by the form in mod.html) this function
-     * will create a new instance and return the id number
-     * of the new instance.
-     * The due data is added to the calendar
-     * Tests are added to assignment_oj_testcases table
-     *
-     * @param object $assignment The data from the form on mod.html
+     * @param object $assignment The data from the form
      * @return int The id of the assignment
      */
     function add_instance($assignment) {
+        global $DB;
+
         // Add assignment instance
         $assignment->id = parent::add_instance($assignment);
 
         if ($assignment->id) {
-            $this->after_add_update($assignment);
+            $onlinejudge = $assignment;
+            $onlinejudge->assignment = $onlinejudge->id;
+            $DB->insert_record('assignment_oj', $onlinejudge);
         }
 
         return $assignment->id;
@@ -215,20 +216,22 @@ class assignment_onlinejudge extends assignment_upload {
     /**
      * Updates a program assignment activity
      *
-     * Given an object containing all the necessary data,
-     * (defined by the form in mod.html) this function
-     * will update the assignment instance and return the id number
-     * The due date is updated in the calendar
-     *
-     * @param object $assignment The data from the form on mod.html
+     * @param object $assignment The data from the form
      * @return int The assignment id
      */
     function update_instance($assignment) {
+        global $DB;
+
         // Add assignment instance
         $returnid = parent::update_instance($assignment);
 
         if ($returnid) {
-            $this->after_add_update($assignment);
+            $onlinejudge = $assignment;
+            $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
+            if ($old_onlinejudge) {
+                $onlinejudge->id = $old_onlinejudge->id;
+                $DB->update_record('assignment_oj', $onlinejudge);
+            }
         }
 
         return $returnid;
@@ -249,44 +252,23 @@ class assignment_onlinejudge extends assignment_upload {
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $assignment->id));
         foreach ($submissions as $submission) {
             // TODO: inform judgelib to delete related tasks
-            if (!$DB->delete_records('assignment_oj_submissions', 'submission', $submission->id))
+            if (!$DB->delete_records('assignment_oj_submissions', array('submission' => $submission->id)))
                 return false;
         }
 
         // DELETE tests
-        if (!$DB->delete_records('assignment_oj_testcases', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj_testcases', array('assignment' => $assignment->id))) {
             return false;
         }
 
         // DELETE programming language
-        if (!$DB->delete_records('assignment_oj', 'assignment', $assignment->id)) {
+        if (!$DB->delete_records('assignment_oj', array('assignment' => $assignment->id))) {
             return false;
         }
 
         $result = parent::delete_instance($assignment);
 
         return $result;
-    }
-
-    /**
-     * This function is called at the end of add_instance
-     * and update_instance, to add or update tests and add or update programming language
-     * 
-     * @param object $assignment the onlinejudge object.
-     */
-    function after_add_update($assignment) {
-        global $DB;
-
-        $onlinejudge = $assignment;
-        $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignment->id));
-        if ($old_onlinejudge) {
-            $onlinejudge->id = $old_onlinejudge->id;
-            print_object($onlinejudge);
-            $DB->update_record('assignment_oj', $onlinejudge);
-        } else {
-            $onlinejudge->assignment = $onlinejudge->id;
-            $DB->insert_record('assignment_oj', $onlinejudge);
-        }
     }
 
     /**
@@ -424,11 +406,63 @@ class assignment_onlinejudge extends assignment_upload {
         $output = parent::print_user_files($userid, true);
 
         // TODO: Syntax Highlighert source code link
+        // TODO: replace '<input type="submit" name="unfinalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with get_string('waitingforjudge', 'assignment_onlinejudge')
+        // TODO: replace '<input type="submit" name="finalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with value=get_string('rejudge', 'assignment_onlinejudge')
 
         if ($return) {
             return $output;
         }
         echo $output;
+    }
+
+    /**
+     * Print the request grade button
+     *
+     * This function is forked from upload type. Keep syncing if necessary
+     */
+    function view_final_submission() {
+        global $CFG, $USER, $OUTPUT;
+
+        $submission = $this->get_submission($USER->id);
+
+        if ($this->isopen() and $this->can_finalize($submission)) {
+            //print final submit button
+            echo $OUTPUT->heading(get_string('readytojudge','assignment_onlinejudge'), 3);
+            echo '<div style="text-align:center">';
+            echo '<form method="post" action="upload.php">';
+            echo '<fieldset class="invisiblefieldset">';
+            echo '<input type="hidden" name="id" value="'.$this->cm->id.'" />';
+            echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
+            echo '<input type="hidden" name="action" value="finalize" />';
+            echo '<input type="hidden" name="confirm" value="1" />';
+            echo '<input type="submit" name="formarking" value="'.get_string('requestjudge', 'assignment_onlinejudge').'" />';
+            echo '</fieldset>';
+            echo '</form>';
+            echo '</div>';
+        } else if (!$this->isopen()) {
+            echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
+
+        } else if ($this->drafts_tracked() and $state = $this->is_finalized($submission)) {
+            if ($state == ASSIGNMENT_STATUS_SUBMITTED) {
+                echo $OUTPUT->heading(get_string('waitingforjudge','assignment_onlinejudge'), 3);
+            } else {
+                echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
+            }
+        } else {
+            //no submission yet
+        }
+    }
+
+    function finalize($forcemode=null) {
+        global $USER, $DB, $OUTPUT;
+        $userid = optional_param('userid', $USER->id, PARAM_INT);
+        $submission = $this->get_submission($userid);
+
+        if ($this->can_finalize($submission)) {
+            $this->request_judge($submission);
+        }
+
+        parent::finalize($forcemode);
     }
 
     /**
@@ -654,7 +688,14 @@ class assignment_onlinejudge extends assignment_upload {
     
         return $cputime;
     }
-    
+
+    /**
+     * Send judge request to judgelib
+     */
+    function request_judge($submission) {
+        //TODO: final
+    }
+
     /**
      * Returns an array of installed programming languages indexed and sorted by name
      *

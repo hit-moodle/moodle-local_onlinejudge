@@ -49,11 +49,13 @@ $string['ratiope'] = '格式错误得分比例';
 $string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例
 
 格式错误是指程序输出的数据都是正确的，但数据之间的分隔符存在错误。它通常是由多余的空格或者换行符导致的。如果严格要求，可以把比例设为0%，那么格式错误就得不到任何分数。如果不介意这些琐碎的问题，可以把比例设为100%，那么格式错误就相当于正确。';
+$string['readytojudge'] = '已准备好接受评测';
 $string['rejudge'] = '重新评测';
 $string['rejudgeall'] = '全部重新评测';
 $string['rejudgeallnotice'] = '您确定要重新评测“{$a}”中所有已交的作业吗？';
 $string['rejudgefailed'] = '无法提交重新评测请求。';
 $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
+$string['requestjudge'] = '请求评测';
 $string['statistics'] = '统计';
 $string['status'] = '状态';
 $string['status_help'] = '状态是自动评测的结果。不同状态的含义如下：
@@ -89,3 +91,4 @@ $string['successrate'] = '成功率';
 $string['testcases'] = '测试用例';
 $string['typeonlinejudge'] = '在线评测';
 $string['usefile'] = '测试用例来自文件';
+$string['waitingforjudge'] = '等待评测结果';
