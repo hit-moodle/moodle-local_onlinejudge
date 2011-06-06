@@ -119,7 +119,7 @@ class judge_sandbox extends judge_base {
         $id = $DB->insert_record('onlinejudge_task', $record, true);
         
         //创建存储目录
-        $temp_dir = './exec_file/'.$id;
+        $temp_dir = $CFG->dirroot.'/temp/onlinejudge2/'.$id;
         if (!check_dir_exists($temp_dir, true, true)) {
             mtrace("Can't mkdir ".$temp_dir);
             return false;
@@ -143,17 +143,8 @@ class judge_sandbox extends judge_base {
                 $result = $this->merge_results($results, $cases);
                 */
                 $result = new stdClass();
-                //用例
-                $case = new stdClass();          
-                if($task['usefile']) {
-                    $case->input = $task['inputfile'];
-                    $case->output = $task['outputfile'];
-                }
-                else {
-                    $case->input = $task['input'];
-                    $case->output = $task['output'];   		
-                }
-                $result = $this->run_for_test($temp_dir.'a.out', $case);
+                
+                $result = $this->run_for_test($temp_dir.'a.out', $task);
                 //$result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
             } 
             else if ($result->status === 'ce') {
@@ -179,7 +170,18 @@ class judge_sandbox extends judge_base {
         return $id;
     }
     
-    function run_in_sandbox($exec_file, $case) {
+    function run_in_sandbox($exec_file, $task) {
+        //用例
+        $case = new stdClass();          
+        if($task['usefile']) {
+            $case->input = $task['inputfile'];
+            $case->output = $task['outputfile'];
+        }
+        else {
+            $case->input = $task['input'];
+            $case->output = $task['output'];   		
+        }
+    	
          //结果对象
         $ret = new stdClass();
         //利用sandbox引擎编译,这里需要用到后台进程，暂时还没添加。
@@ -195,10 +197,10 @@ class judge_sandbox extends judge_base {
             return $ret;
         }
         
-        //原先命令命令行是注释掉的部分，这里为了方便测试直接指定数字了。
-        //$sand .= ' -l cpu='.($this->onlinejudge->cpulimit*1000).' -l memory='.$this->onlinejudge->memlimit.' -l disk=512000 '.$exec_file; 
-        $sand .= ' -l cpu=1000'.' -l memory=1048576'.' -l disk=512000 '.$exec_file; 
-        
+        $sand .= ' -l cpu='.($task['cpulimit']*1000).' -l memory='.$task['memlimit'].' -l disk=512000 '.$exec_file; 
+        //test
+        //$sand .= ' -l cpu=1000'.' -l memory=1048576'.' -l disk=512000 '.$exec_file; 
+    
         //描述符，包含标准输入，标准输出和标准错误输出
         $descriptorspec = array(
             0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
