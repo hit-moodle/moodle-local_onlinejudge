@@ -4,8 +4,7 @@ require_once(dirname(dirname(__FILE__))."/../../../config.php");
 global $CFG, $DB;
 require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
-class judge_sandbox extends judge_base
-{
+class judge_sandbox extends judge_base {
    // var $cases = parent::get_tests;
     var $langs = array(
         //sandbox languages
@@ -20,13 +19,11 @@ class judge_sandbox extends judge_base
     	global $DB ;
     	$lang = array();
         // Get local languages. Linux only
-        if ($CFG->ostype != 'WINDOWS') 
-        {
+        if ($CFG->ostype != 'WINDOWS') {
             $dir = $CFG->dirroot.'/local/onlinejudge2/languages/';
             $files = get_directory_list($dir);
             $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
-            foreach ($names as $name) 
-            {
+            foreach ($names as $name) {
                 $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
             }
         }
@@ -39,8 +36,7 @@ class judge_sandbox extends judge_base
      * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
      * @param integer $id
      */
-    function translator($id)
-    {
+    function translator($id) {
         $lang_temp = array();
         //将数组的键值调换，存入temp数组
         $lang_temp = array_flip($this->langs);
@@ -53,8 +49,7 @@ class judge_sandbox extends judge_base
     
     // Compile submission $task in temp_dir
     // return result class on success, false on error
-    function compile($task, $temp_dir) 
-    {
+    function compile($task, $temp_dir) {
         $result = false;
         //创建存储源代码的.c文件
         $file = 'prog.c';
@@ -65,10 +60,9 @@ class judge_sandbox extends judge_base
         $judgeName = $this->translator($task['judgeName']);
         echo $judgeName.'<br>';
         //根据需要选择编译器
-        //gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o $DEST $SOURCE -lm
+        //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
         $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'sh';
-        if (!is_executable($compiler)) 
-        {
+        if (!is_executable($compiler)) {
             echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
             $result->status = 'ie';
             $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
@@ -84,13 +78,11 @@ class judge_sandbox extends judge_base
         //return是命令行结果的最后一行
         exec($command, $output, $return);
        
-        if ($return) 
-        { 
+        if ($return) { 
         	//Compile error
             $result->status = 'ce';
         } 
-        else 
-        { 
+        else { 
             $result->status = 'compileok';
         }
 
@@ -110,8 +102,7 @@ class judge_sandbox extends judge_base
      * returns the id of onlinejudge_task table in the database, after compile,
      *         the ide returned reference to the onlinejudge_result table in the database.
      */   
-    function judge($task)
-    {
+    function judge($task) {
         global $CFG, $DB;
         //存入数据库的数据包
         $record = new stdClass();
@@ -135,12 +126,10 @@ class judge_sandbox extends judge_base
         }
         
         //得到结果对象
-        if($result = $this->compile($task, $temp_dir))
-        {
+        if($result = $this->compile($task, $temp_dir)) {
             
             $result->grade = -1;
-            if ($result->status === 'compileok') 
-            {
+            if ($result->status === 'compileok') {
                 echo '运行成功，现在开始存入数据库';
                 //Run and test!
             	/*
@@ -156,21 +145,18 @@ class judge_sandbox extends judge_base
                 $result = new stdClass();
                 //用例
                 $case = new stdClass();          
-                if($task['usefile'])
-                {
+                if($task['usefile']) {
                     $case->input = $task['inputfile'];
                     $case->output = $task['outputfile'];
                 }
-                else 
-                {
+                else {
                     $case->input = $task['input'];
                     $case->output = $task['output'];   		
                 }
                 $result = $this->run_for_test($temp_dir.'a.out', $case);
                 //$result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
             } 
-            else if ($result->status === 'ce') 
-            {
+            else if ($result->status === 'ce') {
                 $result->grade = 'ce';
                 $result->output = '';
             }	
@@ -193,8 +179,7 @@ class judge_sandbox extends judge_base
         return $id;
     }
     
-    function run_in_sandbox($exec_file, $case) 
-    {
+    function run_in_sandbox($exec_file, $case) {
          //结果对象
         $ret = new stdClass();
         //利用sandbox引擎编译,这里需要用到后台进程，暂时还没添加。
@@ -240,23 +225,19 @@ class judge_sandbox extends judge_base
         //将文件变成字符串，存入结果的输出中
         $ret->output = file_get_contents($exec_file.'.out');
 
-        if ($return_value == 255) 
-        {
+        if ($return_value == 255) {
             $ret->status = 'ie';
             return $ret;
         } 
-        else if ($return_value >= 2) 
-        {
+        else if ($return_value >= 2) {
             $ret->status = $result[$return_value];
             return $ret;
         } 
-        else if($return_value == 0) 
-        {
+        else if($return_value == 0) {
             mtrace('Pending? Why?');
             exit();
         }
-        else 
-        {
+        else {
             exit();	
         }
         

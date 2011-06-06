@@ -7,8 +7,7 @@ require_once($CFG->dirroot."/lib/dml/moodle_database.php");
 
 
 
-class judge_base
-{
+class judge_base{
 	var $langs;
 	var $onlinejudge;
 	/**
@@ -27,8 +26,7 @@ class judge_base
 	 * @param id 是数据库表onlinejudge_result中的taskid
 	 * @return 返回结果对象
 	 */
-    function get_result($id)
-    {
+    function get_result($id){
         $result = stdClass(); //结果对象
         $result = $DB->get_record('onlinejudge_result', array('taskid'=>$id));
         return $result;
@@ -45,8 +43,7 @@ class judge_base
      *        eg: ideone.com need the username and password;
      *            sandbox need the executable file(.o).
      */
-    function judge($task)
-    {
+    function judge($task){
     	// TO DO
     }
     
@@ -54,26 +51,22 @@ class judge_base
      * 
      * function diff() compare the output and the answer 
      */  
-    function diff($answer, $output) 
-    {
+    function diff($answer, $output) {
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
         $output = trim($output);
 
         if (strcmp($answer, $output) == 0)
             return 'ac';
-        else 
-        {
+        else {
             $tokens = array();
             $tok = strtok($answer, " \n\r\t");
-            while ($tok) 
-            {
+            while ($tok) {
                 $tokens[] = $tok;
                 $tok = strtok(" \n\r\t");
             }
 
             $tok = strtok($output, " \n\r\t");
-            foreach ($tokens as $anstok) 
-            {
+            foreach ($tokens as $anstok) {
                 if (!$tok || $tok !== $anstok)
                     return 'wa';
                 $tok = strtok(" \n\r\t");
@@ -93,11 +86,9 @@ class judge_base
         // Detect the frequence of cron
         //从数据库中获取还没有编译过的数据,onlinejudge_task表中的所有数据都是没有执行过的.
         $tasks = $DB->get_records_list('onlinejudge_task');
-        foreach($tasks as $task) 
-        {
+        foreach($tasks as $task) {
             $lastcron = $task;
-            if ($lastcron) 
-            {
+            if ($lastcron) {
                 set_config('onlinejudge_cronfreq', time() - $lastcron);
             }
             
@@ -106,13 +97,11 @@ class judge_base
             //  2. After installation, the first cron running will fork a daemon to be judger.
             // Routine two works only when the cron job is executed by php cli
             //
-            if (function_exists('pcntl_fork')) 
-            { 
+            if (function_exists('pcntl_fork')) { 
                 // pcntl_fork supported. Use routine two
                 $this->fork_daemon();
             } 
-            else if ($CFG->onlinejudge_judge_in_cron) 
-            { 
+            else if ($CFG->onlinejudge_judge_in_cron) { 
                 // pcntl_fork is not supported. So use routine one if configured.
                 $this->judge_all_unjudged();
             }        
@@ -120,8 +109,7 @@ class judge_base
       
     }
     
-    function fork_daemon() 
-    {
+    function fork_daemon() {
         global $CFG, $db;
 
         if(empty($CFG->onlinejudge_daemon_pid) || !posix_kill($CFG->onlinejudge_daemon_pid, 0)){ // No daemon is running
@@ -141,8 +129,7 @@ class judge_base
         }
     }
     
-    function daemon()
-    {
+    function daemon(){
         global $CFG;
 
         $pid = getmypid();
@@ -201,14 +188,12 @@ require_once($CFG->dirroot."/local/onlinejudge2/judge/ideone/ideone.php");
 /*利用设计模式中的工厂模式来设计一个类，这个类根据id值的不同来选择创建不同
  *的ideone或sandbox实例
  */
-class judge_factory
-{
+class judge_factory {
     var $sandbox_obj;
     var $ideone_obj;
     var $langs;
     
-    function __construct()
-    {
+    function __construct(){
         $this->sandbox_obj = new judge_sandbox();
         $this->ideone_obj  = new judge_ideone(); 
         $this->langs = array_merge($this->sandbox_obj->langs, $this->ideone_obj->langs);
@@ -218,16 +203,14 @@ class judge_factory
      * 函数get_langs列出可以使用的编译器语言的id，
      * 然后用户通过提供id值来进行以后的编译操作。 
      */
-    function get_langs_temp()
-    {
+    function get_langs_temp() {
     	$this->langs = array_merge($this->sandbox_obj->get_languages(),$this->ideone_obj->get_languages());
     }
     
     /**
      * 将数字id转换为编译器语言名字，如301转换为c_sandbox
      */
-    function translate_into_langs($id)
-    {
+    function translate_into_langs($id) {
         $lang_temp = array();
         $lang_temp = array_flip($this->langs);
         return $lang_temp[$id];
@@ -239,8 +222,7 @@ class judge_factory
      * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
      * @param integer $id
      */
-    function translator($id)
-    {
+    function translator($id) {
         $lang_temp = array();
         //将数组的键值调换，存入temp数组
         $lang_temp = array_flip($this->langs);
@@ -256,11 +238,9 @@ class judge_factory
      * $task数据包就是数据库中的一个数据,包括judgeName,memlimit,cpulimit,input,output等数据.
      * 
      */
-    function get_judge($judgeName)
-    {
+    function get_judge($judgeName) {
         //检测id值是否在支持的编译器语言里
-        if(in_array($judgeName, $this->langs))
-        {   
+        if(in_array($judgeName, $this->langs)) {   
             // test result -> ok  
             $judgeName_temp = $judgeName; //保存原先的id值
             //将id翻译为c_sandbox这种形式的语言  	
@@ -270,8 +250,7 @@ class judge_factory
             //选择的为sandbox的引擎以及语言,
             //还原原先的id值
             $judgeName = $judgeName_temp;
-            if($judge_type == "_sandbox" )
-            {
+            if($judge_type == "_sandbox" ) {
                 //echo "sandbox compiler...<br>";
                 $judgeName = $this->translator($judgeName);
                 //echo "语言为".$judgeName;
@@ -279,20 +258,17 @@ class judge_factory
                 return $judge_obj;	
             }
             //选择的为ideone的引擎以及语言
-            else if($judge_type == "_ideone")
-            {
+            else if($judge_type == "_ideone") {
                 $judgeName = $this->translator($judgeName);
                 $judge_obj = new judge_ideone(); 
                 return $judge_obj;              
             }
-            else 
-            {
+            else {
                 //其他的编译器引擎
             }
         }
         //提示出错，重新传入id值
-        else
-        {	
+        else {	
             echo "所选择的语言不支持，请重新选择.<br>";
         }
     }
@@ -302,8 +278,7 @@ class judge_factory
      * @param taskid是onlinejudge_result表中的taskid。
      * @return 返回结果对象
      */
-    function get_result($taskid)
-    {
+    function get_result($taskid) {
         global $DB;
         $result = new stdClass();
         $result = $DB->get_record('onlinejudge_result', array('taskid' => $taskid));
