@@ -98,6 +98,28 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011060500, 'assignment', 'onlinejudge');
     }
 
+    if ($oldversion < 2011060700) {
+
+        // Define field unused to be added to assignment_oj_testcases
+        $table = new xmldb_table('assignment_oj_testcases');
+        $field = new xmldb_field('unused', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'subgrade');
+        // Conditionally launch add field unused
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define index unused (not unique) to be added to assignment_oj_testcases
+        $table = new xmldb_table('assignment_oj_testcases');
+        $index = new xmldb_index('unused', XMLDB_INDEX_NOTUNIQUE, array('unused'));
+        // Conditionally launch add index unused
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011060700, 'assignment', 'onlinejudge');
+    }
+
     return true;
 }
 

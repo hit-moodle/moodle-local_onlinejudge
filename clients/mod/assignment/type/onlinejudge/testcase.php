@@ -47,7 +47,8 @@ if ($testform->is_cancelled()){
 
 } else if ($fromform = $testform->get_data()){
 
-	$DB->delete_records('assignment_oj_testcases', array('assignment' => $assignment->id));
+    // Mark old testcases as unused
+	$DB->set_field('assignment_oj_testcases', 'unused', '1', array('assignment' => $assignment->id));
 
 	for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
         if (emptycase($fromform, $i))
