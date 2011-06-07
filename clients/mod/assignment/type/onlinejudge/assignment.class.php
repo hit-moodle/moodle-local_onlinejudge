@@ -296,26 +296,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Append rejudge all link to the teachers' view subimissions link
-     */
-    function submittedlink($allgroups=false) {
-
-        global $USER, $CFG;
-
-        $parent_link = parent::submittedlink($allgroups);
-
-        $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
-        if (has_capability('mod/assignment:grade', $context))
-        {
-            $rejudge_link = get_string('rejudgeall','assignment_onlinejudge');
-            $testcase_link = '<a href = "'.$CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id.'">'.get_string('managetestcases','assignment_onlinejudge').'</a>';
-            return $parent_link .'<br />'.$rejudge_link.'<br />'.$testcase_link;
-        } else {
-            return $parent_link;
-        }    
-    }
-
-    /**
      * Rejudge all submissions
      * return bool Success
      */
@@ -810,6 +790,23 @@ class assignment_onlinejudge extends assignment_upload {
         }
 
         return false;
+    }
+
+    /**
+     * Adds specific settings to the settings block
+     */
+    function extend_settings_navigation($assignmentnode) {
+        global $PAGE, $DB, $USER, $CFG;
+
+        if (has_capability('mod/assignment:grade', $PAGE->cm->context)) {
+            $string = get_string('rejudgeall','assignment_onlinejudge');
+            $link = '';
+            $assignmentnode->add($string, $link, navigation_node::TYPE_SETTING);
+
+            $string = get_string('managetestcases','assignment_onlinejudge');
+            $link = $CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id;
+            $assignmentnode->add($string, $link, navigation_node::TYPE_SETTING);
+        }
     }
 }
 
