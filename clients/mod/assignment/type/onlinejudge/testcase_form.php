@@ -2,7 +2,7 @@
 
 require_once('../../../../config.php');
 require_once("$CFG->libdir/formslib.php");
-require ("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
+require_once("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
 
 class testcase_form extends moodleform {
     var $testcasecount;
