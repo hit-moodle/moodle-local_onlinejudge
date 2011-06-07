@@ -21,6 +21,15 @@ class judge_base{
      * @param integer $id
      */
     function translator($id){}
+    
+    /**
+     * 将status从英文翻译为id值，便于存储到数据库中
+     * @param status表示结果状态的缩写，不同编译器结果不同。
+     * @return 返回表示status的整数值。
+     */
+    function translate_status($status) {
+     }
+    
 	/**
 	 * 通过传递任务id值来查看评测的结果
 	 * @param id 是数据库表onlinejudge_result中的taskid
