@@ -800,7 +800,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         if (has_capability('mod/assignment:grade', $PAGE->cm->context)) {
             $string = get_string('rejudgeall','assignment_onlinejudge');
-            $link = '';
+            $link = $CFG->wwwroot.'/mod/assignment/type/onlinejudge/rejudge.php?id='.$this->cm->id;
             $assignmentnode->add($string, $link, navigation_node::TYPE_SETTING);
 
             $string = get_string('managetestcases','assignment_onlinejudge');

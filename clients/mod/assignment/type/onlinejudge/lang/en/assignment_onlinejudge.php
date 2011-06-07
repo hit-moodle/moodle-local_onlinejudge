@@ -109,7 +109,7 @@ Presentation error means the data outputted by the program is correct, but the s
 $string['readytojudge'] = 'Ready to be judged';
 $string['rejudge'] = 'Rejudge';
 $string['rejudgeall'] = 'Rejudge all';
-$string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in {$a}?';
+$string['rejudgeallnotice'] = 'Rejudging all submissions may take a long time. Do you want to continue?';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';
 $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
 $string['requestjudge'] = 'Request judge';
