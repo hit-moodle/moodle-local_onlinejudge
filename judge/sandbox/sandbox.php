@@ -31,6 +31,25 @@ class judge_sandbox extends judge_base {
         return $lang;
     }
     
+    function translate_status($status) {
+        $status_arr = array(
+            'pending' => 4,
+            'nr'      => 0,
+            'ac'      => 1,
+            'wa'      => 2,
+            'pe'      => 3,
+            're'      => 12,
+            'tle'     => 13,
+            'mle'     => 17,
+            'ole'     => 16,
+            'ce'      => 11,
+            'ie'      => 20,
+            'rf'      => 5,
+            'at'      => 6
+        );
+        return $status_arr[$status];
+    }
+    
     /**
      * 
      * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
@@ -157,7 +176,7 @@ class judge_sandbox extends judge_base {
         $task_result = $record; //先保存原先数据
         $task_result->taskid = $id;
         $task_result->judged = 1; //已经编译运行完
-        $task_result->status = $result->status; //执行状态，'ac','ie'等
+        $task_result->status = $this->translate_status($result->status); //执行状态，'ac','ie'等
         $task_result->info = $result->info; //描述,比如内存不足，程序不能运行等.
         $task_result->starttime = $result->starttime;//开始时间
         $task_result->endtime = $result->endtime; //结束时间
