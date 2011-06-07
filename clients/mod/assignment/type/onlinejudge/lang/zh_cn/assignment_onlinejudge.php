@@ -1,5 +1,5 @@
 <?php
-$string['addtestcases'] = '增加 $a 组测试用例';
+$string['addtestcases'] = '增加 {$a} 组测试用例';
 $string['assignmentlangs'] = '编程语言';
 $string['badtestcasefile'] = '此文件不存在，或不可读';
 $string['cannotruncompiler'] = '无法执行编译器脚本';
@@ -12,7 +12,8 @@ $string['cpulimit'] = 'CPU使用时间上限';
 $string['denytoreadfile'] = '您没有访问此文件的权限。';
 $string['download'] = '下载 ';
 $string['duejudge'] = '到截止时间后才评测';
-$string['feedbackforwa'] = '给错误答案的反馈';
+$string['feedback'] = '给错误答案的反馈';
+$string['feedback_help'] = '没能通过测试的学生会看到这条信息。可以通过它给学生一些提示或指导，很方便。';
 $string['filereaderror'] = '此文件不可读';
 $string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle在线评测</a>使用了<a href="http://sphere-research.com">Sphere Research Labs</a>的<a href="http://ideone.com">Ideone API</a> &copy; ';
 $string['ideoneuser'] = 'Ideone用户名';
@@ -28,13 +29,14 @@ $string['infoie'] = '沙箱程序出错，请报告管理员！';
 $string['infomle'] = '你使用了太多内存。';
 $string['infoole'] = '你的代码向stdout输出太多数据了。';
 $string['infope'] = '几乎完美，除了几个用错的空格、tab和换行等。';
-$string['infopending'] = '还剩大约{$a}分钟。';
 $string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
 $string['inforf'] = '你的程序调用了一些<em>不</em>允许使用的函数。';
 $string['infotle'] = '此程序运行得太久了。';
 $string['infowa'] = '请仔细检查您的代码。不要在输出中有手误或任何未要求的字符';
 $string['input'] = '输入';
+$string['input_help'] = '输入数据会被送入被测程序的标准输入。';
 $string['inputfile'] = '输入文件';
+$string['inputfile_help'] = '此文件中的数据会被送入被测程序的标准输入。如果此文件不可读，这条测试用例会被忽略。';
 $string['judgetime'] = '评测时间';
 $string['langc_warn2err'] = 'C (警告视为错误)';
 $string['langcpp_warn2err'] = 'C++ (警告视为错误)';
@@ -44,7 +46,9 @@ $string['maximumfilesize'] = '源文件最大长度';
 $string['maxmemusage'] = '最大内存用量';
 $string['memlimit'] = '内存最多可用';
 $string['output'] = '输出';
+$string['output_help'] = '输出数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。';
 $string['outputfile'] = '输出文件';
+$string['outputfile_help'] = '此文件中的数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。如果此文件不可读，这条测试用例会被忽略。';
 $string['ratiope'] = '格式错误得分比例';
 $string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例
 
@@ -87,8 +91,15 @@ $string['statusre'] = '运行时错误';
 $string['statusrf'] = '受限函数';
 $string['statustle'] = '运行超时';
 $string['statuswa'] = '错误答案';
+$string['subgrade'] = '成绩';
+$string['subgrade_help'] = '通过此测试用例能获得百分之几的分数。
+
+如果作业最高分设为50，此测试用例的成绩设为20%，那么通过测试的学生可以获得10分，没能通过测试的学生只能获得0分。最终成绩是所有测试用例得分的总和。如果该和超过了作业的最高分，那么将以最高分做为最终成绩。
+
+所有测试用例成绩的总和<em>并非</em>必须为100%。这样，把总和设成低于100%，可以留一些分数给人工评分；把总和设成高于100%，那么没通过所有的测试用例也有可能获得满分。';
 $string['successrate'] = '成功率';
 $string['testcases'] = '测试用例';
+$string['testcases_help'] = '每个测试用例都会被单独评测。例如，有3个测试用例，那么被测程序会被运行三次，每次处理不同的用例。';
 $string['typeonlinejudge'] = '在线评测';
 $string['usefile'] = '测试用例来自文件';
 $string['waitingforjudge'] = '等待评测结果';
