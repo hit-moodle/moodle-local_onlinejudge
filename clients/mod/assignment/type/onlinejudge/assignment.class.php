@@ -767,13 +767,8 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
 
-    /**
-     * Evaluate student submissions
-     */
     function cron() {
-
-        global $CFG;
-
+        //TODO: clean never unused testcases
     }
 
 
