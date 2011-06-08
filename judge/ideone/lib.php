@@ -70,7 +70,7 @@ class judge_ideone extends judge_base
     /**
      * Returns an array of installed programming languages indexed and sorted by name
      */
-    function get_languages()
+    static function get_languages()
     {
     	$lang = array();
         // Get ideone.com languages

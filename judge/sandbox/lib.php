@@ -29,7 +29,7 @@ class judge_sandbox extends judge_base {
             'rf'      => 5,
             'at'      => 6
         );
-    function get_languages()
+    static function get_languages()
     {
     	global $CFG;
     	global $DB ;
