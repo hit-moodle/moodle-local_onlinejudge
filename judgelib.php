@@ -162,11 +162,12 @@ function onlinejudge2_get_language_name($language) {
  * Submit task to judge of specified language
  *
  * @param string $language ID of the language
- * @param object $task include source, input, output and etc
+ * @param string $source Source code
+ * @param object $options include input, output and etc. TODO: enrich details
  * @param string $error error message if error occurs
  * @return id of the task or false
  */
-function onlinejudge2_judge($language, $task, &$error) {
+function onlinejudge2_submit_task($language, $source, $options, &$error) {
     //TODO: recode this function
 
     //检测id值是否在支持的编译器语言里
