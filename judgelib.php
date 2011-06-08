@@ -3,17 +3,16 @@
 require_once(dirname(__FILE__).'/../../config.php');
 global $CFG,$DB;
 require_once($CFG->dirroot."/lib/dml/moodle_database.php");
-//require_once($CFG->dirroot."/mod/assignment/type/onlinejudge/assignment.class.php");
-
 
 
 class judge_base{
 	var $langs;
 	var $onlinejudge;
+
 	/**
      * Returns an array of installed programming languages indexed and sorted by name
      */
-	function get_languages(){}
+	abstract function get_languages();
     
     /**
      * 
@@ -45,6 +44,7 @@ class judge_base{
     function output_result($result){}
     
     /**
+     * TODO: rewrite the comments
      * @param cases is the testcase for input and output.
      * @param extra is the extra limit information, 
      *        eg: runtime limit and cpu limit.
@@ -52,9 +52,7 @@ class judge_base{
      *        eg: ideone.com need the username and password;
      *            sandbox need the executable file(.o).
      */
-    function judge($task){
-    	// TO DO
-    }
+    abstract function judge($task);
     
     /**
      * 
@@ -84,120 +82,14 @@ class judge_base{
             return 'pe';
         }
     }
-    
-    /**
-     * Evaluate student submissions
-     */
-    function cron() {
-
-        global $CFG;
-
-        // Detect the frequence of cron
-        //从数据库中获取还没有编译过的数据,onlinejudge_task表中的所有数据都是没有执行过的.
-        $tasks = $DB->get_records_list('onlinejudge_task');
-        foreach($tasks as $task) {
-            $lastcron = $task;
-            if ($lastcron) {
-                set_config('onlinejudge_cronfreq', time() - $lastcron);
-            }
-            
-            // There are two judge routines
-            //  1. Judge only when cron job is running. 
-            //  2. After installation, the first cron running will fork a daemon to be judger.
-            // Routine two works only when the cron job is executed by php cli
-            //
-            if (function_exists('pcntl_fork')) { 
-                // pcntl_fork supported. Use routine two
-                $this->fork_daemon();
-            } 
-            else if ($CFG->onlinejudge_judge_in_cron) { 
-                // pcntl_fork is not supported. So use routine one if configured.
-                $this->judge_all_unjudged();
-            }        
-        }
-      
-    }
-    
-    function fork_daemon() {
-        global $CFG, $db;
-
-        if(empty($CFG->onlinejudge_daemon_pid) || !posix_kill($CFG->onlinejudge_daemon_pid, 0)){ // No daemon is running
-            $pid = pcntl_fork(); 
-
-            if ($pid == -1) {
-                mtrace('Could not fork');
-            } else if ($pid > 0){ 
-                //Parent process
-                //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-                reconnect_db();
-
-                set_config('onlinejudge_daemon_pid' , $pid);
-            } else { //Child process
-                $this->daemon(); 
-            }
-        }
-    }
-    
-    function daemon(){
-        global $CFG;
-
-        $pid = getmypid();
-        mtrace('Judge daemon created. PID = ' . $pid);
-
-        if (function_exists('pcntl_fork')) { 
-            // In linux, this is a new session
-            // Start a new sesssion. So it works like a daemon
-            $sid = posix_setsid();
-            if ($sid < 0) {
-                mtrace('Can not setsid');
-                exit;
-            }
-
-            //Redirect error output to php log
-            $CFG->debugdisplay = false;
-            @ini_set('display_errors', '0');
-            @ini_set('log_errors', '1');
-
-            // Close unused fd
-            fclose(STDIN);
-            fclose(STDOUT);
-            fclose(STDERR);
-
-            reconnect_db();
-
-            // Handle SIGTERM so that can be killed without pain
-            declare(ticks = 1); // tick use required as of PHP 4.3.0
-            pcntl_signal(SIGTERM, 'sigterm_handler');
-        }
-
-        set_config('onlinejudge_daemon_pid' , $pid);
-
-        // Run forever until be killed or plugin was upgraded
-        while(!empty($CFG->onlinejudge_daemon_pid)){
-            global $db;
-
-            $this->judge_all_unjudged();
-
-            // If error occured, reconnect db
-            if ($db->ErrorNo())
-                reconnect_db();
-
-            //Check interval is 5 seconds
-            sleep(5);
-
-            //renew the config value which could be modified by other processes
-            $CFG->assignment_oj_daemon_pid = get_config(NULL, 'onlinejudge_daemon_pid');
-        }
-    }
 }
-
 
 require_once($CFG->dirroot."/local/onlinejudge2/judge/sandbox/sandbox.php");
 require_once($CFG->dirroot."/local/onlinejudge2/judge/ideone/ideone.php");
 /*利用设计模式中的工厂模式来设计一个类，这个类根据id值的不同来选择创建不同
  *的ideone或sandbox实例
  */
-class judge_factory {
+class judgelib {
     var $sandbox_obj;
     var $ideone_obj;
     var $langs;
