@@ -1,100 +1,57 @@
 <?php
 
-require_once("../../../../config.php");
-require_once("../../lib.php");
-require_once("../../../../lib/weblib.php");
+require_once('../../../../config.php');
+require_once("$CFG->dirroot/mod/assignment/lib.php");
+require_once("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
 
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
 $a  = optional_param('a', 0, PARAM_INT);   // Assignment ID
-$force  = optional_param('force', 0, PARAM_INT);   // Force to rejudge
+$confirm = optional_param('confirm', 0, PARAM_INT);   // Force to rejudge
 
+$url = new moodle_url('/mod/assignment/type/onlinejudge/rejudge.php');
 if ($id) {
     if (! $cm = get_coursemodule_from_id('assignment', $id)) {
-        error("Course Module ID was incorrect");
+        print_error('invalidcoursemodule');
     }
 
-    if (! $assignment = get_record("assignment", "id", $cm->instance)) {
-        error("assignment ID was incorrect");
+    if (! $assignment = $DB->get_record("assignment", array("id"=>$cm->instance))) {
+        print_error('invalidid', 'assignment');
     }
 
-    if (! $course = get_record("course", "id", $assignment->course)) {
-        error("Course is misconfigured");
+    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
+        print_error('coursemisconf', 'assignment');
     }
+    $url->param('id', $id);
 } else {
-    if (!$assignment = get_record("assignment", "id", $a)) {
-        error("Course module is incorrect");
+    if (!$assignment = $DB->get_record("assignment", array("id"=>$a))) {
+        print_error('invalidid', 'assignment');
     }
-    if (! $course = get_record("course", "id", $assignment->course)) {
-        error("Course is misconfigured");
+    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
+        print_error('coursemisconf', 'assignment');
     }
     if (! $cm = get_coursemodule_from_instance("assignment", $assignment->id, $course->id)) {
-        error("Course Module ID was incorrect");
+        print_error('invalidcoursemodule');
     }
+    $url->param('a', $a);
 }
 
-require_login($course->id, false, $cm);
+$PAGE->set_url($url);
+require_login($course, true, $cm);
 
 require_capability('mod/assignment:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
 
-require ("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
 $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
 
-if($force == 1 && confirm_sesskey()){
-    rejudge_showresult($assignmentinstance->rejudge_all());
+if ( $confirm == 1 && confirm_sesskey()){
+    $assignmentinstance->rejudge_all();
+	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
 } else {
-    rejudge_notice();
+    $optionsno = array ('id'=>$id);
+    $optionsyes = array ('id'=>$id, 'confirm'=>1, 'sesskey'=>sesskey());
+    $assignmentinstance->view_header();
+    echo $OUTPUT->heading(get_string('rejudgeall', 'assignment_onlinejudge'));
+    echo $OUTPUT->confirm(get_string('rejudgeallnotice', 'assignment_onlinejudge'), new moodle_url('rejudge.php', $optionsyes),new moodle_url( '../../view.php', $optionsno));
 } 
 
-function rejudge_notice() {
-    global $assignment, $id;
-
-    print_header(get_string('notice'));
-
-    $message = get_string('rejudgeallnotice', 'assignment_onlinejudge', $assignment->name);
-    $link = 'rejudge.php?id='.$id.'&force=1';
-
-    notice_okcancel($message, $link, array('sesskey' => sesskey()));
-
-    print_footer('none');
-}
-
-function rejudge_showresult($success=true) {
-    
-    print_header(get_string('notice'));
-
-    if ($success){
-        $message = get_string('rejudgesuccess', 'assignment_onlinejudge');
-    } else {
-        $message = get_string('rejudgefailed', 'assignment_onlinejudge');
-    }
-    print_box($message, 'generalbox', 'notice');
-
-    close_window_button();
-    print_footer('none');
-}
-
-/**
- * Print a message along with "Ok" link for the user to continue and "Cancel" link to close window.
- *
- * @param string $message The text to display
- * @param string $linkok The link to take the user to if they choose "Ok"
- * TODO Document remaining arguments
- */
-function notice_okcancel ($message, $linkok, $optionsok=NULL, $methodok='post') {
-
-    global $CFG;
-
-    $message = clean_text($message);
-    $linkok = clean_text($linkok);
-
-    print_box_start('generalbox', 'notice');
-    echo '<p>'. $message .'</p>';
-    echo '<div class="buttons">';
-    print_single_button($linkok, $optionsok, get_string('ok'), $methodok, $CFG->framename);
-    close_window_button('cancel');
-    echo '</div>';
-    print_box_end();
-}
-?>
-
+$assignmentinstance->view_footer();
 

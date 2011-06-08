@@ -7,36 +7,39 @@ require_once('testcase_form.php');
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
 $a  = optional_param('a', 0, PARAM_INT);   // Assignment ID
 
-
+$url = new moodle_url('/mod/assignment/type/onlinejudge/testcase.php');
 if ($id) {
-	if (! $cm = get_coursemodule_from_id('assignment', $id)) {
-		error("Course Module ID was incorrect");
-	}
+    if (! $cm = get_coursemodule_from_id('assignment', $id)) {
+        print_error('invalidcoursemodule');
+    }
 
-	if (! $assignment = get_record("assignment", "id", $cm->instance)) {
-		error("assignment ID was incorrect");
-	}
+    if (! $assignment = $DB->get_record("assignment", array("id"=>$cm->instance))) {
+        print_error('invalidid', 'assignment');
+    }
 
-	if (! $course = get_record("course", "id", $assignment->course)) {
-		error("Course is misconfigured");
-	}
+    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
+        print_error('coursemisconf', 'assignment');
+    }
+    $url->param('id', $id);
 } else {
-	if (!$assignment = get_record("assignment", "id", $a)) {
-		error("Course module is incorrect");
-	}
-	if (! $course = get_record("course", "id", $assignment->course)) {
-		error("Course is misconfigured");
-	}
-	if (! $cm = get_coursemodule_from_instance("assignment", $assignment->id, $course->id)) {
-		error("Course Module ID was incorrect");
-	}
+    if (!$assignment = $DB->get_record("assignment", array("id"=>$a))) {
+        print_error('invalidid', 'assignment');
+    }
+    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
+        print_error('coursemisconf', 'assignment');
+    }
+    if (! $cm = get_coursemodule_from_instance("assignment", $assignment->id, $course->id)) {
+        print_error('invalidcoursemodule');
+    }
+    $url->param('a', $a);
 }
 
-require_login($course->id, false, $cm);
+$PAGE->set_url($url);
+require_login($course, true, $cm);
 
 require_capability('mod/assignment:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
 
-$testform = new testcase_form(count_records('assignment_oj_tests', 'assignment', $assignment->id));
+$testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id)));
 
 if ($testform->is_cancelled()){
 
@@ -44,7 +47,8 @@ if ($testform->is_cancelled()){
 
 } else if ($fromform = $testform->get_data()){
 
-	delete_records('assignment_oj_tests', 'assignment', $assignment->id);
+    // Mark old testcases as unused
+	$DB->set_field('assignment_oj_testcases', 'unused', '1', array('assignment' => $assignment->id));
 
 	for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
         if (emptycase($fromform, $i))
@@ -65,7 +69,7 @@ if ($testform->is_cancelled()){
         $testcase->feedback = $fromform->feedback[$i];
         $testcase->subgrade = $fromform->subgrade[$i];
         $testcase->assignment = $assignment->id;
-        insert_record('assignment_oj_tests', $testcase);
+        $DB->insert_record('assignment_oj_testcases', $testcase);
         unset($testcase);
 	}
 
@@ -73,16 +77,15 @@ if ($testform->is_cancelled()){
 
 } else {
 
-	$navigation = build_navigation(get_string('testcases','assignment_onlinejudge'), $cm);
-	$title = get_string('modulename', 'assignment').': '.$cm->name.': '.get_string('testcases','assignment_onlinejudge');
-	print_header_simple($title, '', $navigation, $testform->focus(), "", false);
+    $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
+    $assignmentinstance->view_header();
 
-    $tests = get_records('assignment_oj_tests', 'assignment', $assignment->id, 'id ASC');
+    $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id, 'unused' => '0'), 'id ASC');
 
     $toform = array();
-    if ($tests) {
+    if ($testcases) {
         $i = 0;
-        foreach ($tests as $tstObj => $tstValue) {
+        foreach ($testcases as $tstObj => $tstValue) {
             $toform["input[$i]"] = $tstValue->input;
             $toform["output[$i]"] = $tstValue->output;
             $toform["feedback[$i]"] = $tstValue->feedback;
@@ -96,8 +99,8 @@ if ($testform->is_cancelled()){
 
 	$testform->set_data($toform);
 	$testform->display();
-	print_footer($course);
 
+	$assignmentinstance->view_footer();
 }
 
 function emptycase(&$form, $i) {

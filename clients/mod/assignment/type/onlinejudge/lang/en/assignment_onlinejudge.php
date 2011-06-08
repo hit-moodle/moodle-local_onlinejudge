@@ -1,10 +1,10 @@
 <?php
 
-$string['addtestcases'] = 'Add $a more testcase(s)';
+$string['addtestcases'] = 'Add {$a} more testcase(s)';
 $string['assignmentlangs'] = 'Programming language';
 $string['badtestcasefile'] = 'This file does not exist or can not be read';
 $string['cannotruncompiler'] = 'Can not execute the script of compiler';
-$string['case'] = 'Case $a:';
+$string['case'] = 'Case {$a}:';
 $string['compileonly'] = 'Compile only';
 $string['compileonly_help'] = 'If select yes, the submissions will be compiled but not executed. Teachers must grade manually.';
 $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
@@ -13,7 +13,8 @@ $string['cpulimit'] = 'Maximum CPU time';
 $string['denytoreadfile'] = 'You have not the permission to read this file.';
 $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
-$string['feedbackforwa'] = 'Feedback for Wrong Answer';
+$string['feedback'] = 'Feedback for Wrong Answer';
+$string['feedback_help'] = 'The message would be showen to the students who did not pass the testcase. It is helpful if you want to give some hints or instructions.';
 $string['filereaderror'] = 'Can not read this file';
 $string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['ideoneuser'] = 'Ideone username';
@@ -29,13 +30,14 @@ $string['infoie'] = 'Sandbox error. Report to admin please.';
 $string['infomle'] = 'You ate too much memory.';
 $string['infoole'] = 'Your code sent too much to stdout.';
 $string['infope'] = 'Almost perfect, except some bad white spaces, tabs, new lines and etc.';
-$string['infopending'] = 'About $a minute(s) left.';
 $string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse.';
 $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
 $string['infotle'] = 'The program has been running for a too long time.';
 $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
 $string['input'] = 'Input';
+$string['input_help'] = 'The input data will be sent to the stdin of submitted programs.';
 $string['inputfile'] = 'Input file';
+$string['inputfile_help'] = 'The data in the file will be sent to the stdin of submitted programs. If the file is missing, the testcase will be skipped.';
 $string['judgetime'] = 'Judge time';
 $string['langc'] = 'C';
 $string['langc_warn2err'] = 'C (Warnings as Errors)';
@@ -97,7 +99,9 @@ $string['maximumfilesize'] = 'Maximum source file size';
 $string['maxmemusage'] = 'Maximum memory usage';
 $string['memlimit'] = 'Maximum memory usage';
 $string['output'] = 'Output';
+$string['output_help'] = 'The output data will be compared with submissions\' stdout to judge correctness.';
 $string['outputfile'] = 'Output file';
+$string['outputfile_help'] = 'The data in the file will be compared submissions\' stdout to judge correctness. If the file is missing, the testcase will be skipped.';
 $string['ratiope'] = 'Ratio for presentation error';
 $string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s max grade times this ratio.
   
@@ -105,7 +109,7 @@ Presentation error means the data outputted by the program is correct, but the s
 $string['readytojudge'] = 'Ready to be judged';
 $string['rejudge'] = 'Rejudge';
 $string['rejudgeall'] = 'Rejudge all';
-$string['rejudgeallnotice'] = 'Are you sure to rejude all submissions in $a?';
+$string['rejudgeallnotice'] = 'Rejudging all submissions may take a long time. Do you want to continue?';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';
 $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
 $string['requestjudge'] = 'Request judge';
@@ -142,8 +146,15 @@ $string['statusre'] = 'Runtime Error';
 $string['statusrf'] = 'Restricted Functions';
 $string['statustle'] = 'Time-Limit Exceed';
 $string['statuswa'] = 'Wrong answer';
+$string['subgrade'] = 'Grade';
+$string['subgrade_help'] = 'How many points can students obtain after passing the test.
+
+If the assignment\'s max grade is set to 50, and this testcase\'s grade is set to 20%, then students who pass the test will earn 10 points and who can not pass will get zero. The final grade is the sum of all points gotten from each testcase. If the sum is larger than the assignment\'s max grade, the max grade will be used as the final grade.
+
+The sum of all testcases\' grades is <em>not</em> required to be 100%. Therefore, you can leave some points for manual grading if the sum is below 100%. And also, you can make the sum be over 100% so that not all testcases are required to pass.';
 $string['successrate'] = 'Success rate';
 $string['testcases'] = 'Test Cases';
+$string['testcases_help'] = 'Each testcase will be applied to the submissions and judged seperately. E.g. if there are three testcases, one submission will run three times to test different case.';
 $string['typeonlinejudge'] = 'Online Judge';
 $string['usefile'] = 'Testcase from files';
 $string['waitingforjudge'] = 'Waiting for judge';

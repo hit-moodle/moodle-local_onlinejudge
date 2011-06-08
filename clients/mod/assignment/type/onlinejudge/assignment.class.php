@@ -296,26 +296,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Append rejudge all link to the teachers' view subimissions link
-     */
-    function submittedlink($allgroups=false) {
-
-        global $USER, $CFG;
-
-        $parent_link = parent::submittedlink($allgroups);
-
-        $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
-        if (has_capability('mod/assignment:grade', $context))
-        {
-            $rejudge_link = get_string('rejudgeall','assignment_onlinejudge');
-            $testcase_link = '<a href = "'.$CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id.'">'.get_string('managetestcases','assignment_onlinejudge').'</a>';
-            return $parent_link .'<br />'.$rejudge_link.'<br />'.$testcase_link;
-        } else {
-            return $parent_link;
-        }    
-    }
-
-    /**
      * Rejudge all submissions
      * return bool Success
      */
@@ -343,7 +323,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         parent::view_intro();
 
-        echo $OUTPUT->box($this->view_summary(null, true), 'generalbox boxaligncenter', 'intro');
+        echo $OUTPUT->box($this->view_summary(), 'generalbox boxaligncenter', 'intro');
     }
 
     /**
@@ -389,13 +369,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Display submit history
-     */
-    function custom_feedbackform($submission, $return=false) {
-        return parent::custom_feedbackform($submission, $return) . $this->view_summary($submission, true);
-    }
-
-    /**
      * Produces a list of links to the files uploaded by a user
      *
      * @param $userid int optional id of the user. If 0 then $USER->id is used.
@@ -405,9 +378,20 @@ class assignment_onlinejudge extends assignment_upload {
     function print_user_files($userid=0, $return=false) {
         $output = parent::print_user_files($userid, true);
 
+        $patterns = array();
+        $replacements = array();
+
         // TODO: Syntax Highlighert source code link
-        // TODO: replace '<input type="submit" name="unfinalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with get_string('waitingforjudge', 'assignment_onlinejudge')
-        // TODO: replace '<input type="submit" name="finalize" value="xxxxxxxxxxxxxxxxxxxxxxx" />' with value=get_string('rejudge', 'assignment_onlinejudge')
+
+        // Replace upload strings with onlinejudge strings
+        $patterns[] = '/<input type="submit" name="unfinalize" .+ \\/><\\/a><\\/span>/';
+        $replacements[] = get_string('waitingforjudge', 'assignment_onlinejudge');
+        $patterns[] = '/(<input type="submit" name="finalize" value=")[^"]*(" \\/>)/';
+        $replacements[] = '$1'.get_string('rejudge', 'assignment_onlinejudge').'$2';
+
+        $output = preg_replace($patterns, $replacements, $output, 1);
+
+        $output .= $this->view_summary($userid);
 
         if ($return) {
             return $output;
@@ -468,7 +452,7 @@ class assignment_onlinejudge extends assignment_upload {
     /**
      * Display auto generated info about the submission
      */
-    function view_summary($submission=null, $return = false) {
+    function view_summary($user=0, $return = true) {
         global $USER, $CFG, $DB, $OUTPUT;
 
         //TODO: links on testcases to show outputs
@@ -485,8 +469,7 @@ class assignment_onlinejudge extends assignment_upload {
         $lang = get_string('lang' . $this->onlinejudge->language, 'assignment_onlinejudge');
         $table->data[] = array($item_name, $lang);
 
-        if (is_null($submission))
-            $submission = $this->get_submission();
+        $submission = $this->get_submission($user);
 
         // Status
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
@@ -778,13 +761,8 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
 
-    /**
-     * Evaluate student submissions
-     */
     function cron() {
-
-        global $CFG;
-
+        //TODO: clean never unused testcases
     }
 
 
@@ -801,6 +779,23 @@ class assignment_onlinejudge extends assignment_upload {
         }
 
         return false;
+    }
+
+    /**
+     * Adds specific settings to the settings block
+     */
+    function extend_settings_navigation($assignmentnode) {
+        global $PAGE, $DB, $USER, $CFG;
+
+        if (has_capability('mod/assignment:grade', $PAGE->cm->context)) {
+            $string = get_string('rejudgeall','assignment_onlinejudge');
+            $link = $CFG->wwwroot.'/mod/assignment/type/onlinejudge/rejudge.php?id='.$this->cm->id;
+            $assignmentnode->add($string, $link, navigation_node::TYPE_SETTING);
+
+            $string = get_string('managetestcases','assignment_onlinejudge');
+            $link = $CFG->wwwroot.'/mod/assignment/type/onlinejudge/testcase.php?id='.$this->cm->id;
+            $assignmentnode->add($string, $link, navigation_node::TYPE_SETTING);
+        }
     }
 }
 
