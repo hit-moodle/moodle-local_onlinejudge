@@ -13,6 +13,22 @@ class judge_sandbox extends judge_base {
         'cpp_warn2err_sandbox'                   =>302,
         'cpp_sandbox'                            =>303,
 	);
+	
+	var $status_arr = array(
+            'pending' => 4,
+            'nr'      => 0,
+            'ac'      => 1,
+            'wa'      => 2,
+            'pe'      => 3,
+            're'      => 12,
+            'tle'     => 13,
+            'mle'     => 17,
+            'ole'     => 16,
+            'ce'      => 11,
+            'ie'      => 20,
+            'rf'      => 5,
+            'at'      => 6
+        );
     function get_languages()
     {
     	global $CFG;
@@ -32,22 +48,12 @@ class judge_sandbox extends judge_base {
     }
     
     function translate_status($status) {
-        $status_arr = array(
-            'pending' => 4,
-            'nr'      => 0,
-            'ac'      => 1,
-            'wa'      => 2,
-            'pe'      => 3,
-            're'      => 12,
-            'tle'     => 13,
-            'mle'     => 17,
-            'ole'     => 16,
-            'ce'      => 11,
-            'ie'      => 20,
-            'rf'      => 5,
-            'at'      => 6
-        );
-        return $status_arr[$status];
+        return $this->status_arr[$status];
+    }
+    
+    function flip_status($statusid) {
+        $status_arr_temp = array_flip($this->status_arr);
+        return $status_arr_temp[$statusid];
     }
     
     /**
@@ -69,6 +75,7 @@ class judge_sandbox extends judge_base {
     // Compile submission $task in temp_dir
     // return result class on success, false on error
     function compile($task, $temp_dir) {
+    	global $CFG, $DB;
         $result = false;
         //创建存储源代码的.c文件
         $file = 'prog.c';
@@ -80,9 +87,10 @@ class judge_sandbox extends judge_base {
         echo $judgeName.'<br>';
         //根据需要选择编译器
         //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
-        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'sh';
+        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'.sh';
         if (!is_executable($compiler)) {
-            echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
+            //echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
+            echo get_string('cannotruncompiler', 'local_onlinejudge2');
             $result->status = 'ie';
             $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
             //break;
@@ -149,7 +157,7 @@ class judge_sandbox extends judge_base {
             
             $result->grade = -1;
             if ($result->status === 'compileok') {
-                echo '运行成功，现在开始存入数据库';
+               // echo '运行成功，现在开始存入数据库';
                 //Run and test!
             	/*
                 $results = array();
@@ -271,24 +279,25 @@ class judge_sandbox extends judge_base {
     //测试函数，测试是否可以运行
     function run_for_test($exec_file, $case)
     {
-        $ret = new stdClass(); //保存结果对象
-        $ret->output = null;
+    	//echo 'run_for_test' ;
+        $result = new stdClass(); //保存结果对象
+        $result->output = null;
         $output = array();
         $return = null;
         $command = $exec_file.' '.$case->input;
         exec($command, $output, $return);
         if($case->output == $output[0])
         {
-            echo "执行成功！！！";
+            //echo "执行成功！！！";
             $result->status = 'ac';
         }
         else 
         {
-            echo "执行失败";	
+            //echo "执行失败";	
             $result->status = 'ie';
         }
         $result->output = $output[0];
-        $result->info = null;
+        $result->info = '运行成功～';
         $result->starttime = time();
         $result->endtime = time();
         

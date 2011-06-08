@@ -4,6 +4,9 @@ require_once(dirname(__FILE__).'/../../config.php');
 global $CFG,$DB;
 require_once($CFG->dirroot."/lib/dml/moodle_database.php");
 
+if(!isset($CFG->assignment_oj_judge_in_cron)) {
+    set_config('assignment_oj_judge_in_cron', 0);
+}
 
 class judge_base{
 	var $langs;
@@ -28,15 +31,28 @@ class judge_base{
      */
     function translate_status($status) {
      }
+     
+    /**
+     * 将status从整数id值译为英文，便于显示给用户看
+     * @param statusid表示结果状态的id值，不同编译器结果不同。
+     * @return 返回表示statusid的英文描述。
+     */
+    function flip_status($statusid) {
+    
+    }
     
 	/**
 	 * 通过传递任务id值来查看评测的结果
 	 * @param id 是数据库表onlinejudge_result中的taskid
 	 * @return 返回结果对象
 	 */
-    function get_result($id){
-        $result = stdClass(); //结果对象
-        $result = $DB->get_record('onlinejudge_result', array('taskid'=>$id));
+    function get_result($taskid){
+        global $DB;
+        if(! $DB->record_exists('onlinejudge_result', array('taskid' => $taskid))) {
+            echo get_string('nosuchrecord', 'local_onlinejudge2');
+        } 
+        $result = null; //结果对象
+        $result = $DB->get_record('onlinejudge_result', array('taskid' => $id));
         return $result;
     }
     

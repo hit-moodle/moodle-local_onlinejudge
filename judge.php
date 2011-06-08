@@ -57,8 +57,8 @@ $result = $judge_obj->get_result($taskid); //得到结果对象
 //输出结果，实际上是空内容，因为在sandbox.php的run_in_sandbox里面，sand不可执行,直接return了
 //两种方式输出结果
 //方式一
-echo $result->status;
-echo $result->info;
+echo '运行状态：'.$judge_obj->flip_status($result->status);
+echo '<br>运行结果:'.$result->info;
 //方式二
 //$judge_obj->output_result($result);
 
