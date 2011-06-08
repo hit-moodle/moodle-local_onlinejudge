@@ -94,6 +94,7 @@
     $string['maximumfilesize'] = 'Maximum source file size';
     $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
+    $string['nosuchrecord'] = 'There is no such record in database';
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
     $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';
