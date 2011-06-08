@@ -323,7 +323,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         parent::view_intro();
 
-        echo $OUTPUT->box($this->view_summary(null, true), 'generalbox boxaligncenter', 'intro');
+        echo $OUTPUT->box($this->view_summary(), 'generalbox boxaligncenter', 'intro');
     }
 
     /**
@@ -369,13 +369,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Display submit history
-     */
-    function custom_feedbackform($submission, $return=false) {
-        return parent::custom_feedbackform($submission, $return) . $this->view_summary($submission, true);
-    }
-
-    /**
      * Produces a list of links to the files uploaded by a user
      *
      * @param $userid int optional id of the user. If 0 then $USER->id is used.
@@ -397,6 +390,8 @@ class assignment_onlinejudge extends assignment_upload {
         $replacements[] = '$1'.get_string('rejudge', 'assignment_onlinejudge').'$2';
 
         $output = preg_replace($patterns, $replacements, $output, 1);
+
+        $output .= $this->view_summary($userid);
 
         if ($return) {
             return $output;
@@ -457,7 +452,7 @@ class assignment_onlinejudge extends assignment_upload {
     /**
      * Display auto generated info about the submission
      */
-    function view_summary($submission=null, $return = false) {
+    function view_summary($user=0, $return = true) {
         global $USER, $CFG, $DB, $OUTPUT;
 
         //TODO: links on testcases to show outputs
@@ -474,8 +469,7 @@ class assignment_onlinejudge extends assignment_upload {
         $lang = get_string('lang' . $this->onlinejudge->language, 'assignment_onlinejudge');
         $table->data[] = array($item_name, $lang);
 
-        if (is_null($submission))
-            $submission = $this->get_submission();
+        $submission = $this->get_submission($user);
 
         // Status
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
