@@ -80,7 +80,7 @@ if ($testform->is_cancelled()){
     $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
     $assignmentinstance->view_header();
 
-    $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id), 'id ASC');
+    $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id, 'unused' => '0'), 'id ASC');
 
     $toform = array();
     if ($testcases) {
