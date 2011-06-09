@@ -324,7 +324,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         parent::view_intro();
 
-        echo $OUTPUT->box($this->view_summary(), 'generalbox boxaligncenter', 'intro');
+        //TODO: Show info of judge. E.g. compiler parameters
     }
 
     /**
