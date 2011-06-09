@@ -2,6 +2,61 @@
 global $DB,$CFG;
 require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
+//TODO: use oj2 manager to update latest language list
+global $supported_langs;
+$supported_langs = array(
+    'ada_ideone'                     => 7,                      
+    'assembler_ideone'               => 13,                  
+    'awk_gawk_ideone'                => 104,            
+    'awk_mawk_ideone'                => 105,             
+    'bash_ideone'                    => 28,             
+    'bc_ideone'                      => 110,                        
+    'brainfxxk_ideone'               => 12,            
+    'c_ideone'                       => 11,                     
+    'csharp_ideone'                  => 27,                        
+    'cpp_ideone'                     => 1,                  
+    'c99_strict_ideone'              => 34,             
+    'clojure_ideone'                 => 111,                
+    'cobol_ideone'                   => 118,                      
+    'cobol85_ideone'                 => 106,                      
+    'common_lisp_clisp_ideone'       => 32,    
+    'd_dmd_ideone'                   => 102,                 
+    'erlang_ideone'                  => 36,                     
+    'forth_ideone'                   => 107,                     
+    'fortran_ideone'                 => 5,                 
+    'go_ideone'                      => 114,                
+    'haskell_ideone'                 => 21,                   
+    'icon_ideone'                    => 16,             
+    'intercal_ideone'                => 9,                 
+    'java_ideone'                    => 10,                    
+    'javascript_rhino_ideone'        => 35,         
+    'javascript_spidermonkey_ideone' => 112,  
+    'lua_ideone'                     => 26,                       
+    'nemerle_ideone'                 => 30,                  
+    'nice_ideone'                    => 25,                     
+    'ocaml_ideone'                   => 8,                      
+    'oz_ideone'                      => 119,                      
+    'pascal_fpc_ideone'              => 22,             
+    'pascal_gpc_ideone'              => 2,            
+    'perl_ideone'                    => 3,              
+    'php_ideone'                     => 29,            
+    'pike_ideone'                    => 19,            
+    'prolog_gnu_ideone'              => 108,   
+    'prolog_swi_ideone'              => 15,      
+    'python_ideone'                  => 4,             
+    'python3_ideone'                 => 116,             
+    'r_ideone'                       => 117,             
+    'ruby_ideone'                    => 17,             
+    'scala_ideone'                   => 39,             
+    'scheme_guile_ideone'            => 33,    
+    'smalltalk_ideone'               => 23,          
+    'tcl_ideone'                     => 38,              
+    'text_ideone'                    => 62,               
+    'unlambda_ideone'                => 115,         
+    'vbdotnet_ideone'                => 101, 
+    'whitespace_ideone'              => 6
+);
+
 class judge_ideone extends judge_base 
 {
     /**
@@ -14,72 +69,16 @@ class judge_ideone extends judge_base
      * step5: 返回step2来编译其他需要编译的程序.
      */
 	//var $cases = parent::get_tests;
-	var $langs = array(
-        'ada_ideone'                     => 7,                      
-        'assembler_ideone'               => 13,                  
-        'awk_gawk_ideone'                => 104,            
-        'awk_mawk_ideone'                => 105,             
-        'bash_ideone'                    => 28,             
-        'bc_ideone'                      => 110,                        
-        'brainfxxk_ideone'               => 12,            
-        'c_ideone'                       => 11,                     
-        'csharp_ideone'                  => 27,                        
-        'cpp_ideone'                     => 1,                  
-        'c99_strict_ideone'              => 34,             
-        'clojure_ideone'                 => 111,                
-        'cobol_ideone'                   => 118,                      
-        'cobol85_ideone'                 => 106,                      
-        'common_lisp_clisp_ideone'       => 32,    
-        'd_dmd_ideone'                   => 102,                 
-        'erlang_ideone'                  => 36,                     
-        'forth_ideone'                   => 107,                     
-        'fortran_ideone'                 => 5,                 
-        'go_ideone'                      => 114,                
-        'haskell_ideone'                 => 21,                   
-        'icon_ideone'                    => 16,             
-        'intercal_ideone'                => 9,                 
-        'java_ideone'                    => 10,                    
-        'javascript_rhino_ideone'        => 35,         
-        'javascript_spidermonkey_ideone' => 112,  
-        'lua_ideone'                     => 26,                       
-        'nemerle_ideone'                 => 30,                  
-        'nice_ideone'                    => 25,                     
-        'ocaml_ideone'                   => 8,                      
-        'oz_ideone'                      => 119,                      
-        'pascal_fpc_ideone'              => 22,             
-        'pascal_gpc_ideone'              => 2,            
-        'perl_ideone'                    => 3,              
-        'php_ideone'                     => 29,            
-        'pike_ideone'                    => 19,            
-        'prolog_gnu_ideone'              => 108,   
-        'prolog_swi_ideone'              => 15,      
-        'python_ideone'                  => 4,             
-        'python3_ideone'                 => 116,             
-        'r_ideone'                       => 117,             
-        'ruby_ideone'                    => 17,             
-        'scala_ideone'                   => 39,             
-        'scheme_guile_ideone'            => 33,    
-        'smalltalk_ideone'               => 23,          
-        'tcl_ideone'                     => 38,              
-        'text_ideone'                    => 62,               
-        'unlambda_ideone'                => 115,         
-        'vbdotnet_ideone'                => 101, 
-        'whitespace_ideone'              => 6
-    );
     
-    /**
-     * Returns an array of installed programming languages indexed and sorted by name
-     */
-    static function get_languages()
-    {
-    	$lang = array();
-        // Get ideone.com languages
-        foreach ($this->langs as $name => $id) 
-        {
-            $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
+    static function get_languages() {
+        global $supported_langs;
+
+    	$langs = array();
+        foreach ($supported_langs as $langid => $var) {
+            $langs[$langid] = get_string('lang'.$langid, 'local_onlinejudge2');
         }
-        asort($lang);
-        return $lang;
+
+        return $langs;
     }
     
     /**

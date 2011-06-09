@@ -4,11 +4,12 @@ require_once(dirname(__FILE__).'/../../config.php');
 global $CFG,$DB;
 require_once($CFG->dirroot."/lib/dml/moodle_database.php");
 
+global $judgeclasses;
 $judgeclasses = array();
 if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
     foreach ($plugins as $plugin=>$dir) {
         require_once("$CFG->dirroot/local/onlinejudge2/judge/$dir/lib.php");
-        $judgeclasses[] = "judge_$plugin";
+        $judgeclasses[] = "judge_$dir";
     }
 }
 
@@ -138,7 +139,6 @@ function onlinejudge2_get_languages() {
     global $judgeclasses;
 
     $langs = array();
-
     foreach ($judgeclasses as $judgeclass) {
         $langs = array_merge($langs, $judgeclass::get_languages());
     }
