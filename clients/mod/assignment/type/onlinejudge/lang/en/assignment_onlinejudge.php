@@ -11,6 +11,7 @@ $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignmen
 $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
 $string['cpulimit'] = 'Maximum CPU time';
 $string['denytoreadfile'] = 'You have not the permission to read this file.';
+$string['details'] = 'Details';
 $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
 $string['feedback'] = 'Feedback for Wrong Answer';
@@ -23,7 +24,6 @@ $string['ideonepass'] = 'Ideone API password';
 $string['ideonepass_help'] = 'It is NOT the ideone password but the ideone <em>API</em> password. Change API password at <a href="https://ideone.com/account/">https://ideone.com/account/</a>.';
 $string['ideonepass2'] = 'Retype API password';
 $string['ideonepassmismatch'] = 'The two passwords are mismatch';
-$string['info'] = 'Information';
 $string['infoat'] = 'A good program must return 0 if no error occur.';
 $string['infocompileok'] = 'It seems that the compiler likes your code.';
 $string['infoie'] = 'Sandbox error. Report to admin please.';
@@ -78,20 +78,6 @@ $string['status_help'] = 'Status indicates the results given by the online judge
 * Runtime Error - Your program performed an illegal operation. Perhaps it was an attempt to access unaccessible memory or call illegal instructions. Grade is 0.
 * Time-Limit Exceed - Your program has used up the maximum CPU time allowed. Grade is 0.
 * Wrong Answer - The output of your program does not match with the standard answer. Grade is 0.';
-$string['statusac'] = '<font color=red>Accepted</font>';
-$string['statusat'] = 'Abnormal Termination';
-$string['statusce'] = 'Compilation Error';
-$string['statuscompileok'] = 'Compilation Ok';
-$string['statusie'] = 'Internal Error';
-$string['statusmle'] = 'Memory-Limit Exceed';
-$string['statusmultiple'] = 'Multi-status';
-$string['statusole'] = 'Output-Limit Exceed';
-$string['statuspe'] = 'Presentation Error';
-$string['statuspending'] = 'Pending...';
-$string['statusre'] = 'Runtime Error';
-$string['statusrf'] = 'Restricted Functions';
-$string['statustle'] = 'Time-Limit Exceed';
-$string['statuswa'] = 'Wrong answer';
 $string['subgrade'] = 'Grade';
 $string['subgrade_help'] = 'How many points can students obtain after passing the test.
 

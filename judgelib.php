@@ -213,10 +213,17 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
  * @param int $taskid
  * @return object of task or null if unavailable
  */
-function onlinejudge2_get_task_status($taskid) {
+function onlinejudge2_get_task($taskid) {
     global $DB;
     $result = new stdClass();
-    $result = $DB->get_record('onlinejudge2_result', array('taskid' => $taskid));
+    //TODO: to be real
+    //$result = $DB->get_record('onlinejudge2_result', array('taskid' => $taskid));
+    if ($taskid == 2)
+        $result->status = ONLINEJUDGE2_STATUS_ACCEPTED;
+    else
+        $result->status = ONLINEJUDGE2_STATUS_WRONG_ANSWER;
+
+    $result->judgetime = 1234567890;
 
     return $result ;
 }
@@ -229,4 +236,25 @@ function onlinejudge2_get_task_status($taskid) {
  */
 function onlinejudge2_get_status_name($status) {
     return get_string('status'.$status, 'local_onlinejudge2');
+}
+
+/**
+ * Return the overall status of a list of tasks
+ *
+ * @param array $tasks
+ * @return Overall status
+ */
+function onlinejudge2_get_overall_status($tasks) {
+
+    $status = 0;
+    foreach ($tasks as $task) {
+        if ($status == 0) {
+            $status = $task->status;
+        } else if ($status != $task->status) {
+            $status = ONLINEJUDGE2_STATUS_MULTI_STATUS;
+            break;
+        }
+    }
+
+    return $status;
 }
