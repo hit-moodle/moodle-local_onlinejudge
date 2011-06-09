@@ -57,6 +57,7 @@ require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
+require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 /**
  * Extends the upload assignment class
@@ -130,7 +131,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Programming languages
         unset($choices);
-        $choices = $this->get_languages();
+        $choices = onlinejudge2_get_languages();
         $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         /// TODO: Set global default language
         $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
@@ -466,7 +467,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Language
         $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
-        $lang = get_string('lang' . $this->onlinejudge->language, 'assignment_onlinejudge');
+        $lang = onlinejudge2_get_language_name($this->onlinejudge->language);
         $table->data[] = array($item_name, $lang);
 
         $submission = $this->get_submission($user);
