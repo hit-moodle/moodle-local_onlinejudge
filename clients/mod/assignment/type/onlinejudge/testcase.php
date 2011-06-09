@@ -71,11 +71,10 @@ if ($testform->is_cancelled()){
 
         $testcase_id = $DB->insert_record('assignment_oj_testcases', $testcase);
 
-        // Useless code? If so, delete
-        //if ($testcase->usefile) {
-        //    file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase_id);
-        //    file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase_id);
-        //}
+        if ($testcase->usefile) {
+            file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase_id);
+            file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase_id);
+        }
 
         unset($testcase);
 	}
@@ -98,8 +97,10 @@ if ($testform->is_cancelled()){
             $toform["feedback[$i]"] = $tstValue->feedback;
             $toform["subgrade[$i]"] = $tstValue->subgrade;
             $toform["usefile[$i]"] = $tstValue->usefile;
-            $toform["inputfile[$i]"] = $tstValue->inputfile;
-            $toform["outputfile[$i]"] = $tstValue->outputfile;
+
+            file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_input', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
+            file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_output', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
+
             $i++;
         }
     }
