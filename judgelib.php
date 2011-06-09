@@ -161,13 +161,15 @@ function onlinejudge2_get_language_name($language) {
 /**
  * Submit task to judge of specified language
  *
+ * @param int $cm ID of coursemodule
+ * @param int $user ID of user
  * @param string $language ID of the language
  * @param string $source Source code
  * @param object $options include input, output and etc. TODO: enrich details
  * @param string $error error message if error occurs
  * @return id of the task or false
  */
-function onlinejudge2_submit_task($language, $source, $options, &$error) {
+function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$error) {
     //TODO: recode this function
 
     //检测id值是否在支持的编译器语言里
