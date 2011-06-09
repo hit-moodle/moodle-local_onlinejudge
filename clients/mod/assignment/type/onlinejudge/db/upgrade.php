@@ -115,6 +115,29 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
+        // Changing nullability of field input on table assignment_oj_testcases to null
+        $table = new xmldb_table('assignment_oj_testcases');
+        $field = new xmldb_field('input', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'assignment');
+        // Launch change of nullability for field input
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field output on table assignment_oj_testcases to null
+        $table = new xmldb_table('assignment_oj_testcases');
+        $field = new xmldb_field('output', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'input');
+        // Launch change of nullability for field output
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field inputfile on table assignment_oj_testcases to null
+        $table = new xmldb_table('assignment_oj_testcases');
+        $field = new xmldb_field('inputfile', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'usefile');
+        // Launch change of nullability for field inputfile
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field outputfile on table assignment_oj_testcases to null
+        $table = new xmldb_table('assignment_oj_testcases');
+        $field = new xmldb_field('outputfile', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'inputfile');
+        // Launch change of nullability for field outputfile
+        $dbman->change_field_notnull($table, $field);
 
         // onlinejudge savepoint reached
         upgrade_plugin_savepoint(true, 2011060700, 'assignment', 'onlinejudge');

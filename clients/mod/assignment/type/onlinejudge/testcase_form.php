@@ -27,8 +27,8 @@ class testcase_form extends moodleform {
 		$repeatarray[] = &$mform->createElement('checkbox', 'usefile', get_string('usefile', 'assignment_onlinejudge'));
 		$repeatarray[] = &$mform->createElement('textarea', 'input', get_string('input', 'assignment_onlinejudge'), 'wrap="virtual" rows="5" cols="50"');
 		$repeatarray[] = &$mform->createElement('textarea', 'output', get_string('output', 'assignment_onlinejudge'), 'wrap="virtual" rows="5" cols="50"');
-		$repeatarray[] = &$mform->createElement('filepicker', 'inputfile', get_string('inputfile', 'assignment_onlinejudge'), array('accepted_types' => '*.txt'));
-		$repeatarray[] = &$mform->createElement('filepicker', 'outputfile', get_string('outputfile', 'assignment_onlinejudge'), array('accepted_types' => '*.txt'));
+		$repeatarray[] = &$mform->createElement('filemanager', 'inputfile', get_string('inputfile', 'assignment_onlinejudge'), null, array('subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => array('plaintext')));
+		$repeatarray[] = &$mform->createElement('filemanager', 'outputfile', get_string('outputfile', 'assignment_onlinejudge'), null, array('subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => array('plaintext')));
 		$repeatarray[] = &$mform->createElement('text', 'feedback', get_string('feedback', 'assignment_onlinejudge'), array('size' => 50));
 
 		$repeateloptions = array();
@@ -61,51 +61,4 @@ class testcase_form extends moodleform {
 		$mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
 		$mform->closeHeaderBefore('buttonar');
 	}
-
-    //Fix MDL-18539
-    function get_data($slashed=true) {
-        $data = parent::get_data($slashed);
-        if ($data) {
-            $data->inputfile = array();
-            $data->outputfile = array();
-            foreach (array_keys($data->feedback) as $key) { 
-                $prop = "inputfile[$key]";
-                $data->inputfile[$key] = $data->$prop;
-                unset($data->$prop);
-                $prop = "outputfile[$key]";
-                $data->outputfile[$key] = $data->$prop;
-                unset($data->$prop);
-            }
-        }
-
-        return $data;
-    }
-
-    function validation($data) {
-        global $CFG, $COURSE;
-
-        $errors = array();
-
-        if (isset($data['usefile'])) {
-            foreach ($data['usefile'] as $key => $usefile) {
-                if ($usefile) {
-                    $file = $data["inputfile[$key]"];
-                    if (empty($file) || !is_readable("$CFG->dataroot/$COURSE->id/$file")) {
-                        $errors["inputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
-                    }
-
-                    $file = $data["outputfile[$key]"];
-                    if (empty($file) || !is_readable("$CFG->dataroot/$COURSE->id/$file")) {
-                        $errors["outputfile[$key]"] = get_string('badtestcasefile', 'assignment_onlinejudge');
-                    }
-                }
-            }
-        }
-
-        return $errors;
-    }
 }
-
-
-
-?>

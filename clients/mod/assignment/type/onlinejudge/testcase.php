@@ -37,9 +37,10 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
-require_capability('mod/assignment:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
+$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+require_capability('mod/assignment:grade', $context);
 
-$testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id)));
+$testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id, 'unused' => '0')));
 
 if ($testform->is_cancelled()){
 
@@ -55,21 +56,27 @@ if ($testform->is_cancelled()){
             continue;
 
         if (isset($fromform->usefile[$i])) {
-            $testcase->usefile = $fromform->usefile[$i];
-        }
-        if (isset($fromform->input[$i]) && isset($fromform->output[$i])) {
-			$testcase->input = $fromform->input[$i];
-			$testcase->output = $fromform->output[$i];
-        }
-        if (isset($fromform->inputfile[$i]) && isset($fromform->outputfile[$i])) {
+            $testcase->usefile = true;
 			$testcase->inputfile = $fromform->inputfile[$i];
 			$testcase->outputfile = $fromform->outputfile[$i];
+        } else {
+            $testcase->usefile = false;
+			$testcase->input = $fromform->input[$i];
+			$testcase->output = $fromform->output[$i];
         }
 
         $testcase->feedback = $fromform->feedback[$i];
         $testcase->subgrade = $fromform->subgrade[$i];
         $testcase->assignment = $assignment->id;
-        $DB->insert_record('assignment_oj_testcases', $testcase);
+
+        $testcase_id = $DB->insert_record('assignment_oj_testcases', $testcase);
+
+        // Useless code? If so, delete
+        //if ($testcase->usefile) {
+        //    file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase_id);
+        //    file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase_id);
+        //}
+
         unset($testcase);
 	}
 
