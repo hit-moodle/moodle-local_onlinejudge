@@ -681,24 +681,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Returns an array of installed programming languages indexed and sorted by name
-     *
-     * @return array The index is the name of the assignment type,the value its full name from the language strings
-     */
-    function get_languages() {
-        global $CFG;
-        
-        $lang = array ();
-
-        //TODO: Get languages from judgelib
-        $lang['example'] = 'Example';
-
-        asort($lang);
-        return $lang;
-    }
-
-
-    /**
      * return grade
      * status means ac, wa, pe and etc.
      * fraction means max fraction in modgrade, :-)
