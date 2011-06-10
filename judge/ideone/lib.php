@@ -98,8 +98,7 @@ class judge_ideone extends judge_base
         return $selected_lang;        
     }
     
-    //function judge($cases, $extra, $compiler)
-    function judge($sub)
+    function judge($task)
     {
     	//get the username and password form param compiler.
     	//onelinejude_ideone_username and onlinejudge_ideone_password

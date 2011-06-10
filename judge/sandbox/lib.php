@@ -30,6 +30,9 @@ class judge_sandbox extends judge_base {
             'at'      => 6
         );
 
+    function __construct() {
+    }
+        
     static function get_languages()
     {
     	global $CFG;
@@ -87,8 +90,7 @@ class judge_sandbox extends judge_base {
             $language = substr($task->language, 0, strlen($task->language)-8);
             //select the compiler shell.
             //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
-            $compiler = $CFG->dirroot.'/local/onlinejudge2/sandbox/languages/'.$language.'.sh';
-            
+            $compiler = $CFG->dirroot.'/local/onlinejudge2/judge/sandbox/languages/'.$language.'.sh';
             if (!is_executable($compiler)) {
                 echo get_string('cannotruncompiler', 'local_onlinejudge2');
                 $result->status = 'ie';
@@ -192,6 +194,7 @@ class judge_sandbox extends judge_base {
     }
     
     function run_in_sandbox($exec_file, $task) {
+    	global $CFG, $DB;
         //testcase
         $case = new stdClass();          
         $case->input = $task->input;
@@ -201,10 +204,21 @@ class judge_sandbox extends judge_base {
         $ret = new stdClass();
         $ret->output = null;
         
-        $status = array('pending', 'ac', 'rf', 'mle', 'ole', 'tle', 're', 'at', 'ie');
-        $sand = $CFG->dirroot . '/local/onlinejudge2/sandbox/sand';
+        $result = array (
+                ONLINEJUDGE2_STATUS_PENDING, 
+                ONLINEJUDGE2_STATUS_ACCEPTED,
+                ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS, 
+                ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED, 
+                ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED,
+                ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED,
+                ONLINEJUDGE2_STATUS_RUNTIME_ERROR,
+                ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION,
+                ONLINEJUDGE2_STATUS_INTERNAL_ERROR
+        );
+        //print_r($result);
         
-        //目前sand不可执行
+        $sand = $CFG->dirroot . '/local/onlinejudge2/judge/sandbox/sand/sand';
+        
         //如果sand不可执行，则返回空的结果对象
         if (!is_executable($sand)){
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
@@ -218,13 +232,11 @@ class judge_sandbox extends judge_base {
         //描述符，包含标准输入，标准输出和标准错误输出
         $descriptorspec = array(
             0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
-            1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file to write to
-            2 => array('file', $exec_file.'err', 'w') // stderr is a file to write to
+            1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file that the child will write to
+            2 => array('file', $exec_file.'.err', 'w') // stderr is a file that the child will write to
         );
         
-        //change status to judging
-        $ret->status = ONLINEJUDGE2_STATUS_JUDGING;
-        
+        //echo $sand;
         //执行sand命令行，打开文件指针，用于输入输出,返回表示进程的资源
         $proc = proc_open($sand, $descriptorspec, $pipes);
         
@@ -240,7 +252,7 @@ class judge_sandbox extends judge_base {
 
         //关闭proc_open打开的进程，并且返回进程的退出代码
         $return_value = proc_close($proc);
-        
+        //echo $return_value;
         //将文件变成字符串，存入结果的输出中
         $ret->output = file_get_contents($exec_file.'.out');
 
@@ -256,43 +268,12 @@ class judge_sandbox extends judge_base {
             mtrace('Pending? Why?');
             exit();
         }
-        else {
-            exit();	
-        }
         
         $ret->judgetime = time();
         //比较结果和用例输出
         $ret->status = $this->diff($case->output, $ret->output);
         
         return $ret;
-    }
-    
-    //测试函数，测试是否可以运行
-    function run_for_test($exec_file, $case)
-    {
-    	//echo 'run_for_test' ;
-        $result = new stdClass(); //保存结果对象
-        $result->output = null;
-        $output = array();
-        $return = null;
-        $command = $exec_file.' '.$case->input;
-        exec($command, $output, $return);
-        if($case->output == $output[0])
-        {
-            //echo "执行成功！！！";
-            $result->status = 'ac';
-        }
-        else 
-        {
-            //echo "执行失败";	
-            $result->status = 'ie';
-        }
-        $result->output = $output[0];
-        $result->info = '运行成功～';
-        $result->starttime = time();
-        $result->endtime = time();
-        
-        return $result;
     }
 }
 

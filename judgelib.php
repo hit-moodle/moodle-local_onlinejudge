@@ -88,7 +88,7 @@ class judge_base{
         $output = trim($output);
 
         if (strcmp($answer, $output) == 0)
-            return 'ac';
+            return ONLINEJUDGE2_STATUS_ACCEPTED;
         else {
             $tokens = array();
             $tok = strtok($answer, " \n\r\t");
@@ -100,11 +100,11 @@ class judge_base{
             $tok = strtok($output, " \n\r\t");
             foreach ($tokens as $anstok) {
                 if (!$tok || $tok !== $anstok)
-                    return 'wa';
+                    return ONLINEJUDGE2_STATUS_WRONG_ANSWER;
                 $tok = strtok(" \n\r\t");
             }
 
-            return 'pe';
+            return ONLINEJUDGE2_STATUS_PRESENTATION_ERROR;
         }
     }
 }
@@ -161,6 +161,7 @@ function onlinejudge2_get_languages() {
     }
 
     asort($langs);
+    //print_r($langs);
     return $langs;
 }
 
@@ -187,13 +188,14 @@ function onlinejudge2_get_language_name($language) {
  * @return id of the task or false
  */
 function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$error) {
-    //TODO: complete this function
+    global $judgeclasses, $CFG;
+	//TODO: complete this function
     $id = false; //return id
     //get the languages.
     $langs_arr = array_flip(onlinejudge2_get_languages());
     //check if @param language is the the langs array.
     if(in_array($language, $langs_arr)) {
-    	
+    	//echo $language.' in the language lib';
         //get the judge type, such as sandbox, ideone etc.
         $judge_type = substr($language, strrpos($language, '_')+1);
         
@@ -204,6 +206,7 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
         //TODO: 这里要面向未来编程，不能写死sandbox、ideone这样的字眼
         if(in_array($judge_compiler, $judgeclasses)) {
             require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");
+            
             $judge_obj = new $judge_compiler();
             
             //packing the task data.
@@ -219,9 +222,11 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
             $task->compileonly = $options->compileonly;
             $task->status = ONLINEJUDGE2_STATUS_PENDING;
             $task->submittime = time();
+            $task->error = $error;
             
             //get the id
             $id = $judge_obj->judge($task);
+            //echo $id;
         }
     }
     
@@ -239,9 +244,9 @@ function onlinejudge2_get_task($taskid) {
     $result = new stdClass();
     $result = null;
     //TODO: to be real
-    $result = $DB->get_record('onlinejudge2_tasks', array('taskid' => $taskid));
+    $result = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
     
-    if($result->status = ONLINEJUDGE2_STATUS_JUDGING) {
+    if($result->status == ONLINEJUDGE2_STATUS_JUDGING) {
     	//judging...
         echo get_string('status22', 'local_onlinejudge2');
         $result = null;
