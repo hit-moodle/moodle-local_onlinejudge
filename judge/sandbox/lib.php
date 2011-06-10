@@ -44,8 +44,8 @@ class judge_sandbox extends judge_base {
                 $langs[$name] = get_string('lang'.$name, 'local_onlinejudge2');
             }
         }
-
         return $langs;
+        
     }
 
     function translate_status($status) {
@@ -83,15 +83,13 @@ class judge_sandbox extends judge_base {
         //将代码写入文件里
         if($task['source'] != null) {
             file_put_contents("$temp_dir/$file", $task['source']);
-            //将id转换为可识别的语言
-            $judgeName = $this->translator($task['judgeName']);
-            //echo $judgeName.'<br>';
+            //get judge name, such c,c_warn2err, cpp etc..
+            $judgename = substr($task['judgename'], 0, strlen($task['judgename'])-8);
             //根据需要选择编译器
             //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
-            $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'.sh';
+            $compiler = $CFG->dirroot.'/local/onlinejudge2/sandbox/languages/'.$judgename.'.sh';
             
             if (!is_executable($compiler)) {
-                //echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
                 echo get_string('cannotruncompiler', 'local_onlinejudge2');
                 $result->status = 'ie';
                 $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
@@ -141,7 +139,7 @@ class judge_sandbox extends judge_base {
         //存入数据库的数据包
         $record = new stdClass();
         $record->taskname = $task['taskname'];
-        $record->judgename = $task['judgeName'];//这是编译器语言的数字id
+        $record->judgename = $task['judgename'];//这是编译器语言的数字id
         $record->memlimit = $task['memlimit'];
         $record->cpulimit = $task['cpulimit'];    
         $record->input = $task['input'];
@@ -178,8 +176,8 @@ class judge_sandbox extends judge_base {
                 */
                 $ret = new stdClass();
                 
-                $ret = $this->run_for_test($temp_dir.'/a.out', $task);
-                //$result = $this->run_in_sandbox($temp_dir.'/a.out', $case);	
+                //$ret = $this->run_for_test($temp_dir.'/a.out', $task);
+                $result = $this->run_in_sandbox($temp_dir.'/a.out', $case);	
             } 
             else if ($result->status === 'ce') {
                 //$result->grade = 'ce';

@@ -6,6 +6,7 @@ require_once($CFG->dirroot."/lib/dml/moodle_database.php");
 
 global $judgeclasses;
 $judgeclasses = array();
+//得到结果表示为judge_sandbox, judge_ideone等数组
 if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
     foreach ($plugins as $plugin=>$dir) {
         require_once("$CFG->dirroot/local/onlinejudge2/judge/$dir/lib.php");
@@ -70,13 +71,9 @@ class judge_base{
     function output_result($result){}
     
     /**
-     * TODO: rewrite the comments
-     * @param cases is the testcase for input and output.
-     * @param extra is the extra limit information, 
-     *        eg: runtime limit and cpu limit.
-     * @param compiler is the need of certain compiler,
-     *        eg: ideone.com need the username and password;
-     *            sandbox need the executable file(.o).
+     * judge the source of task, and return the id of the certain database record.
+     * @param task is configed by clients, include the memlimit, cpulimit, case(input,output) etc.
+     * @return the id of the task in the database.
      */
     function judge($task) {
         return false;
@@ -84,7 +81,7 @@ class judge_base{
 
     /**
      * 
-     * function diff() compare the output and the answer 
+     * function diff() compare the output and the answer
      */  
     function diff($answer, $output) {
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
@@ -111,7 +108,7 @@ class judge_base{
         }
     }
 }
-
+/*
 const ONLINEJUDGE2_STATUS_PENDING                = 0;
 
 const ONLINEJUDGE2_STATUS_ACCEPTED               = 1;
@@ -129,6 +126,25 @@ const ONLINEJUDGE2_STATUS_WRONG_ANSWER           = 11;
 const ONLINEJUDGE2_STATUS_INTERNAL_ERROR         = 21;
 const ONLINEJUDGE2_STATUS_JUDGING                = 22;
 const ONLINEJUDGE2_STATUS_MULTI_STATUS           = 23;
+*/
+
+define("ONLINEJUDGE2_STATUS_PENDING",               0 );
+
+define("ONLINEJUDGE2_STATUS_ACCEPTED",              1 );
+define("ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION",  2 );
+define("ONLINEJUDGE2_STATUS_COMPILATION_ERROR",     3 );
+define("ONLINEJUDGE2_STATUS_COMPILATION_OK",        4 );
+define("ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED",   5 );
+define("ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
+define("ONLINEJUDGE2_STATUS_PRESENTATION_ERROR",    7 );
+define("ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS",  8 );
+define("ONLINEJUDGE2_STATUS_RUNTIME_ERROR",         9 );
+define("ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED",     10);
+define("ONLINEJUDGE2_STATUS_WRONG_ANSWER",          11);
+
+define("ONLINEJUDGE2_STATUS_INTERNAL_ERROR",        21);
+define("ONLINEJUDGE2_STATUS_JUDGING",               22);
+define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
 
 /**
  * Returns an sorted array of all programming languages supported
@@ -166,46 +182,48 @@ function onlinejudge2_get_language_name($language) {
  * @param int $user ID of user
  * @param string $language ID of the language
  * @param string $source Source code
- * @param object $options include input, output and etc. TODO: enrich details
+ * @param object $options include input, output and etc. 
  * @param string $error error message if error occurs
  * @return id of the task or false
  */
 function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$error) {
-    //TODO: recode this function
-
-    //检测id值是否在支持的编译器语言里
-    if(in_array($judgeName, $this->langs)) {   
-        // test result -> ok  
-        $judgeName_temp = $judgeName; //保存原先的id值
-        //将id翻译为c_sandbox这种形式的语言  	
-        $judgeName = $this->translate_into_langs($judgeName);
-        //获取编译器类型，结果表示 _ideone或者_sandbox
-        $judge_type = substr($judgeName, strrpos($judgeName, '_'));
-        //选择的为sandbox的引擎以及语言,
-        //还原原先的id值
-        $judgeName = $judgeName_temp;
+    //TODO: complete this function
+    $id = false; //return id
+    //get the languages.
+    $langs_arr = array_flip(onlinejudge2_get_languages());
+    //check if @param language is the the langs array.
+    if(in_array($language, $langs_arr)) {
+    	
+        //get the judge type, such as sandbox, ideone etc.
+        $judge_type = substr($language, strrpos($language, '_')+1);
+        
+        //get the compiler, such as judge_sandbox, judge_ideone etc.
+        $judge_compiler = 'judge_'.$judge_type;
+        
+        //select the certain compiler by judge_type
         //TODO: 这里要面向未来编程，不能写死sandbox、ideone这样的字眼
-        if($judge_type == "_sandbox" ) {
-            //echo "sandbox compiler...<br>";
-            $judgeName = $this->translator($judgeName);
-            //echo "语言为".$judgeName;
-            $judge_obj = new judge_sandbox();
-            return $judge_obj;	
-        }
-        //选择的为ideone的引擎以及语言
-        else if($judge_type == "_ideone") {
-            $judgeName = $this->translator($judgeName);
-            $judge_obj = new judge_ideone(); 
-            return $judge_obj;              
-        }
-        else {
-            //其他的编译器引擎
+        if(in_array($judge_compiler, $judgeclasses)) {
+            require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");
+            $judge_obj = new $judge_compiler();
+            
+            //packing the task data.
+            $task = array();
+            $task['judgename'] = $language;
+            $task['source'] = $source;
+            $task['memlimit'] = $options->memlimit;
+            $task['cpulimit'] = $options->cpulimit;
+            $task['input'] = $options->input;
+            $task['output'] = $options->output;
+            $task['usefile'] = $option->usefile;
+            $task['inputfile'] = $options->inputfile;
+            $task['outputfile'] = $options->outputfile;
+            
+            //get the id
+            $id = $judge_obj->judge($task);
         }
     }
-    //提示出错，重新传入id值
-    else {	
-        echo "所选择的语言不支持，请重新选择.<br>";
-    }
+    
+    return $id;
 }
 
 /**
