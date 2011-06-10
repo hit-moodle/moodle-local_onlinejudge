@@ -112,6 +112,8 @@ class judge_base{
     }
 }
 
+const ONLINEJUDGE2_STATUS_PENDING                = 0;
+
 const ONLINEJUDGE2_STATUS_ACCEPTED               = 1;
 const ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION   = 2;
 const ONLINEJUDGE2_STATUS_COMPILATION_ERROR      = 3;
@@ -125,9 +127,8 @@ const ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED      = 10;
 const ONLINEJUDGE2_STATUS_WRONG_ANSWER           = 11;
 
 const ONLINEJUDGE2_STATUS_INTERNAL_ERROR         = 21;
-const ONLINEJUDGE2_STATUS_PENDING                = 22;
-const ONLINEJUDGE2_STATUS_JUDGING                = 23;
-const ONLINEJUDGE2_STATUS_MULTI_STATUS           = 24;
+const ONLINEJUDGE2_STATUS_JUDGING                = 22;
+const ONLINEJUDGE2_STATUS_MULTI_STATUS           = 23;
 
 /**
  * Returns an sorted array of all programming languages supported

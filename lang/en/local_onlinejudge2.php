@@ -109,6 +109,7 @@
     $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
     $string['statistics'] = 'Statistics';
+    $string['status0'] = 'Pending...';
     $string['status1'] = '<font color=red>Accepted</font>';
     $string['status2'] = 'Abnormal Termination';
     $string['status3'] = 'Compilation Error';
@@ -121,9 +122,8 @@
     $string['status10'] = 'Time-Limit Exceed';
     $string['status11'] = 'Wrong answer';
     $string['status21'] = 'Internal Error';
-    $string['status22'] = 'Pending...';
-    $string['status23'] = 'Judging...';
-    $string['status24'] = 'Multi-status';
+    $string['status22'] = 'Judging...';
+    $string['status23'] = 'Multi-status';
     $string['successrate'] = 'Success rate';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
