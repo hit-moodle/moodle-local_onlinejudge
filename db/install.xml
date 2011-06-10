@@ -17,8 +17,10 @@
         <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="answer"/>
         <FIELD NAME="answer" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="output" NEXT="compileonly"/>
         <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="answer" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="cpuusage"/>
-        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="status" NEXT="memusage"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="info_teacher"/>
+        <FIELD NAME="info_teacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program runtime/compiler error, message seen by teacher" PREVIOUS="status" NEXT="info_student"/>
+        <FIELD NAME="info_student" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program runtime/compiler error, the message seen by student." PREVIOUS="info_teacher" NEXT="cpuusage"/>
+        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="info_student" NEXT="memusage"/>
         <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
         <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
         <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime"/>

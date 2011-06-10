@@ -207,16 +207,18 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
             $judge_obj = new $judge_compiler();
             
             //packing the task data.
-            $task = array();
-            $task['judgename'] = $language;
-            $task['source'] = $source;
-            $task['memlimit'] = $options->memlimit;
-            $task['cpulimit'] = $options->cpulimit;
-            $task['input'] = $options->input;
-            $task['output'] = $options->output;
-            $task['usefile'] = $option->usefile;
-            $task['inputfile'] = $options->inputfile;
-            $task['outputfile'] = $options->outputfile;
+            $task = new stdClass();
+            $task->cm = $cm;
+            $task->user = $user;
+            $task->language = $language;
+            $task->source = $source;
+            $task->memlimit = $options->memlimit;
+            $task->cpulimit = $options->cpulimit;
+            $task->input = $options->input;
+            $task->output = $options->output;
+            $task->compileonly = $options->compileonly;
+            $task->status = ONLINEJUDGE2_STATUS_PENDING;
+            $task->submittime = time();
             
             //get the id
             $id = $judge_obj->judge($task);
@@ -235,16 +237,26 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
 function onlinejudge2_get_task($taskid) {
     global $DB;
     $result = new stdClass();
+    $result = null;
     //TODO: to be real
-    //$result = $DB->get_record('onlinejudge2_result', array('taskid' => $taskid));
+    $result = $DB->get_record('onlinejudge2_tasks', array('taskid' => $taskid));
+    
+    if($result->status = ONLINEJUDGE2_STATUS_JUDGING) {
+    	//judging...
+        echo get_string('status22', 'local_onlinejudge2');
+        $result = null;
+    }
+    return $result;
+    
+
+    /*
     if ($taskid == 2)
         $result->status = ONLINEJUDGE2_STATUS_ACCEPTED;
     else
         $result->status = ONLINEJUDGE2_STATUS_WRONG_ANSWER;
 
     $result->judgetime = 1234567890;
-
-    return $result ;
+    */
 }
 
 /**
