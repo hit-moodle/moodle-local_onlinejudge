@@ -80,46 +80,50 @@ class judge_sandbox extends judge_base {
         //创建存储源代码的.c文件
         $file = 'prog.c';
         //将代码写入文件里
-        file_put_contents("$temp_dir/$file", $task['source']);
+        if($task['source'] != null) {
+            file_put_contents("$temp_dir/$file", $task['source']);
+            //将id转换为可识别的语言
+            $judgeName = $this->translator($task['judgeName']);
+            //echo $judgeName.'<br>';
+            //根据需要选择编译器
+            //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
+            $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'.sh';
+            
+            if (!is_executable($compiler)) {
+                //echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
+                echo get_string('cannotruncompiler', 'local_onlinejudge2');
+                $result->status = 'ie';
+                $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
+                //break;
+            }
         
-        //将id转换为可识别的语言
-        $judgeName = $this->translator($task['judgeName']);
-        echo $judgeName.'<br>';
-        //根据需要选择编译器
-        //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
-        $compiler = $CFG->dirroot.'/local/onlinejudge2/languages/'.$judgeName.'.sh';
-        if (!is_executable($compiler)) {
-            //echo '.sh脚本文件不可执行，请查看有无执行权限或者脚本错误';
-            echo get_string('cannotruncompiler', 'local_onlinejudge2');
-            $result->status = 'ie';
-            $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
-            //break;
-        }
+            //output是一个数组，保存输出信息
+            $output = null;
+            $return = null;
+            // $compiler后面第一个参数为source,第二个参数为dest,2>&1表示将标准错误输出信息定向到标准输出里
+            $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
         
-        //output是一个数组，保存输出信息
-        $output = null;
-        $return = null;
-        // $compiler后面第一个参数为source,第二个参数为dest,2>&1表示将标准错误输出信息定向到标准输出里
-        $command = "$compiler $temp_dir/$file $temp_dir/a.out 2>&1";
-        
-        //return是命令行结果的最后一行
-        exec($command, $output, $return);
+            //return是命令行结果的最后一行
+            exec($command, $output, $return);
        
-        if ($return) { 
-        	//Compile error
-            $result->status = 'ce';
-        } 
-        else { 
-            $result->status = 'compileok';
+            if ($return) { 
+        	    //Compile error
+                $result->status = 'ce';
+            } 
+            else { 
+                $result->status = 'compileok';
+            }
+
+            //strip path info
+            //将output里面的$temp_dir.'/'替换为空
+            $output = str_replace($temp_dir.'/', '', $output);
+            //将output数组结合为字符串，元素中间用\n换行符放置,并转换为html元素
+            $error = htmlspecialchars(implode("\n", $output));
+            $result->info = addslashes($error);
+            
+            return $result;
         }
-
-        //strip path info
-        //将output里面的$temp_dir.'/'替换为空
-        $output = str_replace($temp_dir.'/', '', $output);
-        //将output数组结合为字符串，元素中间用\n换行符放置,并转换为html元素
-        $error = htmlspecialchars(implode("\n", $output));
-        $result->info = addslashes($error);
-
+        
         //Compile the first file only
         return $result;       
     }
@@ -131,6 +135,8 @@ class judge_sandbox extends judge_base {
      */   
     function judge($task) {
         global $CFG, $DB;
+        $result = new stdClass(); //结果对象
+        
         //存入数据库的数据包
         $record = new stdClass();
         $record->taskname = $task['taskname'];
@@ -155,7 +161,7 @@ class judge_sandbox extends judge_base {
         //得到结果对象
         if($result = $this->compile($task, $temp_dir)) {
             
-            $result->grade = -1;
+            //$result->grade = -1;
             if ($result->status === 'compileok') {
                // echo '运行成功，现在开始存入数据库';
                 //Run and test!
@@ -169,13 +175,13 @@ class judge_sandbox extends judge_base {
 
                 $result = $this->merge_results($results, $cases);
                 */
-                $result = new stdClass();
+                $ret = new stdClass();
                 
-                $result = $this->run_for_test($temp_dir.'a.out', $task);
-                //$result = $this->run_in_sandbox($temp_dir.'a.out', $case);	
+                $ret = $this->run_for_test($temp_dir.'/a.out', $task);
+                //$result = $this->run_in_sandbox($temp_dir.'/a.out', $case);	
             } 
             else if ($result->status === 'ce') {
-                $result->grade = 'ce';
+                //$result->grade = 'ce';
                 $result->output = '';
             }	
         } 
