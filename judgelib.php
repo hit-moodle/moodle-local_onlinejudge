@@ -229,16 +229,6 @@ function onlinejudge2_get_task($taskid) {
 }
 
 /**
- * Return the name of specified status
- *
- * @param int $status
- * @return name
- */
-function onlinejudge2_get_status_name($status) {
-    return get_string('status'.$status, 'local_onlinejudge2');
-}
-
-/**
  * Return the overall status of a list of tasks
  *
  * @param array $tasks

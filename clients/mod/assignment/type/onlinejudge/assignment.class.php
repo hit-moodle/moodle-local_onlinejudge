@@ -484,7 +484,7 @@ class assignment_onlinejudge extends assignment_upload {
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
         if (!empty($result->status)) {
-            $item = onlinejudge2_get_status_name($result->status);
+            $item = get_string('status'.$result->status, 'local_onlinejudge2');
         }
         $table->data[] = array($item_name, $item);
 
