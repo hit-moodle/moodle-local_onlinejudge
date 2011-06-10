@@ -29,24 +29,25 @@ class judge_sandbox extends judge_base {
             'rf'      => 5,
             'at'      => 6
         );
-    function get_languages()
+
+    static function get_languages()
     {
     	global $CFG;
-    	global $DB ;
-    	$lang = array();
+
+        $langs = array();
         // Get local languages. Linux only
         if ($CFG->ostype != 'WINDOWS') {
-            $dir = $CFG->dirroot.'/local/onlinejudge2/languages/';
+            $dir = $CFG->dirroot.'/local/onlinejudge2/judge/sandbox/languages/';
             $files = get_directory_list($dir);
-            $names = preg_replace('/\.(\w+)/', '', $files); // Replace file extension with nothing
+            $names = preg_replace('/\.(\w+)/', '_sandbox', $files); // Replace file extension with _sandbox
             foreach ($names as $name) {
-                $lang[$name] = get_string('lang'.$name, 'local_onlinejudge2');
+                $langs[$name] = get_string('lang'.$name, 'local_onlinejudge2');
             }
         }
-        asort($lang);
-        return $lang;
+
+        return $langs;
     }
-    
+
     function translate_status($status) {
         return $this->status_arr[$status];
     }

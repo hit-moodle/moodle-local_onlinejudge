@@ -10,6 +10,7 @@ $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作�
 $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
 $string['cpulimit'] = 'CPU使用时间上限';
 $string['denytoreadfile'] = '您没有访问此文件的权限。';
+$string['details'] = '详细信息';
 $string['download'] = '下载 ';
 $string['duejudge'] = '到截止时间后才评测';
 $string['feedback'] = '给错误答案的反馈';
@@ -22,7 +23,6 @@ $string['ideonepass'] = 'Ideone API密码';
 $string['ideonepass_help'] = '这不是ideone网站的密码，而是ideone <em>API</em>密码。在<a href="https://ideone.com/account/">https://ideone.com/account/</a>修改API密码。';
 $string['ideonepass2'] = '再次输入API密码';
 $string['ideonepassmismatch'] = '两个密码不匹配';
-$string['info'] = '信息';
 $string['infoat'] = '一个好程序在没遇到错误的时候，必须“return 0”。';
 $string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';
 $string['infoie'] = '沙箱程序出错，请报告管理员！';

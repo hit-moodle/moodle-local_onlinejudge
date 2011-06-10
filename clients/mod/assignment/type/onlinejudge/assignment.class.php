@@ -57,6 +57,7 @@ require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
+require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 /**
  * Extends the upload assignment class
@@ -130,7 +131,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Programming languages
         unset($choices);
-        $choices = $this->get_languages();
+        $choices = onlinejudge2_get_languages();
         $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         /// TODO: Set global default language
         $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
@@ -272,22 +273,29 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Get tests data for current assignment.
+     * Get testcases data of current assignment.
      *
-     * @return array tests An array of tests objects. All testcase files are read into memory
+     * @return An array of testcases objects. All testcase files are read into memory
      */
-    function get_tests() {
+    function get_testcases() {
         global $CFG, $DB;
 
-        $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $this->assignment->id), 'id ASC');
+        $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $this->assignment->id, 'unused' => 0), 'id ASC');
         $tests = array();
 
         foreach ($records as $record) {
             if ($record->usefile) {
-                if (! $record->input = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->inputfile"))
-                    continue; //Skip case whose file(s) can't be read
-                if (! $record->output = file_get_contents("$CFG->dataroot/{$this->assignment->course}/$record->outputfile"))
-                    continue; //Skip case whose file(s) can't be read
+                $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+                $fs = get_file_storage();
+
+                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_input', $record->id)) {
+                    $file = array_pop($files);
+                    $record->input = $file->get_content();
+                }
+                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_output', $record->id)) {
+                    $file = array_pop($files);
+                    $record->output = $file->get_content();
+                }
             }
             $tests[] = $record;
         }
@@ -323,7 +331,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         parent::view_intro();
 
-        echo $OUTPUT->box($this->view_summary(), 'generalbox boxaligncenter', 'intro');
+        //TODO: Show info of judge. E.g. compiler parameters
     }
 
     /**
@@ -466,61 +474,40 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Language
         $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
-        $lang = get_string('lang' . $this->onlinejudge->language, 'assignment_onlinejudge');
+        $lang = onlinejudge2_get_language_name($this->onlinejudge->language);
         $table->data[] = array($item_name, $lang);
 
         $submission = $this->get_submission($user);
+        $result = $this->get_onlinejudge_result($submission->id);
 
         // Status
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (!empty($submission->status)) {
-            $item = get_string('status' . $submission->status, 'assignment_onlinejudge');
+        if (!empty($result->status)) {
+            $item = get_string('status'.$result->status, 'local_onlinejudge2');
         }
         $table->data[] = array($item_name, $item);
 
         // Judge time
         $item_name = get_string('judgetime','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (isset($submission->judgetime)) {
-            $item = userdate($submission->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $submission->judgetime)) . ')';
+        if (isset($result->judgetime)) {
+            $item = userdate($result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $result->judgetime)) . ')';
         }
         $table->data[] = array($item_name, $item);
 
-        // Information
-        $item_name = get_string('info','assignment_onlinejudge').':';
+        // Details
+        $item_name = get_string('details','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (isset($submission->status)) {
-            if ($submission->status === 'pending') {
-                if (empty($CFG->assignment_oj_daemon_pid)) { //Judge from cron
-                    $lastcron = $DB->get_field('modules', 'lastcron', 'name', 'assignment');
-                    $left = ceil(($lastcron + $CFG->assignment_oj_cronfreq - time()) / 60);
-                    $left = $left > 0 ? $left : 0;
-                    $submission->info = get_string('infopending', 'assignment_onlinejudge', $left);
-                } else {
-                    $submission->info = get_string('notavailable');
-                }
-            } else if ($submission->status !== 'ac' && $submission->status !== 'ce' && empty($submission->info)) {
-                $submission->info = get_string('info'.$submission->status, 'assignment_onlinejudge');
-            }
 
-            if (!empty($submission->info)) {
-                $item = $submission->info;
-            }
+        $i = 1;
+        $lines = array();
+        foreach ($result->testcases as $case) {
+            $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.onlinejudge2_get_status_name($case->status);
+            $i++;
         }
-        $options = new stdClass();
-        $options->para = false;
-        $table->data[] = array($item_name, format_text(stripslashes($item), FORMAT_MOODLE, $options));
-
-        // Statistics
-        $item_name = get_string('statistics','assignment_onlinejudge').':';
-        $item = get_string('notavailable');
-        if (isset($submission->id)) {
-            $item = '';
-            $ac_rate = $this->get_statistics($submission, &$item);
-            if (!empty($item)) {
-                $item .= '<br />'.get_string('successrate', 'assignment_onlinejudge').': '.round($ac_rate*100, 2).'%';
-            }
+        if (!empty($lines)) {
+            $item = implode($lines, '<br />');
         }
         $table->data[] = array($item_name, $item);
 
@@ -576,14 +563,35 @@ class assignment_onlinejudge extends assignment_upload {
         return 0;
     }
 
-    function get_submission($userid=0, $createnew=false, $teachermodified=false) {
-        global $CFG, $DB;
+    function get_onlinejudge_result($submissionid) {
+        global $DB;
 
-        if ($submission = parent::get_submission($userid, $createnew, $teachermodified)) {
-            //TODO: Construct submission judge infos, such as status etc.
+        $sql = 'SELECT s.*
+                FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
+                ON s.testcase = t.id
+                WHERE s.submission = ? AND t.unused = 0 AND s.id IN (
+                    SELECT MAX(id)
+                    FROM {assignment_oj_submissions}
+                    WHERE submission = ?
+                    GROUP BY testcase)
+                ORDER BY s.testcase ASC';
+        $onlinejudges = $DB->get_records_sql($sql, array($submissionid, $submissionid)); 
+
+        $cases = array();
+        $result->judgetime = 0;
+        foreach ($onlinejudges as $oj) {
+            $task = onlinejudge2_get_task($oj->task);
+            $task->testcase = $oj->testcase;
+            $cases[] = $task;
+
+            if($task->judgetime > $result->judgetime)
+                $result->judgetime = $task->judgetime;
         }
 
-        return $submission;
+        $result->testcases = $cases;
+        $result->status = onlinejudge2_get_overall_status($cases);
+
+        return $result;
     }
 
     function update_submission($submission, $new_oj=false) {
@@ -680,24 +688,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Returns an array of installed programming languages indexed and sorted by name
-     *
-     * @return array The index is the name of the assignment type,the value its full name from the language strings
-     */
-    function get_languages() {
-        global $CFG;
-        
-        $lang = array ();
-
-        //TODO: Get languages from judgelib
-        $lang['example'] = 'Example';
-
-        asort($lang);
-        return $lang;
-    }
-
-
-    /**
      * return grade
      * status means ac, wa, pe and etc.
      * fraction means max fraction in modgrade, :-)
@@ -718,48 +708,6 @@ class assignment_onlinejudge extends assignment_upload {
 
         return $grades[$status];
     }
-
-
-    function merge_results($results, $testcases, $appends = null) {
-        $result = null;
-        $result->output = '';
-        $result->info = '';
-        $result->grade = 0;
-
-        reset($testcases);
-
-        $result->output = '';
-        foreach ($results as $i => $one) {
-            $testcase = each($testcases);
-            $result->output .= $one->output;
-
-            $result->info .= get_string('case', 'assignment_onlinejudge', $i+1).' '.get_string('status'.$one->status, 'assignment_onlinejudge');
-            if ($one->status === 'wa' && !empty($testcase['value']->feedback)) {
-                $result->info .= '('.$testcase['value']->feedback.')';
-            } else if ($one->status !== 'ac') {
-                $result->info .= '('.get_string('info'.$one->status, 'assignment_onlinejudge').')';
-            }
-            $result->info .= '<br />';
-
-            if (!empty($appends))
-                $result->info .= $appends[$i];
-
-            $grade = $this->grade_marker($one->status, $testcase['value']->subgrade);
-            if ($grade != -1)
-                $result->grade += $grade;
-
-            if ($i == 0)
-                $result->status = $one->status;
-            else if ($result->status !== $one->status)
-                $result->status = 'multiple';
-        }
-
-        //Make sure the grade is not too big
-        $result->grade = min($result->grade, $this->assignment->grade);
-
-        return $result;
-    }
-
 
     function cron() {
         //TODO: clean never unused testcases

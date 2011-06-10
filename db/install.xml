@@ -1,48 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge2/db" VERSION="20110329" COMMENT="XMLDB file for Moodle local/onlinejudge2"
+<XMLDB PATH="local/onlinejudge2/db" VERSION="20110610" COMMENT="XMLDB file for Moodle local/onlinejudge2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="onlinejudge_task" COMMENT="put the information into task table" NEXT="onlinejudge_result">
+    <TABLE NAME="onlinejudge2_tasks" COMMENT="Details of tasks">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="taskname"/>
-        <FIELD NAME="taskname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="task name" PREVIOUS="id" NEXT="judgename"/>
-        <FIELD NAME="judgename" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="the compiler name and language." PREVIOUS="taskname" NEXT="memlimit"/>
-        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="judgename" NEXT="cpulimit"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="coursemodule"/>
+        <FIELD NAME="coursemodule" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Related user" PREVIOUS="coursemodule" NEXT="language"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language" PREVIOUS="userid" NEXT="source"/>
+        <FIELD NAME="source" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Source code" PREVIOUS="language" NEXT="memlimit"/>
+        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="source" NEXT="cpulimit"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
-        <FIELD NAME="input" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="input" PREVIOUS="cpulimit" NEXT="output"/>
-        <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="output" PREVIOUS="input" NEXT="usefile"/>
-        <FIELD NAME="usefile" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="usefile?" PREVIOUS="output" NEXT="inputfile"/>
-        <FIELD NAME="inputfile" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="inputfile" PREVIOUS="usefile" NEXT="outputfile"/>
-        <FIELD NAME="outputfile" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="inputfile"/>
+        <FIELD NAME="input" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
+        <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="answer"/>
+        <FIELD NAME="answer" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="output" NEXT="compileonly"/>
+        <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="answer" NEXT="status"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="cpuusage"/>
+        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="status" NEXT="memusage"/>
+        <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
+        <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
+        <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="coursemodule"/>
+        <KEY NAME="coursemodule" TYPE="foreign" FIELDS="coursemodule" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="coursemodule"/>
       </KEYS>
-    </TABLE>
-    <TABLE NAME="onlinejudge_result" COMMENT="the result task" PREVIOUS="onlinejudge_task">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="taskid"/>
-        <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="foreign key reference to task.id" PREVIOUS="id" NEXT="taskname"/>
-        <FIELD NAME="taskname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="taskid" NEXT="judgename"/>
-        <FIELD NAME="judgename" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskname" NEXT="memlimit"/>
-        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="judgename" NEXT="cpulimit"/>
-        <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu." PREVIOUS="memlimit" NEXT="input"/>
-        <FIELD NAME="input" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="cpulimit" NEXT="output"/>
-        <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="input" NEXT="usefile"/>
-        <FIELD NAME="usefile" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="output" NEXT="inputfile"/>
-        <FIELD NAME="inputfile" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="usefile" NEXT="outputfile"/>
-        <FIELD NAME="outputfile" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="inputfile" NEXT="judged"/>
-        <FIELD NAME="judged" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="judged or not" PREVIOUS="outputfile" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="success or fail or exception" PREVIOUS="judged" NEXT="info"/>
-        <FIELD NAME="info" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="extra information to describe the status." PREVIOUS="status" NEXT="starttime"/>
-        <FIELD NAME="starttime" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="info" NEXT="endtime"/>
-        <FIELD NAME="endtime" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="starttime"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
