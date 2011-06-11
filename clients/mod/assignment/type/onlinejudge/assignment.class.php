@@ -694,9 +694,9 @@ class assignment_onlinejudge extends assignment_upload {
 
         $source = array();
         $fs = get_file_storage();
-        $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id);
+        $files = $fs->get_directory_files($this->context->id, 'mod_assignment', 'submission', $submission->id, '/', true, false);
         foreach ($files as $file) {
-            $source[$file->get_filename()] = $file->get_content();
+            $source[] = $file->get_pathname_hash();
         }
 
         onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $source, $oj);
