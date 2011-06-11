@@ -9,17 +9,17 @@ require_once("judgelib.php");
 global $CFG, $DB;
 //sub是封装的数据包
 $task = new stdClass();
-$cm = 1;
-$user = 1;
-$language = 'c_sandbox';
-$source = '#include "stdio.h" 
-               int main()
-               {
-                   int a, b;
-                   scanf("%d%d",&a,&b);
-                   printf("%d",a+b);
-                   return 0;
-               }
+$cm = 2;
+$user = 2;
+$language = 'c_ideone';
+$source = '#include <stdio.h>
+int main(void)
+{
+    int a, b;
+    while (scanf("%d %d", &a, &b)==2)
+        printf("%d\n",a+b);
+    return 0;
+
 ';
 
 $task->cpulimit = 1;
@@ -35,10 +35,23 @@ $task->cpuusage = $task->cpulimit;
 $task->memusage = $task->memusage;
 $task->submittime = null;
 $task->judgetime = null;
+$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
+$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
+$task->onlinejudge2_ideone_delay = 100;
+
 
 $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
-echo $result->status;
-echo $result->info_teacher;
+//echo $result->status;
+echo "<br>";
+//echo $result->info_teacher;
+echo "<br>";
+//echo microtime($result->submittime);
+echo gmdate("d-M-Y h:i:s A",$result->submittime);
+echo "<br>";
+echo gmdate("d-M-Y h:i:s A",$result->judgetime);
+echo "<br>";
+echo $result->answer;
+
 
 
 

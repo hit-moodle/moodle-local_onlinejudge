@@ -83,51 +83,44 @@ class judge_ideone extends judge_base
     
     /**
      * 
-     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
-     * @param integer $id
+     * translate the language(cpp_ideone) into the interger id, that 
+     * can be identified by ideone.com compiler. 
+     * @param language id the name of language, such as cpp_ideone
+     * @return id of language, such as 1 if $language is cpp_ideone.
      */
-    function translator($id)
+    function translator($language)
     {
-        $lang_temp = array();
-        //将数组的键值调换，存入temp数组
-        $lang_temp = array_flip($this->langs);
-        //获取翻译后的编译语言，比如‘c_ideone’变成‘c’
-        $selected_lang = substr($lang_temp[$id],0,strrpos($lang_temp[$id],'_'));
-        
-        
-        return $selected_lang;        
+        global $supported_langs;
+        $id = false;
+        if(in_array($language, array_flip($supported_langs))) {
+            return $supported_langs[$language]; 
+        }
+        echo get_string('nosuchlanguage', 'local_onlinejudge2');
+        return $id;     
     }
     
     function judge($task)
     {
-    	//get the username and password form param compiler.
-    	//onelinejude_ideone_username and onlinejudge_ideone_password
-    	//are defined in file config.php in the root. 
-    	$user = $CFG->onlinejudge_ideone_username;
-    	$pass = $CFG->onlinejudge_ideone_password;
+    	global $DB;
+    	//get the username and password from param..
+    	$user = $task->onlinejudge2_ideone_username;
+    	$pass = $task->onlinejudge2_ideone_password;
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
-        /**
-         *  0=>'nr' : not running – the paste has been created 
-            with run parameter set to false
-         * 11=>'ce' : compilation error – the program could not 
-            be executed due to compilation errors
-         * 12=>'re' : runtime error – the program finished 
-            because of  the runtime error, for example: 
-            division by zero,  array index out of bounds, uncaught exception
-         * 13=>‘tle’： time limit exceeded – the program didn't 
-            stop before the time limit
-         * 15=>'ok' : success – everything went ok
-         * 17=>'mle': memory limit exceeded – the program tried 
-            to use more memory than it is allowed
-         * 19=>'rf' : illegal system call – the program tried to call 
-            illegal system function
-         * 20=>'ie' : internal error – some problem occurred on 
-            ideone.com; try to submit the paste again and if that fails too, 
-            then please contact us at contact@ideone.com
-         */
-
-        $source = $cases; // source code of the paste.
-        $status = array(
+        
+        // source code of the paste.
+        $source = $task->source;
+        /*
+         *  0=>'nr' : not running 
+         * 11=>'ce' : compilation error 
+         * 12=>'re' : runtime error
+         * 13=>‘tle’： time limit exceeded 
+         * 15=>'ok' : success
+         * 17=>'mle': memory limit exceeded
+         * 19=>'rf' : illegal system call
+         * 20=>'ie' : internal error 
+         */    
+        
+        $status_ideone = array(
                 0   => 'nr',
                 11  => 'ce',
                 12  => 're',
@@ -137,104 +130,166 @@ class judge_ideone extends judge_base
                 19  => 'rf',
                 20  => 'ie'
             );
+        //result class
+        $result = new stdClass();
         $result  = false;
+        
+        //packing the data will be inserted into database
+        $record = new stdClass();
+        $record->coursemodule = $task->cm;
+        $record->userid = $task->user;
+        $record->language = $task->language;
+        $record->source = $task->source;
+        $record->memlimit = $task->memlimit;
+        $record->cpulimit = $task->cpulimit;    
+        $record->input = $task->input;
+        $record->output = $task->output;
+        $record->compileonly = $task->compileonly;
+        $record->status = $task->status;
+        $record->submittime = $task->submittime;
+        
+        // id is the database record.
+        $id = false;
         try { 
 	        // Begin soap
             // Submit all cases first to save time.
-            $links = array();
-            // loop: get data from database table onlinejudge_task.
-            global $DB;
-            $tasks = $DB->get_records($CFG->prefix.'onlinejudge_task');
-            foreach ($tasks as $task) {
-                /**
-                 * function createSubmission create a paste.
-                 * @param user is the user name.
-                 * @param pass is the user's password.
-                 * @param source is the source code of the paste.
-                 * @param language is language identifier. these identifiers can be 
-                 *     retrieved by using the getLanguages methods.
-                 * @param input is the data that will be given to the program on the stdin
-                 * @param run is the determines whether the source code should be executed.
-                 * @param private is the determines whether the paste should be private.   
-                 *     Private pastes do not appear on the recent pastes page on ideone.com. 
-                 *     Notice: you can only set submission's visibility to public or private through
-                 *     the API (you cannot set the user's visibility).
+            $link = null;
+            
+            //get the language id ,cpp_ideone as 21
+            $language = $this->translator($task->language);
+            /**
+             * function createSubmission create a paste.
+             * @param user is the user name.
+             * @param pass is the user's password.
+             * @param source is the source code of the paste.
+             * @param language is language identifier. these identifiers can be 
+             *     retrieved by using the getLanguages methods.
+             * @param input is the data that will be given to the program on the stdin
+             * @param run is the determines whether the source code should be executed.
+             * @param private is the determines whether the paste should be private.   
+             *     Private pastes do not appear on the recent pastes page on ideone.com. 
+             *     Notice: you can only set submission's visibility to public or private through
+             *     the API (you cannot set the user's visibility).
+             * @return array(
+             *         error => string
+             *         link  => string
+             *     )
+             */
+            $webid = $client->createSubmission($user,$pass,$source,$language,$task->input,true,true);     
+            if ($webid['error'] == 'OK') {
+                $link = $webid['link'];
+            }
+            else {
+                echo get_string('createsubmissionerror', 'local_onlinejudge2');
+                $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+                $result->info_teacher = $webid['error'];
+                $result->info_student = $webid['error'];
+                //return $result;
+                $record->status = $result->status;
+                $record->info_teacher = $result->info_teacher;
+                $record->info_student = $result->info_student;
+                $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+
+                return $id;
+            }
+            // Get ideone results
+            $delay = $task->onlinejudge2_ideone_delay;
+            $i = 0;
+            while(1){
+                if ($delay > 0) {
+                    sleep($delay); 
+                    $delay = ceil($delay / 2);
+                }
+                $status = $client->getSubmissionStatus($user, $pass, $link);
+               // echo "status:".print_r($status);
+                /*status's id
+                 *  0 => done
+                 * <0 => waiting for compilation
+                 *  1 => compilation, being compiled
+                 *  3 => running.
                  */
-    	        $webid = $client->createSubmission($user,$pass,$source,translator($task['judgeName']),$task->input,true,true);     
-                if ($webid['error'] == 'OK')
-                    $links[] = $webid['link'];
+                if($status['status'] == 0) {
+                    $delay = 0;
+                    break;
+                }
+            }
+            
+            $details = $client->getSubmissionDetails($user,$pass,$link,false,true,true,true,true,false); 
+            echo "details:<br>";
+            print_r($details);
+            $result->status = $status_ideone[$details['result']];
+            
+            if ($result->status == 'ce' || $task->compileonly) {
+                if ($result->status != 'ce' && $result->status != 'ie') {
+                    //change status to global status.
+                    $result->status = ONLINEJUDGE2_STATUS_COMPILATION_OK;
+                }
                 else {
-                    $result->status = 'ie';
-                    $result->info = $webid['error'];
-                    return $result;
+                    //change status to global status.
+                	$result->status = ONLINEJUDGE2_STATUS_COMPILATION_ERROR;
                 }
-                // Get ideone results
-                //onlinejudge_ideone_delay在config.php文件中自己定义,他是表示ideone网站检测的延迟。
-                $delay = $CFG->onlinejudge_ideone_delay;
-                $i = 0;
-                $results = array();
-                foreach ($cases as $case) 
-                {
-                    while(1)
-                    {
-                        if ($delay > 0) 
-                        {
-                            sleep($delay); 
-                            $delay = ceil($delay / 2);
-                        }
-                        $status = $client->getSubmissionStatus($user, $pass, $links[$i]);
-                        if($status['status'] == 0) 
-                        {
-                            $delay = 0;
-                            break;
-                        }
-                    }
-                   /**
-                    * 
-                    * function getSubmissionDetails retrieve detailed information about 
-                    * the execution of the program.
-                    */
-                    $details = $client->getSubmissionDetails($user,$pass,$links[$i],false,true,true,true,true,false);         
-
-                    $result->status = $status_ideone[$details['result']];
-                    // If got ce or compileonly, don't need to test other case
-                    if ($result->status == 'ce' || $this->onlinejudge->compileonly) 
-                    {
-                        if ($result->status != 'ce' && $result->status != 'ie')
-                            $result->status = 'compileok';
-                        $result->info = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
-                        $result->grade = $this->grade_marker('ce', $this->assignment->grade);
-                        return $result;
-                    }
-
-                    // Check for wa, pe, tle, mle or accept
-                    if ($result->status == 'ok') 
-                    {
-                        if ($details['time'] > $this->onlinejudge->cpulimit)
-                            $result->status = 'tle';
-                        else if ($details['memory']*1024 > $this->onlinejudge->memlimit)
-                            $result->status = 'mle';
-                        else 
-                        {
-                            $result->output = $details['output'];
-                            $result->status = $this->diff($case->output, $result->output);
-                        }
-                    }
-
-                    $results[] = $result;
-                    unset($result);
-                    $i++;
+                //echo $result->status;
+                $result->info_teacher = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
+                $result->info_student = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
+                //return $result;
+                
+                $record->status = $result->status;
+                $record->info_teacher = $result->info_teacher;
+                $record->info_student = $result->info_student;
+                $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+                return $id;             
+            }
+            
+            // Check for wa, pe, tle, mle or accept
+            if ($result->status == 'ok') {
+                if ($details['time'] > $task->cpulimit) {
+                    //change status
+                    $result->status = ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED;
                 }
-            } 
-        }catch(SoapFault $sf) {
-            $result->status = 'ie';
-            $result->info = 'faultcode='.$sf->faultcode.'|faultstring='.$sf->faultstring;
-            return $result;
-        } 
-        //这里代码原先是用了作业模块，也需要修改
-        $result = $this->merge_results($results, $cases);
-        $result->info .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
-        return $result;    
+                else if ($details['memory']*1024 > $task->memlimit) {
+                    //change status
+                    $result->status = ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED;
+                }
+                   
+                else {
+                    $result->status = ONLINEJUDGE2_STATUS_COMPILATION_OK;
+                    $result->output = $details['output'];
+                    $result->memusage = $details['memory'];
+                    //date format: YYYY-MM-DD HH-MM-SS eg:2011-06-11 14-52-50
+                    //$result->judgetime = $details['date'];
+                    $result->judgetime = $details['time']+$task->submittime;
+                    echo "<br> 即将进行结果和用例输出的diff。。。当前status是$result->status<br>";
+                    $result->status = $this->diff($case->output, $result->output);
+                }
+            }           
+        }catch (SoapFault $ex) {
+            $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+            $result->info_teacher = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
+            $result->info_student = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
+            //return $result;
+            
+            $record->status = $result->status;
+            $record->info_teacher = $result->info_teacher;
+            $record->info_student = $result->info_student;
+            $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+
+            return $id;
+        }
+        
+        $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+        $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
+        
+        //return $result;
+        $record->status = $result->status;
+        $record->info_teacher = $result->info_teacher;
+        $record->info_student = $result->info_student;
+        $record->memusage = $result->memusage;
+        $record->answer = $result->output;
+        $record->judgetime = $result->judgetime;
+        $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+        
+        return $id;
+        
     echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
 by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
     }

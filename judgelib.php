@@ -223,7 +223,9 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
             $task->status = ONLINEJUDGE2_STATUS_PENDING;
             $task->submittime = time();
             $task->error = $error;
-            
+            $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
+            $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
+            $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
             //get the id
             $id = $judge_obj->judge($task);
             //echo $id;
