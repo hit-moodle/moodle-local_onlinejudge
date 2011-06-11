@@ -12,13 +12,14 @@
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
     $string['cpulimit'] = 'Maximum CPU time';
+    $string['createsubmissionerror'] = 'There is an error during create submission ,ideone';
     $string['denytoreadfile'] = 'You have not the permission to read this file.';
     $string['descratiope'] = 'Grade of presentation error is equal to testcast\'s max grade times this ratio';
     $string['download'] = 'Download ';
     $string['duejudge'] = 'Judge after due date';
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
     $string['filereaderror'] = 'Can not read this file';
-    $string['ideonelogo'] = '<a href=\"http://code.google.com/p/sunner-projects/wiki/OnlineJudgeAssignmentType\">Moodle Online Judge</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
+    $string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge2\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
     $string['info'] = 'Information';
     $string['infoat'] = 'A good program must return 0 if no error occur.';
     $string['infocompileok'] = 'It seems that the compiler likes your code.';
@@ -95,6 +96,7 @@
     $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
     $string['nosuchrecord'] = 'There is no such record in database';
+    $string['nosuchlanguage'] = 'There is no such supported language';
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
     $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';

@@ -94,7 +94,8 @@ class judge_sandbox extends judge_base {
             if (!is_executable($compiler)) {
                 echo get_string('cannotruncompiler', 'local_onlinejudge2');
                 $result->status = 'ie';
-                $result->info = get_string('cannotruncompiler', 'local_onlinejudge2');
+                $result->info_teacher = get_string('cannotruncompiler', 'local_onlinejudge2');
+                $result->info_student = get_string('cannotruncompiler', 'local_onlinejudge2');
                 //break;
             }
         
@@ -235,7 +236,7 @@ class judge_sandbox extends judge_base {
             1 => array('file', $exec_file.'.out', 'w'),  // stdout is a file that the child will write to
             2 => array('file', $exec_file.'.err', 'w') // stderr is a file that the child will write to
         );
-        
+        $ret->judgetime = time();
         //echo $sand;
         //执行sand命令行，打开文件指针，用于输入输出,返回表示进程的资源
         $proc = proc_open($sand, $descriptorspec, $pipes);
@@ -269,7 +270,6 @@ class judge_sandbox extends judge_base {
             exit();
         }
         
-        $ret->judgetime = time();
         //比较结果和用例输出
         $ret->status = $this->diff($case->output, $ret->output);
         
