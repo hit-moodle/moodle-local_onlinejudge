@@ -184,10 +184,9 @@ function onlinejudge2_get_language_name($language) {
  * @param string $language ID of the language
  * @param string $source Source code
  * @param object $options include input, output and etc. 
- * @param string $error error message if error occurs
  * @return id of the task or false
  */
-function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$error) {
+function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
     global $judgeclasses, $CFG;
 	//TODO: complete this function
     $id = false; //return id
@@ -241,27 +240,8 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options, &$er
  */
 function onlinejudge2_get_task($taskid) {
     global $DB;
-    $result = new stdClass();
-    $result = null;
-    //TODO: to be real
-    $result = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
-    
-    if($result->status == ONLINEJUDGE2_STATUS_JUDGING) {
-    	//judging...
-        echo get_string('status22', 'local_onlinejudge2');
-        $result = null;
-    }
-    return $result;
-    
 
-    /*
-    if ($taskid == 2)
-        $result->status = ONLINEJUDGE2_STATUS_ACCEPTED;
-    else
-        $result->status = ONLINEJUDGE2_STATUS_WRONG_ANSWER;
-
-    $result->judgetime = 1234567890;
-    */
+    return $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
 }
 
 /**
@@ -274,6 +254,9 @@ function onlinejudge2_get_overall_status($tasks) {
 
     $status = 0;
     foreach ($tasks as $task) {
+        if (is_null($task)) // We can't give out any status on null task
+            return 0;
+
         if ($status == 0) {
             $status = $task->status;
         } else if ($status != $task->status) {

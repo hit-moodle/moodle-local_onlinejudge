@@ -491,7 +491,7 @@ class assignment_onlinejudge extends assignment_upload {
         // Judge time
         $item_name = get_string('judgetime','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (isset($result->judgetime)) {
+        if (!empty($result->judgetime)) {
             $item = userdate($result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $result->judgetime)) . ')';
         }
         $table->data[] = array($item_name, $item);
@@ -503,7 +503,8 @@ class assignment_onlinejudge extends assignment_upload {
         $i = 1;
         $lines = array();
         foreach ($result->testcases as $case) {
-            $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.onlinejudge2_get_status_name($case->status);
+            if (!is_null($case))
+                $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge2');
             $i++;
         }
         if (!empty($lines)) {
@@ -580,12 +581,15 @@ class assignment_onlinejudge extends assignment_upload {
         $cases = array();
         $result->judgetime = 0;
         foreach ($onlinejudges as $oj) {
-            $task = onlinejudge2_get_task($oj->task);
-            $task->testcase = $oj->testcase;
-            $cases[] = $task;
+            if ($task = onlinejudge2_get_task($oj->task)) {
+                $task->testcase = $oj->testcase;
+                $cases[] = $task;
 
-            if($task->judgetime > $result->judgetime)
-                $result->judgetime = $task->judgetime;
+                if($task->judgetime > $result->judgetime)
+                    $result->judgetime = $task->judgetime;
+            } else {
+                $cases[] = null;
+            }
         }
 
         $result->testcases = $cases;
@@ -681,10 +685,21 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Send judge request to judgelib
+     * Send judge task request to judgelib
      */
     function request_judge($submission) {
-        //TODO: final
+        global $DB;
+
+        $oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
+
+        $source = array();
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id);
+        foreach ($files as $file) {
+            $source[$file->get_filename()] = $file->get_content();
+        }
+
+        onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $source, $oj);
     }
 
     /**
