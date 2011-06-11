@@ -100,6 +100,35 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
     if ($oldversion < 2011060700) {
 
+        // migrate input and output files
+        $fs = get_file_storage();
+
+        $sqlfrom = "FROM {assignment_oj_testcases} t
+                    JOIN {assignment} a ON a.id = t.assignment
+                    JOIN {modules} m ON m.name = 'assignment'
+                    JOIN {course_modules} cm ON (cm.module = m.id AND cm.instance = a.id)";
+
+        $rs = $DB->get_recordset_sql("SELECT t.id, t.assignment, a.course, cm.id AS cmid, t.inputfile, t.outputfile $sqlfrom WHERE t.usefile = 1 ORDER BY a.course, t.assignment");
+
+        if ($rs->valid()) {
+            foreach ($rs as $testcase) {
+                $srccontext = get_context_instance(CONTEXT_COURSE, $testcase->course);
+                $dstcontext = get_context_instance(CONTEXT_MODULE, $testcase->cmid);
+
+                $file = $fs->get_file($srccontext->id, 'course', 'legacy', 0, '/'.dirname($testcase->inputfile).'/', basename($testcase->inputfile));
+                if ($file) {
+                    $file_record = array('contextid'=>$dstcontext->id, 'component'=>'mod_assignment', 'filearea'=>'onlinejudge_input', 'itemid'=>$testcase->id, 'filepath'=>'/', 'filename'=>basename($testcase->inputfile));
+                    $fs->create_file_from_storedfile($file_record, $file);
+                }
+
+                $file = $fs->get_file($srccontext->id, 'course', 'legacy', 0, '/'.dirname($testcase->outputfile).'/', basename($testcase->outputfile));
+                if ($file) {
+                    $file_record = array('contextid'=>$dstcontext->id, 'component'=>'mod_assignment', 'filearea'=>'onlinejudge_output', 'itemid'=>$testcase->id, 'filepath'=>'/', 'filename'=>basename($testcase->outputfile));
+                    $fs->create_file_from_storedfile($file_record, $file);
+                }
+            }
+        }
+
         // Define field unused to be added to assignment_oj_testcases
         $table = new xmldb_table('assignment_oj_testcases');
         $field = new xmldb_field('unused', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'subgrade');
