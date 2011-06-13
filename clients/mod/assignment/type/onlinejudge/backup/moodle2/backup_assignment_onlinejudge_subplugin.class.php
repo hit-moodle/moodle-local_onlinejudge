@@ -16,29 +16,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * @package local_onlinejudge
  * @subpackage backup-moodle2
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @copyright 2011 onwards Sun Zhigang (sunner) {@link http://sunner.cn}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * backup subplugin class that provides the necessary information
- * needed to backup one assignment->offline subplugin.
- *
- * Note: Offline assignments really haven't any special subplugin
- * information to backup/restore, hence code below is skipped (return false)
- * but it's a good example of sublugins supported at different
- * elements (assignment and submission) and conditions
+ * needed to backup one assignment->onlinejudge subplugin.
  */
-class backup_assignment_offline_subplugin extends backup_subplugin {
+class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
 
     /**
      * Returns the subplugin information to attach at assignment element
      */
     protected function define_assignment_subplugin_structure() {
-
-        return false; // This subplugin backup is only one example. Skip it.
 
         /**
          * Any activity sublugins is always rooted by one backup_subplugin_element()
@@ -53,59 +47,73 @@ class backup_assignment_offline_subplugin extends backup_subplugin {
 
         /**
          * Here we are defining the information that will be attached, within the "assignment" element
-         * when assignments of type "offline" are sent to backup, so we define the backup_subplugin_element
+         * when assignments of type "onlinejudge" are sent to backup, so we define the backup_subplugin_element
          * as not having any final element (null) and with the condition of the '/assignment/assignmenttype'
-         * being 'offline' (that will be checked on execution)
+         * being 'onlinejudge' (that will be checked on execution)
          *
          * Note that, while, we allow direct "injection" of final_elements at the "assignment" level (without
          * any nesting, we usually pass 'null', and later enclose the real subplugin information into deeper
          * levels (get_recommended_name() and 'config' in the example below). That will make things
          * on restore easier, as far as subplugin information will be clearly separated from module information.
          */
-        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'offline');
+        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
 
         /**
          * Here we define the real structure the subplugin is going to generate - see note above. Obviously the
          * example below hasn't sense at all, we are exporting the whole config table that is 100% unrelated
          * with assignments. Take it as just one example. The only important bit is that it's highly recommended to
          * use some exclusive name in the main nested element (something that won't conflict with other subplugins/parts).
-         * So we are using 'subplugin_assignment_offline_assignment' as name here (the type of the subplugin, the name of the
+         * So we are using 'subplugin_assignment_onlinejudge' as name here (the type of the subplugin, the name of the
          * subplugin and the name of the connection point). get_recommended_name() will help, in any case ;-)
          *
          * All the code below is 100% standard backup structure code, so you define the structure, the sources,
          * annotations... whatever you need
          */
         $assassoff = new backup_nested_element($this->get_recommended_name());
-        $config = new backup_nested_element('config', null, array('name', 'value'));
+        $onlinejudge = new backup_nested_element('onlinejudge', array('id'), array('language', 'memlimit', 'cpulimit', 'compileonly', 'ratiope', 'ideoneuser', 'ideonepass'));
+        $testcase = new backup_nested_element('testcase', array('id'), array('input', 'output', 'usefile', 'feedback', 'subgrade', 'unused'));
 
         $subplugin->add_child($assassoff);
-        $assassoff->add_child($config);
+        $assassoff->add_child($onlinejudge);
+        $assassoff->add_child($testcase);
 
-        $config->set_source_table('config', array('id' => '/assignment/id'));
+        $onlinejudge->set_source_table('assignment_oj', array('assignment' => backup::VAR_PARENTID));
+        $testcase->set_source_table('assignment_oj_testcases', array('assignment' => backup::VAR_PARENTID));
+
+        $testcase->annotate_files('mod_assignment', 'onlinejudge_input', 'id');
+        $testcase->annotate_files('mod_assignment', 'onlinejudge_output', 'id');
 
         return $subplugin; // And we return the root subplugin element
     }
 
     /**
      * Returns the subplugin information to attach at submission element
+     *
+     * TODO: the function is not tested fully
      */
     protected function define_submission_subplugin_structure() {
 
-        return false; // This subplugin backup is only one example. Skip it.
-
         // remember this has not XML representation
-        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'offline');
+        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
 
         // type of the subplugin, name of the subplugin and name of the connection point (recommended)
         $asssuboff = new backup_nested_element($this->get_recommended_name());
-        // Why 'submission_config' name? Because it must be unique in the hierarchy and we
-        // already are using 'config' above withing the same file
-        $config = new backup_nested_element('submission_config', null, array('name', 'value'));
+        // onlinejudge assignment type does not copy task details. So must backup from local onlinejudge
+        $task = new backup_nested_element('task', array('id'), array('userid', 'language'  /* TODO: fill up*/));
+        $oj_submissions = new backup_nested_element('onlinejudge_submission', array('id'), array('testcase', 'task'));
 
         $subplugin->add_child($asssuboff);
-        $asssuboff->add_child($config);
+        $asssuboff->add_child($task);
+        $asssuboff->add_child($oj_submissions);
 
-        $config->set_source_table('config', array('id' => backup::VAR_PARENTID));
+        $task->set_source_sql('
+            SELECT *
+            FROM {onlinejudge2_tasks}
+            WHERE coursemodule = ?',
+            array(backup::VAR_MODID));
+        $oj_submissions->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
+
+        $task->annotate_ids('user', 'userid');
 
         return $subplugin; // And we return the root subplugin element
     }
