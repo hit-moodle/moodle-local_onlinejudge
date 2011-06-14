@@ -40,8 +40,3 @@ function onlinejudge2_extends_navigation(global_navigation $navigation) {
 
 
 
-
-
-
-
-
