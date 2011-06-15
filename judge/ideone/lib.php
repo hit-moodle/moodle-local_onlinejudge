@@ -102,6 +102,30 @@ class judge_ideone extends judge_base
     function judge($task)
     {
     	global $DB;
+    	
+    	//previously insert into database.
+        $record = new stdClass();
+        //update the record, mainly update status.
+        $update_record = new stdClass();
+        //the final record updated
+        $final_record = new stdClass();
+        
+        //packing the data.
+        $record->coursemodule = $task->cm;
+        $record->userid = $task->user;
+        $record->language = $task->language;
+        $record->source = $task->source;
+        $record->memlimit = $task->memlimit;
+        $record->cpulimit = $task->cpulimit;    
+        $record->input = $task->input;
+        $record->output = $task->output;
+        $record->compileonly = $task->compileonly;
+        $record->status = $task->status;
+        $record->submittime = $task->submittime;
+
+        $id = false;        
+        $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+    	
     	//get the username and password from param..
     	$user = $task->onlinejudge2_ideone_username;
     	$pass = $task->onlinejudge2_ideone_password;
@@ -133,23 +157,7 @@ class judge_ideone extends judge_base
         //result class
         $result = new stdClass();
         $result  = false;
-        
-        //packing the data will be inserted into database
-        $record = new stdClass();
-        $record->coursemodule = $task->cm;
-        $record->userid = $task->user;
-        $record->language = $task->language;
-        $record->source = $task->source;
-        $record->memlimit = $task->memlimit;
-        $record->cpulimit = $task->cpulimit;    
-        $record->input = $task->input;
-        $record->output = $task->output;
-        $record->compileonly = $task->compileonly;
-        $record->status = $task->status;
-        $record->submittime = $task->submittime;
-        
-        // id is the database record.
-        $id = false;
+       
         try { 
 	        // Begin soap
             // Submit all cases first to save time.
@@ -175,7 +183,26 @@ class judge_ideone extends judge_base
              *         link  => string
              *     )
              */
-            $webid = $client->createSubmission($user,$pass,$source,$language,$task->input,true,true);     
+            $webid = $client->createSubmission($user,$pass,$source,$language,$task->input,true,true); 
+
+            //update database.
+            $update_record->id = $id;
+            $update_record->coursemodule = $task->cm;
+            $update_record->userid = $task->user;
+            $update_record->language = $task->language;
+            $update_record->source = $task->source;
+            $update_record->memlimit = $task->memlimit;
+            $update_record->cpulimit = $task->cpulimit;    
+            $update_record->input = $task->input;
+            $update_record->output = $task->output;
+            $update_record->compileonly = $task->compileonly;
+            //set status to judging.
+            $update_record->status = ONLINEJUDGE2_STATUS_JUDGING;
+            $update_record->submittime = $task->submittime;
+            if(!$DB->update_record('onlinejudge2', $update_record)) {
+                echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+            }
+            
             if ($webid['error'] == 'OK') {
                 $link = $webid['link'];
             }
@@ -184,12 +211,28 @@ class judge_ideone extends judge_base
                 $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
                 $result->info_teacher = $webid['error'];
                 $result->info_student = $webid['error'];
+                
                 //return $result;
-                $record->status = $result->status;
-                $record->info_teacher = $result->info_teacher;
-                $record->info_student = $result->info_student;
-                $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-
+                //update database.
+                $final_record->id = $id;
+                $final_record->coursemodule = $task->cm;
+                $final_record->userid = $task->user;
+                $final_record->language = $task->language;
+                $final_record->source = $task->source;
+                $final_record->memlimit = $task->memlimit;
+                $final_record->cpulimit = $task->cpulimit;    
+                $final_record->input = $task->input;
+                $final_record->output = $task->output;
+                $final_record->compileonly = $task->compileonly;
+                //set status to result status.
+                $final_record->status = $result->status;
+                $final_record->submittime = $task->submittime;
+                $final_record->info_teacher = $result->info_teacher;
+                $final_record->info_student = $result->info_student;
+                //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+                if(!$DB->update_record('onlinejudge2', $final_record)) {
+                    echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+                }
                 return $id;
             }
             // Get ideone results
@@ -233,10 +276,27 @@ class judge_ideone extends judge_base
                 $result->info_student = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
                 //return $result;
                 
-                $record->status = $result->status;
-                $record->info_teacher = $result->info_teacher;
-                $record->info_student = $result->info_student;
-                $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+                //return $result;
+                //update database.
+                $final_record->id = $id;
+                $final_record->coursemodule = $task->cm;
+                $final_record->userid = $task->user;
+                $final_record->language = $task->language;
+                $final_record->source = $task->source;
+                $final_record->memlimit = $task->memlimit;
+                $final_record->cpulimit = $task->cpulimit;    
+                $final_record->input = $task->input;
+                $final_record->output = $task->output;
+                $final_record->compileonly = $task->compileonly;
+                //set status to result status.
+                $final_record->status = $result->status;
+                $final_record->submittime = $task->submittime;
+                $final_record->info_teacher = $result->info_teacher;
+                $final_record->info_student = $result->info_student;
+                //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+                if(!$DB->update_record('onlinejudge2', $final_record)) {
+                    echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+                }
                 return $id;             
             }
             
@@ -267,28 +327,58 @@ class judge_ideone extends judge_base
             $result->info_teacher = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
             $result->info_student = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
             //return $result;
-            
-            $record->status = $result->status;
-            $record->info_teacher = $result->info_teacher;
-            $record->info_student = $result->info_student;
-            $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-
+            //update database.
+            $final_record->id = $id;
+            $final_record->coursemodule = $task->cm;
+            $final_record->userid = $task->user;
+            $final_record->language = $task->language;
+            $final_record->source = $task->source;
+            $final_record->memlimit = $task->memlimit;
+            $final_record->cpulimit = $task->cpulimit;    
+            $final_record->input = $task->input;
+            $final_record->output = $task->output;
+            $final_record->compileonly = $task->compileonly;
+            //set status to result status.
+            $final_record->status = $result->status;
+            $final_record->submittime = $task->submittime;
+            $final_record->info_teacher = $result->info_teacher;
+            $final_record->info_student = $result->info_student;
+            //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+            if(!$DB->update_record('onlinejudge2', $final_record)) {
+                echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+            }
             return $id;
+        
         }
         
         $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         
         //return $result;
-        $record->status = $result->status;
-        $record->info_teacher = $result->info_teacher;
-        $record->info_student = $result->info_student;
-        $record->memusage = $result->memusage;
-        $record->answer = $result->output;
-        $record->judgetime = $result->judgetime;
-        $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-        
+        //update database.
+        $final_record->id = $id;
+        $final_record->coursemodule = $task->cm;
+        $final_record->userid = $task->user;
+        $final_record->language = $task->language;
+        $final_record->source = $task->source;
+        $final_record->memlimit = $task->memlimit;
+        $final_record->cpulimit = $task->cpulimit;    
+        $final_record->input = $task->input;
+        $final_record->output = $task->output;
+        $final_record->compileonly = $task->compileonly;
+        //set status to result status.
+        $final_record->status = $result->status;
+        $final_record->submittime = $task->submittime;
+        $final_record->info_teacher = $result->info_teacher;
+        $final_record->info_student = $result->info_student;
+        $final_record->memusate = $result->memusage;
+        $final_record->answer = $result->output;
+        $final_record->judgetime = $result->judgetime;
+        if(!$DB->update_record('onlinejudge2', $final_record)) {
+            echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+        }
         return $id;
+   // }
         
     echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
 by <a href='http://sphere-research.com'>Sphere Research Labs</a>";

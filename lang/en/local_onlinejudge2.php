@@ -8,6 +8,7 @@
     $string['badtestcasefile'] = 'This file does not exist or can not be read';
     $string['cannotruncompiler'] = 'Can not execute the script of compiler';
     $string['case'] = 'Case $a:';
+    $string['cannotupdaterecord'] = 'cannot update such record in database.';
     $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';

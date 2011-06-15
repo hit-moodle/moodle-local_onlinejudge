@@ -191,7 +191,7 @@ function onlinejudge2_get_language_name($language) {
  * @return id of the task or false
  */
 function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
-    global $judgeclasses, $CFG;
+    global $judgeclasses, $CFG, $DB;
 	//TODO: complete this function
     $id = false; //return id
     //get the languages.
@@ -231,12 +231,15 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
             //get the id
             $id = $judge_obj->judge($task);
-            //echo $id;
+            
+            //save the task into database
+            //$id = $DB->insert_record('onlinejudge2_tasks', $task, true);         
         }
     }
     
     return $id;
 }
+
 
 /**
  * Return detail of the task
@@ -246,8 +249,16 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
  */
 function onlinejudge2_get_task($taskid) {
     global $DB;
+    $result = new stdClass();
+    $result = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
 
-    return $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
+    if($result->status == ONLINEJUDGE2_STATUS_JUDGING) {
+        echo get_string('status22', 'local_onlinejudge2');
+        return null;
+    }
+    else {
+        return $result;
+    }
 }
 
 /**
