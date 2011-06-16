@@ -305,21 +305,20 @@ class assignment_onlinejudge extends assignment_upload {
 
     /**
      * Rejudge all submissions
-     * return bool Success
+     *
+     * @return bool
      */
     function rejudge_all() {
-        global $CFG, $DB;
+        global $DB;
 
-        $sql = 'UPDATE '.
-            $CFG->prefix.'assignment_oj_submissions '.
-            'SET '.
-            'judged = 0 '.
-            'WHERE '.
-            'submission in '.
-            '(SELECT id FROM '.$CFG->prefix.'assignment_submissions '.
-            'WHERE assignment = '.$this->assignment->id.')';
+        $submissions = $DB->get_records('assignment_submissions', array('assignment' => $this->assignment->id));
+        foreach ($submissions as $submission) {
+            if (! $this->request_judge($submission)) {
+                return false;
+            }
+        }
 
-        return $DB->execute_sql($sql, false);
+        return true;
     }
 
     /**
@@ -696,7 +695,7 @@ class assignment_onlinejudge extends assignment_upload {
         $fs = get_file_storage();
         $files = $fs->get_directory_files($this->context->id, 'mod_assignment', 'submission', $submission->id, '/', true, false);
         foreach ($files as $file) {
-            $source[] = $file->get_pathname_hash();
+            $source[] = $file->get_pathnamehash();
         }
 
         onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $source, $oj);
