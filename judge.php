@@ -1,12 +1,8 @@
 <?php
 //本文件主要用于模拟运行
-
-
 require_once("../../config.php");
-//require_once($CFG->dirroot."/local/onlinejudge2/judge/sandbox/lib.php");
-//require_once($CFG->dirroot."/local/onlinejudge2/judge/ideone/lib.php");
-require_once("judgelib.php");
 global $CFG, $DB;
+
 //sub是封装的数据包
 $task = new stdClass();
 $cm = 2;
