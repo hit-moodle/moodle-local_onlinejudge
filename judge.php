@@ -8,7 +8,7 @@ $task = new stdClass();
 $cm = 2;
 $user = 2;
 $language = 'c_ideone';
-$source = '#include <stdio.h>
+$task->source = '#include <stdio.h>
 int main(void)
 {
     int a, b;
@@ -17,7 +17,9 @@ int main(void)
     return 0;
 
 ';
-
+$task->coursemodule = 3;
+$task->userid = 3;
+$task->language = 'cpp_ideone';
 $task->cpulimit = 1;
 $task->memlimit = 1048576;
 
@@ -29,13 +31,26 @@ $task->info_teacher = null;
 $task->info_student = null;
 $task->cpuusage = $task->cpulimit;
 $task->memusage = $task->memusage;
-$task->submittime = null;
+$task->submittime = time();
 $task->judgetime = null;
 $task->onlinejudge2_ideone_username = 'yuzhanlaile2';
 $task->onlinejudge2_ideone_password = 'yuzhanlaile2';
 $task->onlinejudge2_ideone_delay = 100;
 
+//packing the task data.
+            
+            //other info.
+            $task->error = $error;
+            $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
+            $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
+            $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
+            //get the id
+            //$id = $judge_obj->judge($task);
+            
+            //save the task into database
+            $id = $DB->insert_record('onlinejudge2_tasks', $task, true);  
 
+/*
 $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
 //echo $result->status;
 echo "<br>";
@@ -48,8 +63,8 @@ echo gmdate("d-M-Y h:i:s A",$result->judgetime);
 echo "<br>";
 echo $result->answer;
 
-
-
+*/
+echo $id;
 
 
 

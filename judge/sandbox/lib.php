@@ -144,35 +144,29 @@ class judge_sandbox extends judge_base {
      * returns the id of onlinejudge_task table in the database, after compile,
      *         the ide returned reference to the onlinejudge_result table in the database.
      */   
-    function judge($task) {
+    function judge(& $task) {
         global $CFG, $DB;
-        $result = new stdClass();
         
-        $id = null;
-        //directory to save the testcase and source.
-        $temp_dir = $CFG->dirroot.'/temp/onlinejudge2/'.$task->user;
+        //temp directory to save the testcase and source.
+        if(! set($CFG->temp_dir)) {
+            set_config('temp_dir', "$CFG->dirroot./temp/onlinejudge2/$task->userid");
+        }
+        //result class
+        $result = new stdClass();
+        $result = null;
+        
         //if not exist the directory, creat it.
-        if (!check_dir_exists($temp_dir, true, true)) {
-            mtrace("Can't mkdir ".$temp_dir);
+        if (!check_dir_exists($CFG->temp_dir, true, true)) {
+            mtrace("Can't mkdir ".$CFG->temp_dir);
             return false;
         }
         
-        //packing the data will be inserted to database.
+        //packing the data will be updated
         $record = new stdClass();
-        $record->coursemodule = $task->cm;
-        $record->userid = $task->user;
-        $record->language = $task->language;
-        $record->source = $task->source;
-        $record->memlimit = $task->memlimit;
-        $record->cpulimit = $task->cpulimit;    
-        $record->input = $task->input;
-        $record->output = $task->output;
-        $record->compileonly = $task->compileonly;
-        $record->status = $task->status;
-        $record->submittime = $task->submittime;
+        $record = null;
         
         //get the result class.
-        if($result = $this->compile($task, $temp_dir)) {
+        if($result = $this->compile($task, $CFG->temp_dir)) {
             $record->info_teacher = $result->info_teacher;
             $record->info_student = $result->info_student;
             
@@ -191,11 +185,25 @@ class judge_sandbox extends judge_base {
         $record->answer = $result->output;
         $record->judgetime = $result->judgetime;
         
-        // save the record into table onlinejudge2_tasks of database
-        // and get the id
-        $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
+        //packing the data 
+        $record->coursemodule = $task->cm;
+        $record->userid = $task->userid;
+        $record->language = $task->language;
+        $record->source = $task->source;
+        $record->memlimit = $task->memlimit;
+        $record->cpulimit = $task->cpulimit;    
+        $record->input = $task->input;
+        $record->output = $task->output;
+        $record->compileonly = $task->compileonly;
+        $record->status = $task->status;
+        $record->submittime = $task->submittime;
         
-        return $id;
+        //update
+        if(!$DB->update_record('onlinejudge2', $record)) {
+             mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
+        }
+        
+        return $record;
     }
     
     function run_in_sandbox($exec_file, $task) {

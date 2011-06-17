@@ -99,40 +99,35 @@ class judge_ideone extends judge_base
         return $id;     
     }
     
-    function judge($task)
+    /**
+     * judge in ideone, and return the result object.
+     * @param $task is get from the database or introduced by user.
+     * @return result class.
+     * @see judge_base::judge()
+     */
+    
+    function judge(& $task)
     {
-    	global $DB;
+    	global $CFG, $DB;
     	
-    	//previously insert into database.
-        $record = new stdClass();
-        //update the record, mainly update status.
-        $update_record = new stdClass();
-        //the final record updated
-        $final_record = new stdClass();
+    	//get the username and password 
+    	if(! set($CFG->onlinejudge2_ideone_username)) {
+    	    set_config('onlinejudge2_ideone_username', 'yuzhanlaile2');
+    	}
+    	if(! set($CFG->onlinejudge2_ideone_password)) {
+    	    set_config('onlinejudge2_ideone_password', 'yuzhanlaile2');
+    	}
+    	// delay between submitting and getting result
+    	if(! set($CFG->onlinejudge2_ideone_delay)) {
+    	    set_config('onlinejudge2_ideone_delay', 3);
+    	}
         
-        //packing the data.
-        $record->coursemodule = $task->cm;
-        $record->userid = $task->user;
-        $record->language = $task->language;
-        $record->source = $task->source;
-        $record->memlimit = $task->memlimit;
-        $record->cpulimit = $task->cpulimit;    
-        $record->input = $task->input;
-        $record->output = $task->output;
-        $record->compileonly = $task->compileonly;
-        $record->status = $task->status;
-        $record->submittime = $task->submittime;
-
-        $id = false;        
-        $id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-    	
-    	//get the username and password from param..
-    	$user = $task->onlinejudge2_ideone_username;
-    	$pass = $task->onlinejudge2_ideone_password;
+    	// create client.
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
         
         // source code of the paste.
         $source = $task->source;
+        
         /*
          *  0=>'nr' : not running 
          * 11=>'ce' : compilation error 
@@ -154,9 +149,10 @@ class judge_ideone extends judge_base
                 19  => 'rf',
                 20  => 'ie'
             );
+        
         //result class
         $result = new stdClass();
-        $result  = false;
+        $result  = $task;
        
         try { 
 	        // Begin soap
@@ -165,6 +161,7 @@ class judge_ideone extends judge_base
             
             //get the language id ,cpp_ideone as 21
             $language = $this->translator($task->language);
+            $input = $task->input;
             /**
              * function createSubmission create a paste.
              * @param user is the user name.
@@ -183,60 +180,22 @@ class judge_ideone extends judge_base
              *         link  => string
              *     )
              */
-            $webid = $client->createSubmission($user,$pass,$source,$language,$task->input,true,true); 
-
-            //update database.
-            $update_record->id = $id;
-            $update_record->coursemodule = $task->cm;
-            $update_record->userid = $task->user;
-            $update_record->language = $task->language;
-            $update_record->source = $task->source;
-            $update_record->memlimit = $task->memlimit;
-            $update_record->cpulimit = $task->cpulimit;    
-            $update_record->input = $task->input;
-            $update_record->output = $task->output;
-            $update_record->compileonly = $task->compileonly;
-            //set status to judging.
-            $update_record->status = ONLINEJUDGE2_STATUS_JUDGING;
-            $update_record->submittime = $task->submittime;
-            if(!$DB->update_record('onlinejudge2', $update_record)) {
-                echo get_string('cannotupdaterecord', 'local_onlinejudge2');
-            }
+            $webid = $client->createSubmission($user,$pass,$source,$language,$input,true,true); 
             
             if ($webid['error'] == 'OK') {
                 $link = $webid['link'];
             }
             else {
-                echo get_string('createsubmissionerror', 'local_onlinejudge2');
+                mtrace(get_string('createsubmissionerror', 'local_onlinejudge2'));
                 $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
                 $result->info_teacher = $webid['error'];
                 $result->info_student = $webid['error'];
-                
-                //return $result;
-                //update database.
-                $final_record->id = $id;
-                $final_record->coursemodule = $task->cm;
-                $final_record->userid = $task->user;
-                $final_record->language = $task->language;
-                $final_record->source = $task->source;
-                $final_record->memlimit = $task->memlimit;
-                $final_record->cpulimit = $task->cpulimit;    
-                $final_record->input = $task->input;
-                $final_record->output = $task->output;
-                $final_record->compileonly = $task->compileonly;
-                //set status to result status.
-                $final_record->status = $result->status;
-                $final_record->submittime = $task->submittime;
-                $final_record->info_teacher = $result->info_teacher;
-                $final_record->info_student = $result->info_student;
-                //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-                if(!$DB->update_record('onlinejudge2', $final_record)) {
-                    echo get_string('cannotupdaterecord', 'local_onlinejudge2');
-                }
-                return $id;
+                $result->judgetime = time();
+                return $result;
             }
+            
             // Get ideone results
-            $delay = $task->onlinejudge2_ideone_delay;
+            $delay = $CFG->assignment_oj_ideone_delay;
             $i = 0;
             while(1){
                 if ($delay > 0) {
@@ -258,8 +217,10 @@ class judge_ideone extends judge_base
             }
             
             $details = $client->getSubmissionDetails($user,$pass,$link,false,true,true,true,true,false); 
+            //for test
             echo "details:<br>";
             print_r($details);
+            
             $result->status = $status_ideone[$details['result']];
             
             if ($result->status == 'ce' || $task->compileonly) {
@@ -274,30 +235,33 @@ class judge_ideone extends judge_base
                 //echo $result->status;
                 $result->info_teacher = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
                 $result->info_student = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
-                //return $result;
                 
-                //return $result;
+                
+                //packing $record to be update.
+                $record = new stdClass();
+                $record = null;
                 //update database.
-                $final_record->id = $id;
-                $final_record->coursemodule = $task->cm;
-                $final_record->userid = $task->user;
-                $final_record->language = $task->language;
-                $final_record->source = $task->source;
-                $final_record->memlimit = $task->memlimit;
-                $final_record->cpulimit = $task->cpulimit;    
-                $final_record->input = $task->input;
-                $final_record->output = $task->output;
-                $final_record->compileonly = $task->compileonly;
-                //set status to result status.
-                $final_record->status = $result->status;
-                $final_record->submittime = $task->submittime;
-                $final_record->info_teacher = $result->info_teacher;
-                $final_record->info_student = $result->info_student;
-                //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
-                if(!$DB->update_record('onlinejudge2', $final_record)) {
-                    echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+                $record->id = $task->id;
+                $record->coursemodule = $task->cm;
+                $record->userid = $task->user;
+                $record->language = $task->language;
+                $record->source = $task->source;
+                $record->memlimit = $task->memlimit;
+                $record->cpulimit = $task->cpulimit;    
+                $record->input = $task->input;
+                $record->output = $task->output;
+                $record->compileonly = $task->compileonly;
+                $record->submittime = $task->submittime;
+                
+                //set record as result 
+                $record->status = $result->status;             
+                $record->info_teacher = $result->info_teacher;
+                $record->info_student = $result->info_student;
+                
+                if(!$DB->update_record('onlinejudge2', $record)) {
+                    mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
                 }
-                return $id;             
+                //return $record;             
             }
             
             // Check for wa, pe, tle, mle or accept
@@ -318,70 +282,78 @@ class judge_ideone extends judge_base
                     //date format: YYYY-MM-DD HH-MM-SS eg:2011-06-11 14-52-50
                     //$result->judgetime = $details['date'];
                     $result->judgetime = $details['time']+$task->submittime;
+                    // for test
                     echo "<br> 即将进行结果和用例输出的diff。。。当前status是$result->status<br>";
-                    $result->status = $this->diff($case->output, $result->output);
+                    
+                    //TODO use diff function to get the real status.
+                    //$result->status = $this->diff($case->output, $result->output);
                 }
             }           
         }catch (SoapFault $ex) {
             $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
             $result->info_teacher = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
             $result->info_student = 'faultcode='.$ex->faultcode.'|faultstring='.$ex->faultstring;
-            //return $result;
+            
+            //packing the record to be updated
+            $record =  new stdClass();
+            $record = null;
             //update database.
-            $final_record->id = $id;
-            $final_record->coursemodule = $task->cm;
-            $final_record->userid = $task->user;
-            $final_record->language = $task->language;
-            $final_record->source = $task->source;
-            $final_record->memlimit = $task->memlimit;
-            $final_record->cpulimit = $task->cpulimit;    
-            $final_record->input = $task->input;
-            $final_record->output = $task->output;
-            $final_record->compileonly = $task->compileonly;
+            $record->id = $id;
+            $record->coursemodule = $task->cm;
+            $record->userid = $task->user;
+            $record->language = $task->language;
+            $record->source = $task->source;
+            $record->memlimit = $task->memlimit;
+            $record->cpulimit = $task->cpulimit;    
+            $record->input = $task->input;
+            $record->output = $task->output;
+            $record->compileonly = $task->compileonly;
+            $record->submittime = $task->submittime;
+            
             //set status to result status.
-            $final_record->status = $result->status;
-            $final_record->submittime = $task->submittime;
-            $final_record->info_teacher = $result->info_teacher;
-            $final_record->info_student = $result->info_student;
+            $record->status = $result->status;
+            $record->judgetime = time();
+            $record->info_teacher = $result->info_teacher;
+            $record->info_student = $result->info_student;
             //$id = $DB->insert_record('onlinejudge2_tasks', $record, true);
             if(!$DB->update_record('onlinejudge2', $final_record)) {
-                echo get_string('cannotupdaterecord', 'local_onlinejudge2');
+                mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
             }
-            return $id;
+            return $record;
         
         }
         
         $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         $result->info_teacher .= '<br />'.get_string('ideonelogo', 'assignment_onlinejudge');
         
-        //return $result;
+        //packing record to be updated
+        $record = new stdClass();
+        $record = null;
         //update database.
-        $final_record->id = $id;
-        $final_record->coursemodule = $task->cm;
-        $final_record->userid = $task->user;
-        $final_record->language = $task->language;
-        $final_record->source = $task->source;
-        $final_record->memlimit = $task->memlimit;
-        $final_record->cpulimit = $task->cpulimit;    
-        $final_record->input = $task->input;
-        $final_record->output = $task->output;
-        $final_record->compileonly = $task->compileonly;
-        //set status to result status.
-        $final_record->status = $result->status;
-        $final_record->submittime = $task->submittime;
-        $final_record->info_teacher = $result->info_teacher;
-        $final_record->info_student = $result->info_student;
-        $final_record->memusate = $result->memusage;
-        $final_record->answer = $result->output;
-        $final_record->judgetime = $result->judgetime;
-        if(!$DB->update_record('onlinejudge2', $final_record)) {
-            echo get_string('cannotupdaterecord', 'local_onlinejudge2');
-        }
-        return $id;
-   // }
+        $record->id = $id;
+        $record->coursemodule = $task->cm;
+        $record->userid = $task->user;
+        $record->language = $task->language;
+        $record->source = $task->source;
+        $record->memlimit = $task->memlimit;
+        $record->cpulimit = $task->cpulimit;    
+        $record->input = $task->input;
+        $record->output = $task->output;
+        $record->compileonly = $task->compileonly;
+        $record->submittime = $task->submittime;
         
-    echo "onlinejudge2 uses <a href='http://ideone.com'>ideone.com</a> &copy;
-by <a href='http://sphere-research.com'>Sphere Research Labs</a>";
+        //set status to result status.
+        $record->status = $result->status;     
+        $record->info_teacher = $result->info_teacher;
+        $record->info_student = $result->info_student;
+        $record->memusate = $result->memusage;
+        $record->answer = $result->output;
+        $record->judgetime = $result->judgetime;
+        
+        if(!$DB->update_record('onlinejudge2', $final_record)) {
+            mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
+        }
+        return $record;
     }
     
 }
