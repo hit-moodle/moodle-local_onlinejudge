@@ -125,8 +125,12 @@ class judge_sandbox extends judge_base {
             //将output数组结合为字符串，元素中间用\n换行符放置,并转换为html元素
             $error = htmlspecialchars(implode("\n", $output));
             //should judge the user's identity. then get the different info_teacher, info_student.
-            $result->info_teacher = addslashes($error);
-            $result->info_student = addslashes($error);
+            //$result->info_teacher = addslashes($error);
+            //$result->info_student = addslashes($error);
+            
+            //in moodle 2.0, use such output function.
+            $result->info_teacher = format_text($error);
+            $result->info_student = format_text($error);
             
             return $result;
         }

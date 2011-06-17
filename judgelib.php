@@ -150,6 +150,10 @@ define("ONLINEJUDGE2_STATUS_INTERNAL_ERROR",        21);
 define("ONLINEJUDGE2_STATUS_JUDGING",               22);
 define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
 
+// define max_mem and max_cpu
+define("ONLINEJUDGE2_MAX_CPU",                       1);
+define("ONLINEJUDGE2_MAX_MEM",                 1048576);
+
 /**
  * Returns an sorted array of all programming languages supported
  *
@@ -316,18 +320,95 @@ function judge_all_unjudged(){
         }
 }
 
-//events
 
+/********************    events    ******************/
+
+// when judge begin, call cron
 function event_judge_begin() {
-
 }
 
+// when judge over, notify the user or others
 function event_judge_over() {
-    
+   
 }
 
+// when judge error, notify the user or others.
 function event_judge_error() {
     
+}
+
+/***************    for settings.php    **************/
+
+/**
+ * This function returns an
+ * array of possible memory sizes in an array, translated to the
+ * local language.
+ *
+ * @uses SORT_NUMERIC
+ * @param int $sizebytes Moodle site $CFG->onlinejudge2_max_mem
+ * @return array
+ */
+function get_max_memory_usages($sitebytes=0) {
+    global $CFG;
+
+    // Get max size
+    $maxsize = $sitebytes;
+    
+    $memusage[$maxsize] = display_size($maxsize);
+    
+    $sizelist = array(4194304, 8388608, 16777216, 33554432,
+                      67108864, 134217728, 268435456, 536870912);
+    
+    // Allow maxbytes to be selected if it falls outside the above boundaries
+    if( isset($CFG->onlinejudge2_max_mem) && !in_array($CFG->onlinejudge2_max_mem, $sizelist) ){
+        $sizelist[] = $CFG->onlinejudge2_max_mem;
+    }
+    
+    foreach ($sizelist as $sizebytes) {
+       if ($sizebytes < $maxsize) {
+           $memusage[$sizebytes] = display_size($sizebytes);
+       }
+    }
+    
+    krsort($memusage, SORT_NUMERIC);
+    
+    return $memusage;
+}
+    
+/**
+ * This function returns an
+ * array of possible CPU time (in seconds) in an array
+ *
+ * @uses SORT_NUMERIC
+ * @param int $time Moodle site $CGF->onlinejudge2_max_cpu
+ * @return array
+ */
+function get_max_cpu_times($time=0) {
+    global $CFG;
+
+    // Get max size
+    $maxtime = $time;
+    
+    $cputime[$maxtime] = get_string('numseconds', 'moodle', $maxtime);
+    
+    $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                      10, 11, 12, 13, 14, 15, 20,
+                      25, 30, 40, 50, 60);
+    
+    // Allow maxtime to be selected if it falls outside the above boundaries
+    if( isset($CFG->onlinejudge2_max_cpu) && !in_array($CFG->onlinejudge2_max_cpu, $timelist) ){
+        $cputime[] = $CFG->onlinejudge2_max_cpu;
+    }
+    
+    foreach ($timelist as $timesecs) {
+       if ($timesecs < $maxtime) {
+           $cputime[$timesecs] = get_string('numseconds', 'moodle', $timesecs);
+       }
+    }
+    
+    ksort($cputime, SORT_NUMERIC);
+    
+    return $cputime;
 }
 
     
