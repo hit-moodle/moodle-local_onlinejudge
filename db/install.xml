@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge2/db" VERSION="20110610" COMMENT="XMLDB file for Moodle local/onlinejudge2"
+<XMLDB PATH="local/onlinejudge2/db" VERSION="20110618" COMMENT="XMLDB file for Moodle local/onlinejudge2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -23,7 +23,12 @@
         <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="info_student" NEXT="memusage"/>
         <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
         <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
-        <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime"/>
+        <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime" NEXT="var1"/>
+        <FIELD NAME="var1" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="judgetime" NEXT="var2"/>
+        <FIELD NAME="var2" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var1" NEXT="var3"/>
+        <FIELD NAME="var3" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var2" NEXT="var4"/>
+        <FIELD NAME="var4" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var3" NEXT="deleted"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="var4"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="coursemodule"/>
