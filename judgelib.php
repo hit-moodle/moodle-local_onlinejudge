@@ -64,9 +64,11 @@ class judge_base{
     function get_result($taskid){
         global $DB;
         if(! $DB->record_exists('onlinejudge_result', array('taskid' => $taskid))) {
-            echo get_string('nosuchrecord', 'local_onlinejudge2');
+            mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
         } 
-        $result = null; //结果对象
+        //result class
+        $result = new stdClass();
+        $result = null; 
         $result = $DB->get_record('onlinejudge_result', array('taskid' => $id));
         return $result;
     }
@@ -150,6 +152,10 @@ define("ONLINEJUDGE2_STATUS_INTERNAL_ERROR",        21);
 define("ONLINEJUDGE2_STATUS_JUDGING",               22);
 define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
 
+// define max_mem and max_cpu
+define("ONLINEJUDGE2_MAX_CPU",                       1);
+define("ONLINEJUDGE2_MAX_MEM",                 1048576);
+
 /**
  * Returns an sorted array of all programming languages supported
  *
@@ -192,10 +198,10 @@ function onlinejudge2_get_language_name($language) {
  */
 function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
     global $judgeclasses, $CFG, $DB;
-	//TODO: complete this function
     $id = false; //return id
     //get the languages.
     $langs_arr = array_flip(onlinejudge2_get_languages());
+    
     //check if @param language is the the langs array.
     if(in_array($language, $langs_arr)) {
     	//echo $language.' in the language lib';
@@ -206,16 +212,15 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
         $judge_compiler = 'judge_'.$judge_type;
         
         //select the certain compiler by judge_type
-        //TODO: 这里要面向未来编程，不能写死sandbox、ideone这样的字眼
         if(in_array($judge_compiler, $judgeclasses)) {
-            require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");
+            //require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");
             
-            $judge_obj = new $judge_compiler();
+            //$judge_obj = new $judge_compiler();
             
             //packing the task data.
             $task = new stdClass();
             $task->cm = $cm;
-            $task->user = $user;
+            $task->userid = $user;
             $task->language = $language;
             $task->source = $source;
             $task->memlimit = $options->memlimit;
@@ -225,19 +230,70 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             $task->compileonly = $options->compileonly;
             $task->status = ONLINEJUDGE2_STATUS_PENDING;
             $task->submittime = time();
+            
+            //other info.
             $task->error = $error;
             $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
             $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
             $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
-            //get the id
-            $id = $judge_obj->judge($task);
             
             //save the task into database
-            //$id = $DB->insert_record('onlinejudge2_tasks', $task, true);         
+            $id = $DB->insert_record('onlinejudge2_tasks', $task, true);
+            if(! $id) {
+                //print error info
+                mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
+            }         
         }
     }
     
     return $id;
+}
+
+/**
+ * select the compiler and judge the task introduced by user,
+ *  this should based on backup process
+ * and start by judged.php in /moodle/local/onlinejudge2/ 
+ * 
+ * @param $taskid should be got from onlinejudge2_submit_task function.
+ */
+function onlinejudge2_get_judge($taskid) {
+    global $DB;
+    //result class
+    $result = new stdClass(); 
+    $result = null; 
+    
+    $task = $DB->get_record('onlinejudge2', array('id' => $taskid));
+    
+    // no this task
+    if(is_null($task)) {
+        //print error info
+        mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
+        return $result;
+    }
+    
+    //get judge language, such as cpp_ideone, c_sandbox.
+    $language = $task->language;
+    
+    //get the judge type, such as sandbox, ideone etc.
+    $judge_type = substr($language, strrpos($language, '_')+1);
+        
+    //get the compiler, such as judge_sandbox, judge_ideone etc.
+    $judge_compiler = 'judge_'.$judge_type;
+        
+    //select the certain compiler by judge_type
+    if(in_array($judge_compiler, $judgeclasses)) {
+        require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");    
+        $judge_obj = new $judge_compiler();
+        
+        // call the judge function. 
+        $result = $judge_obj->judge(& $task);
+        
+        return $result;
+    }
+    else {
+        mtrace(get_language('nosuchlanguage', 'local_onlinejudge2'));
+        return $result;
+    }
 }
 
 
@@ -261,6 +317,8 @@ function onlinejudge2_get_task($taskid) {
     }
 }
 
+
+
 /**
  * Return the overall status of a list of tasks
  *
@@ -276,7 +334,8 @@ function onlinejudge2_get_overall_status($tasks) {
 
         if ($status == 0) {
             $status = $task->status;
-        } else if ($status != $task->status) {
+        } 
+        else if ($status != $task->status) {
             $status = ONLINEJUDGE2_STATUS_MULTI_STATUS;
             break;
         }
@@ -285,133 +344,99 @@ function onlinejudge2_get_overall_status($tasks) {
     return $status;
 }
 
+
+/********************    events    ******************/
+
+// when judge begin, call cron
+function event_judge_begin() {
+}
+
+// when judge over, notify the user or others
+function event_judge_over() {
+   
+}
+
+// when judge error, notify the user or others.
+function event_judge_error() {
+    
+}
+
+/***************    for settings.php    **************/
+
 /**
- * Get one unjudged tasks and set it as judged
- * If all tasks have been judged, return false
- * The function can be reentranced
+ * This function returns an
+ * array of possible memory sizes in an array, translated to the
+ * local language.
+ *
+ * @uses SORT_NUMERIC
+ * @param int $sizebytes Moodle site $CFG->onlinejudge2_max_mem
+ * @return array
  */
-function get_unjudged_tasks() {
+function get_max_memory_usages($sitebytes=0) {
     global $CFG;
-    while (!set_cron_lock('onlinejudge2_judging', time() + 10)) {}
-    $tasks = get_records_sql('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING));
-    $task = null;
-    if ($tasks != null) {
-        $task = array_pop($tasks);
-        // Set judged mark
-        $DB->set_field('onlinejudge2_tasks', 'judged', 1, array('id' => $task->id));
+
+    // Get max size
+    $maxsize = $sitebytes;
+    
+    $memusage[$maxsize] = display_size($maxsize);
+    
+    $sizelist = array(4194304, 8388608, 16777216, 33554432,
+                      67108864, 134217728, 268435456, 536870912);
+    
+    // Allow maxbytes to be selected if it falls outside the above boundaries
+    if( isset($CFG->onlinejudge2_max_mem) && !in_array($CFG->onlinejudge2_max_mem, $sizelist) ){
+        $sizelist[] = $CFG->onlinejudge2_max_mem;
     }
-
-        set_cron_lock('onlinejudge2_judging', null);
-
-        return $task;     
-}
-
-
-/**
- * Evaluate student submissions
- */
-function cron() {
-
-	global $CFG;
-
-	// Detect the frequence of cron
-	//should modify this cron.
-	$lastcron = $DB->get_field('modules', 'lastcron', 'name', 'assignment');
-    if ($lastcron) {
-        set_config('assignment_oj_cronfreq', time() - $lastcron);
-    }
-
-    // There are two judge routines
-    //  1. Judge only when cron job is running. 
-    //  2. After installation, the first cron running will fork a daemon to be judger.
-    // Routine two works only when the cron job is executed by php cli
-    //
-    if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
-        $this->fork_daemon();
-    }
-     else if ($CFG->onlinejudge2_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
-        $this->judge_all_unjudged();
-    }
-}
-
-function fork_daemon() {
-    global $CFG, $db;
-
-    if(empty($CFG->onlinejudge2_daemon_pid) || !posix_kill($CFG->onlinejudge2_daemon_pid, 0)){ // No daemon is running
-       $pid = pcntl_fork(); 
-       if ($pid == -1) {
-            mtrace('Could not fork');
-       } else if ($pid > 0){ //Parent process
-       //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-       reconnect_db();
-
-        set_config('onlinejudge2_daemon_pid' , $pid);
-       } 
-       else { //Child process
-            $this->daemon(); 
+    
+    foreach ($sizelist as $sizebytes) {
+       if ($sizebytes < $maxsize) {
+           $memusage[$sizebytes] = display_size($sizebytes);
        }
     }
+    
+    krsort($memusage, SORT_NUMERIC);
+    
+    return $memusage;
 }
-
-function daemon(){
+    
+/**
+ * This function returns an
+ * array of possible CPU time (in seconds) in an array
+ *
+ * @uses SORT_NUMERIC
+ * @param int $time Moodle site $CGF->onlinejudge2_max_cpu
+ * @return array
+ */
+function get_max_cpu_times($time=0) {
     global $CFG;
 
-    $pid = getmypid();
-    mtrace('Judge daemon created. PID = ' . $pid);
-
-    if (function_exists('pcntl_fork')) { // In linux, this is a new session
-        // Start a new sesssion. So it works like a daemon
-        $sid = posix_setsid();
-        if ($sid < 0) {
-            mtrace('Can not setsid');
-            exit;
-        }
-
-        //Redirect error output to php log
-        $CFG->debugdisplay = false;
-        @ini_set('display_errors', '0');
-        @ini_set('log_errors', '1');
-
-        // Close unused fd
-        fclose(STDIN);
-        fclose(STDOUT);
-        fclose(STDERR);
-
-        reconnect_db();
-
-        // Handle SIGTERM so that can be killed without pain
-        declare(ticks = 1); // tick use required as of PHP 4.3.0
-        pcntl_signal(SIGTERM, 'sigterm_handler');
+    // Get max size
+    $maxtime = $time;
+    
+    $cputime[$maxtime] = get_string('numseconds', 'moodle', $maxtime);
+    
+    $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                      10, 11, 12, 13, 14, 15, 20,
+                      25, 30, 40, 50, 60);
+    
+    // Allow maxtime to be selected if it falls outside the above boundaries
+    if( isset($CFG->onlinejudge2_max_cpu) && !in_array($CFG->onlinejudge2_max_cpu, $timelist) ){
+        $cputime[] = $CFG->onlinejudge2_max_cpu;
     }
-
-    set_config('onlinejudge2_daemon_pid' , $pid);
-
-    // Run forever until be killed or plugin was upgraded
-    while(!empty($CFG->onlinejudge2_daemon_pid)){
-        global $db;
-        $this->judge_all_unjudged();
-
-        // If error occured, reconnect db
-        if ($db->ErrorNo())
-        reconnect_db();
-
-        //Check interval is 5 seconds
-        sleep(5);
-
-        //renew the config value which could be modified by other processes
-        $CFG->onlinejudge2_daemon_pid = get_config(NULL, 'onlinejudge2_daemon_pid');
+    
+    foreach ($timelist as $timesecs) {
+       if ($timesecs < $maxtime) {
+           $cputime[$timesecs] = get_string('numseconds', 'moodle', $timesecs);
+       }
     }
+    
+    ksort($cputime, SORT_NUMERIC);
+    
+    return $cputime;
 }
 
-// Judge all unjudged tasks
-function judge_all_unjudged(){
-        global $CFG;
-        while ($task = $this->get_unjudged_tasks()) {
-            $cm = get_coursemodule_from_instance('assignment', $task->coursemodule);
-
-            $this->judge($task);
-        }
-    }
+    
+    
 
 
 

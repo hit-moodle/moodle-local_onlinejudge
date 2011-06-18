@@ -33,23 +33,34 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
+    
+    // Ability to view the tasks
+    'local/onlinejudge2:view' => array(
+        'captype' => 'view',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
 
     // Ability to query the task.
     'local/onlinejudge2:query' => array(
-        'captype' => 'write',
+        'captype' => 'query',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
     ),
 
     // Ability to delete the task
     'local/onlinejudge2:delete' => array(
-        'captype' => 'write',
+        'captype' => 'delete',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
     // Ability to ...
-    'local/onlinejudge2:othercap' => array(
+    'local/onlinejudge2:add' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
