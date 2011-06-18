@@ -334,34 +334,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * TODO: Change to grade request
-     */
-    function upload() {
-
-        global $CFG, $USER;
-
-        $oldtimemodified = 0;
-        if ($submission = $this->get_submission()) {
-            $oldtimemodified = $submission->timemodified;
-        }
-
-        parent::upload();
-
-        if ($submission = $this->get_submission()) {
-            if ($oldtimemodified != $submission->timemodified) { //submitting successfully.
-
-                $submission->grade = -1;
-                $submission->judged = 0;
-
-                $this->update_submission($submission, $oldtimemodified == 0);
-
-                $submission = $this->get_submission();
-                $this->update_grade($submission);
-            }
-        }
-    }
-
-    /**
      * Print a link to student submitted file.
      * 
      * @param int $userid User Id
