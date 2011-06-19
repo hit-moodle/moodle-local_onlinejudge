@@ -81,7 +81,7 @@ class judge_base{
      * @param task is configed by clients, include the memlimit, cpulimit, case(input,output) etc.
      * @return the id of the task in the database.
      */
-    function judge($task) {
+    function judge(& $task) {
         return false;
     }
 
@@ -89,10 +89,10 @@ class judge_base{
      * 
      * function diff() compare the output and the answer
      */  
-    function diff($answer, $output) {
+    function diff($output, $answer) {
+    	//format
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
         $output = trim($output);
-
         if (strcmp($answer, $output) == 0)
             return ONLINEJUDGE2_STATUS_ACCEPTED;
         else {
@@ -201,7 +201,7 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
     $id = false; //return id
     //get the languages.
     $langs_arr = array_flip(onlinejudge2_get_languages());
-    
+
     //check if @param language is the the langs array.
     if(in_array($language, $langs_arr)) {
     	//echo $language.' in the language lib';
@@ -219,7 +219,7 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             
             //packing the task data.
             $task = new stdClass();
-            $task->cm = $cm;
+            $task->coursemodule = $cm;
             $task->userid = $user;
             $task->language = $language;
             $task->source = $source;
@@ -254,45 +254,95 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
  *  this should based on backup process
  * and start by judged.php in /moodle/local/onlinejudge2/ 
  * 
+ * ps:this function update the record in the database after judge.
+ * 
  * @param $taskid should be got from onlinejudge2_submit_task function.
+ * @return the result after judge.
  */
 function onlinejudge2_get_judge($taskid) {
-    global $DB;
+    global $CFG, $DB, $judgeclasses;
     //result class
     $result = new stdClass(); 
     $result = null; 
     
-    $task = $DB->get_record('onlinejudge2', array('id' => $taskid));
-    
-    // no this task
+    $task = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
+    $result = $task;
+    // doesn't has task
     if(is_null($task)) {
         //print error info
         mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
         return $result;
     }
     
-    //get judge language, such as cpp_ideone, c_sandbox.
-    $language = $task->language;
-    
-    //get the judge type, such as sandbox, ideone etc.
-    $judge_type = substr($language, strrpos($language, '_')+1);
+    // check the status
+    // pending
+    //if($task->status == ONLINEJUDGE2_STATUS_PENDING) {
+    if(1) {
+        //get judge language, such as cpp_ideone, c_sandbox.
+        $language = $task->language;
         
-    //get the compiler, such as judge_sandbox, judge_ideone etc.
-    $judge_compiler = 'judge_'.$judge_type;
+        //get the judge type, such as sandbox, ideone etc.
+        $judge_type = substr($language, strrpos($language, '_')+1);
         
-    //select the certain compiler by judge_type
-    if(in_array($judge_compiler, $judgeclasses)) {
-        require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");    
-        $judge_obj = new $judge_compiler();
+        //get the compiler, such as judge_sandbox, judge_ideone etc.
+        $judge_compiler = 'judge_'.$judge_type;
         
-        // call the judge function. 
-        $result = $judge_obj->judge(& $task);
-        
-        return $result;
+        //select the certain compiler by judge_type
+        if(in_array($judge_compiler, $judgeclasses)) {
+            require_once($CFG->dirroot."/local/onlinejudge2/judge/$judge_type/lib.php");    
+            $judge_obj = new $judge_compiler();
+            // call the judge function. 
+            $result = $judge_obj->judge(& $task);
+            
+            //before return , update the record.
+            $new_record = new stdClass();
+            $new_record = null;
+            //packing
+            $new_record->id = $task->id;
+            $new_record->coursemodule = $task->coursemodule;
+            $new_record->userid = $task->userid;
+            $new_record->language = $task->language;
+            $new_record->source = $task->source;
+            $new_record->memlimit = $task->memlimit;
+            $new_record->cpulimit = $task->cpulimit;    
+            $new_record->input = $task->input;
+            $new_record->output = $task->output;
+            $new_record->compileonly = $task->compileonly;
+            $new_record->submittime = $task->submittime;
+                
+            //set record as result 
+            $new_record->answer = $result->answer;
+            $new_record->judgetime = $result->judgetime;
+            $new_record->cpuusage = $result->cpuusage;
+            $new_record->memusage = $result->memusage;
+            $new_record->status = $result->status;             
+            $new_record->info_teacher = $result->info_teacher;
+            $new_record->info_student = $result->info_student;
+                
+            //record error ,if exists.
+            $new_record->error = $result->error;
+            
+            if(!$DB->update_record('onlinejudge2_tasks', $new_record)) {
+                mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
+            }
+            
+            return $result;
+        }
+        else {
+            mtrace(get_string('nosuchlanguage', 'local_onlinejudge2'));
+            return $result;
+        }
     }
+    // been judging
+    else if($task->status == ONLINEJUDGE2_STATUS_JUDGING) {
+        //judging
+        mtrace('status22', 'local_onlinejudge2');
+    }
+    // been judged
     else {
-        mtrace(get_language('nosuchlanguage', 'local_onlinejudge2'));
-        return $result;
+        mtrace(get_string('status24', 'local_onlinejudge2'));
+        //返回task
+        return $task;
     }
 }
 

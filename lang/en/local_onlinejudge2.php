@@ -8,7 +8,10 @@
     $string['badtestcasefile'] = 'This file does not exist or can not be read';
     $string['cannotruncompiler'] = 'Can not execute the script of compiler';
     $string['case'] = 'Case $a:';
-    $string['cannotupdaterecord'] = 'cannot update such record in database.';
+    $string['cannotinsertrecord'] = 'cannot insert such record into database.';
+    $string['cannotupdaterecord'] = 'cannot update such record into database.';
+    $string['cannotmakedir'] = 'cannot make directory.';
+    $string['cannotrunsand'] = 'cannot run this sand';
     $string['compileonly'] = 'Compile only';
     $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignments on the site (subject to other local settings)';
     $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
@@ -21,6 +24,7 @@
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
     $string['filereaderror'] = 'Can not read this file';
     $string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge2\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
+    $string['ideoneexception'] = 'Ideone exception...';
     $string['info'] = 'Information';
     $string['infoat'] = 'A good program must return 0 if no error occur.';
     $string['infocompileok'] = 'It seems that the compiler likes your code.';
@@ -127,6 +131,7 @@
     $string['status21'] = 'Internal Error';
     $string['status22'] = 'Judging...';
     $string['status23'] = 'Multi-status';
+    $string['status24'] = 'Judged...';
     $string['successrate'] = 'Success rate';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';

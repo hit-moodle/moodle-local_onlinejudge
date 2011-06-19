@@ -1,7 +1,8 @@
 <?php
 //require_once("../../judgelib.php");
 require_once(dirname(dirname(__FILE__))."/../../../config.php");
-global $CFG, $DB;
+
+global $DB,$CFG;
 require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
 
 class judge_sandbox extends judge_base {
@@ -79,24 +80,38 @@ class judge_sandbox extends judge_base {
     // Compile submission $task in temp_dir
     // return result class on success, false on error
     function compile($task, $temp_dir) {
-    	global $CFG, $DB;
+        echo "<br>compile begin<br>";
+    	global $CFG;
+    	//result class
+    	$result = new stdClass();
         $result = false;
         //创建存储源代码的.c文件
         $file = 'prog.c';
         //将代码写入文件里
         if($task->source != null) {
             file_put_contents("$temp_dir/$file", $task->source);
+            
             //get judge name, such c,c_warn2err, cpp etc..
             $language = substr($task->language, 0, strlen($task->language)-8);
+            
             //select the compiler shell.
             //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
             $compiler = $CFG->dirroot.'/local/onlinejudge2/judge/sandbox/languages/'.$language.'.sh';
+            
             if (!is_executable($compiler)) {
-                echo get_string('cannotruncompiler', 'local_onlinejudge2');
-                $result->status = 'ie';
+            	// for test
+                mtrace(get_string('cannotruncompiler', 'local_onlinejudge2'));
+                
                 $result->info_teacher = get_string('cannotruncompiler', 'local_onlinejudge2');
-                $result->info_student = get_string('cannotruncompiler', 'local_onlinejudge2');
-                //break;
+                $result->info_student = get_string('cannotruncompiler', 'local_onlinejudge2');            
+                $result->cpuusage = null;
+                $result->memusage = null;
+                $result->answer = null;
+                $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+                $result->judgetime = null;
+                $result->error = get_string('cannotruncompiler', 'local_onlinejudge2');
+                
+                break;
             }
         
             //output是一个数组，保存输出信息
@@ -130,7 +145,19 @@ class judge_sandbox extends judge_base {
             
             //in moodle 2.0, use such output function.
             $result->info_teacher = format_text($error);
-            $result->info_student = format_text($error);
+            $result->info_student = format_text($error); 
+                       
+            $result->cpuusage = null;
+            $result->memusage = null;
+            $result->answer = null;
+            $result->judgetime = time();
+            
+            if($result->status == ONLINEJUDGE2_STATUS_COMPILATION_ERROR) {
+                $result->error = get_string('status3', 'local_onlinejudge2');
+            }
+            else {
+                $result->error = null;
+            }
             
             return $result;
         }
@@ -145,77 +172,56 @@ class judge_sandbox extends judge_base {
      *         the ide returned reference to the onlinejudge_result table in the database.
      */   
     function judge(& $task) {
-        global $CFG, $DB;
-        
+    	echo "<br>sandbox judge<br>";
+    	global $CFG;
         //temp directory to save the testcase and source.
-        if(! set($CFG->temp_dir)) {
-            set_config('temp_dir', "$CFG->dirroot./temp/onlinejudge2/$task->userid");
+        if(! isset($CFG->temp_dir)) {
+            set_config('temp_dir', $CFG->dirroot.'/temp/onlinejudge2/'.$task->userid);
         }
         //result class
         $result = new stdClass();
-        $result = null;
-        
+        $result = $task;
         //if not exist the directory, creat it.
         if (!check_dir_exists($CFG->temp_dir, true, true)) {
             mtrace("Can't mkdir ".$CFG->temp_dir);
-            return false;
-        }
-        
-        //packing the data will be updated
-        $record = new stdClass();
-        $record = null;
-        
+            //packing
+            $result->cpuusage = null;
+            $result->memusage = null;
+            $result->answer = null;
+            $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+            $result->info_teacher = null;
+            $result->info_student = null;
+            $result->judgetime = null;
+            $result->error = get_string('cannotmakedir', 'local_onlinejudge2');
+            return $result;
+        }      
         //get the result class.
         if($result = $this->compile($task, $CFG->temp_dir)) {
-            $record->info_teacher = $result->info_teacher;
-            $record->info_student = $result->info_student;
             
             if ($result->status === ONLINEJUDGE2_STATUS_COMPILATION_OK && !$task->compileonly) {
                 //Run and test
-                $result = $this->run_in_sandbox($temp_dir.'/a.out', $task);	
+                $result = $this->run_in_sandbox($CFG->temp_dir.'/a.out', $task);	
             } 
             else if ($result->status === ONLINEJUDGE2_STATUS_COMPILATION_ERROR) {
                 //$result->grade = 'ce';
-                $result->output = '';
+                $result->answer = '';
             }	
         } 
-            
-        //the data after compiler and run
-        $record->status = $result->status;
-        $record->answer = $result->output;
-        $record->judgetime = $result->judgetime;
-        
-        //packing the data 
-        $record->coursemodule = $task->cm;
-        $record->userid = $task->userid;
-        $record->language = $task->language;
-        $record->source = $task->source;
-        $record->memlimit = $task->memlimit;
-        $record->cpulimit = $task->cpulimit;    
-        $record->input = $task->input;
-        $record->output = $task->output;
-        $record->compileonly = $task->compileonly;
-        $record->status = $task->status;
-        $record->submittime = $task->submittime;
-        
-        //update
-        if(!$DB->update_record('onlinejudge2', $record)) {
-             mtrace(get_string('cannotupdaterecord', 'local_onlinejudge2'));
-        }
-        
-        return $record;
+             
+        return $result;
     }
     
     function run_in_sandbox($exec_file, $task) {
+        echo 'run sandbox';
     	global $CFG, $DB;
         //testcase
         $case = new stdClass();          
-        $case->input = $task->input;
+        $case->input = $task->input.'\n';
         $case->output = $task->output;
     	
         //result class
         $ret = new stdClass();
-        $ret->output = null;
+        $ret = null;
         
         $result = array (
                 ONLINEJUDGE2_STATUS_PENDING, 
@@ -231,14 +237,23 @@ class judge_sandbox extends judge_base {
         //print_r($result);
         
         $sand = $CFG->dirroot . '/local/onlinejudge2/judge/sandbox/sand/sand';
-        
         //如果sand不可执行，则返回空的结果对象
         if (!is_executable($sand)){
+            mtrace(get_string('cannotrunsand'), 'local_onlinejudge2');
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+            
+            $ret->info_teacher = get_string('cannotrunsand', 'local_onlinejudge2');
+            $ret->info_student = get_string('cannotrunsand', 'local_onlinejudge2');            
+            $ret->cpuusage = null;
+            $ret->memusage = null;
+            $ret->answer = null;
+            $ret->judgetime = null;
+            $ret->error = get_string('cannotrunsand', 'local_onlinejudge2');
+            
             return $ret;
         }
         
-        $sand .= ' -l cpu='.($task->cpulimit*1000).' -l memory='.$task->memlimit.' -l disk=512000 '.$exec_file; 
+        $sand .= ' -l cpu='.(($task->cpulimit)*1000).' -l memory='.$task->memlimit.' -l disk=512000 '.$exec_file; 
         //test
         //$sand .= ' -l cpu=1000'.' -l memory=1048576'.' -l disk=512000 '.$exec_file; 
     
@@ -255,9 +270,26 @@ class judge_sandbox extends judge_base {
         
         //如果返回的不是资源，即不成功
         if (!is_resource($proc)) {
+        	mtrace(get_string('status21', 'local_onlinejudge2'));
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
+            
+            $ret->info_teacher = get_string('status21', 'local_onlinejudge2');
+            $ret->info_student = get_string('status21', 'local_onlinejudge2');            
+            $ret->cpuusage = null;
+            $ret->memusage = null;
+            $ret->answer = null;
+            $ret->error = get_string('status21', 'local_onlinejudge2');
+            
             return $ret;
         }
+        
+        // $pipes now looks like this:
+        // 0 => writeable handle connected to child stdin
+        // 1 => readable handle connected to child stdout
+        // Any error output will be appended to $exec_file.err
+        
+        //for test
+        print_r($pipes);
         
         //将用例输入写入到$pipes[0]指定的文件中。
         fwrite($pipes[0], $case->input);
@@ -265,10 +297,14 @@ class judge_sandbox extends judge_base {
 
         //关闭proc_open打开的进程，并且返回进程的退出代码
         $return_value = proc_close($proc);
-        //echo $return_value;
+        
         //将文件变成字符串，存入结果的输出中
-        $ret->output = file_get_contents($exec_file.'.out');
-
+        $ret->answer = file_get_contents($exec_file.'.out');
+        
+        if(is_null($ret->answer)) {
+            mtrace('file_get_contents is null');
+        }
+        
         if ($return_value == 255) {
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
             return $ret;
@@ -283,7 +319,14 @@ class judge_sandbox extends judge_base {
         }
         
         //比较结果和用例输出
-        $ret->status = $this->diff($case->output, $ret->output);
+        $ret->status = $this->diff($case->output, $ret->answer);
+              
+        $ret->info_teacher = $ret->status;
+        $ret->info_student = $ret->status;            
+        $ret->cpuusage = null;
+        $ret->memusage = null;
+        $ret->judgetime = time();
+        $ret->error = $ret->status;
         
         return $ret;
     }
