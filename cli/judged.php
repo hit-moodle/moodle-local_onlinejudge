@@ -84,92 +84,49 @@ if(!empty($CFG->onlinejudge2_daemon_pid)) {
    }
 }
 
-// Create daemon
-if (function_exists('pcntl_fork')) {
-    // Linux
-    fork_daemon();
-}
-else {
-    // Windows
-    daemon();
-}
+if (!$options['nodaemon']) {
+    // create daemon
 
-function fork_daemon() {
-    global $CFG, $DB;
-
-    if(empty($CFG->onlinejudge2_daemon_pid) || !posix_kill($CFG->onlinejudge2_daemon_pid, 0)){ 
-        // No daemon is running
-        //Forks the currently running process
-        $pid = pcntl_fork(); 
-        if ($pid == -1) {
-             mtrace('Could not fork');
-        } 
-        else if ($pid > 0){ 
-            //Parent process
-            //Reconnect db, so that the parent won't close the db connection shared with child after exit.
-            reconnect_db();
-
-            set_config('onlinejudge2_daemon_pid' , $pid);
-        } 
-        else { 
-            //Child process
-            daemon(); 
-        }
+    if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
+        cli_error('pcntl and posix extension must be installed!');
     }
-}
 
-function daemon(){
-    global $CFG;
-    
-    // get process pid
-    $pid = getmypid();
-    mtrace('Judge daemon created. PID = ' . $pid);
+    $pid = pcntl_fork();
 
-    if (function_exists('pcntl_fork')) { 
-        // In linux, this is a new session
-        // Start a new sesssion. So it works like a daemon
-        //make the current process a session leader.
+    if ($pid == -1) {
+        cli_error('Could not fork');
+    } else if ($pid > 0) { // parent process
+        mtrace('Judge daemon successfully created. PID = '.$pid);
+        die;
+    } else { // child process
+        // make the current process a session leader.
         $sid = posix_setsid();
         if ($sid < 0) {
-            mtrace('Can not setsid');
-            exit;
+            cli_error('Can not setsid()');
         }
-
-        //Redirect error output to php log
-        $CFG->debugdisplay = false;
-        @ini_set('display_errors', '0');
-        @ini_set('log_errors', '1');
-
-        // Close unused fd
-        fclose(STDIN);
-        fclose(STDOUT);
-        fclose(STDERR);
-
-        reconnect_db();
 
         // Handle SIGTERM so that can be killed without pain
         declare(ticks = 1); // tick use required as of PHP 4.3.0
         pcntl_signal(SIGTERM, 'sigterm_handler');
+
+        // reconnect DB
+        unset($DB);
+        setup_DB();
     }
+}
 
-    set_config('onlinejudge2_daemon_pid' , $pid);
+// Run forever until being killed or the plugin was upgraded
+$stop = false;
+$plugin_version = get_config('local_onlinejudge2', 'version');
+while (!$stop) {
 
-    // Run forever until be killed or plugin was upgraded
-    while(!empty($CFG->onlinejudge2_daemon_pid)){
-        global $DB;
-        $this->judge_all_unjudged();
+    judge_all_unjudged();
 
-        // If error occured, reconnect db
-        if ($DB->ErrorNo()) {
-            reconnect_db();
-        }
+    //Check interval is 5 seconds
+    sleep(5);
 
-        //Check interval is 5 seconds
-        sleep(5);
-
-        //renew the config value which could be modified by other processes
-        $CFG->onlinejudge2_daemon_pid = get_config(NULL, 'onlinejudge2_daemon_pid');
-    }
+    // upgraded?
+    $stop = $plugin_version < get_config('local_onlinejudge2', 'version');
 }
 
 /**
@@ -207,5 +164,10 @@ function judge_all_unjudged(){
         }
 }
 
+function sigterm_handler($signo) {
+    global $stop;
+
+    $stop = true;
+}
 
 ?>
