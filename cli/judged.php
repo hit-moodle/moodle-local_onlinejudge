@@ -35,8 +35,9 @@ require_once($CFG->libdir.'/clilib.php');      // cli only functions
 require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 // now get cli options
-list($options, $unrecognized) = cli_get_params(array('help'=>false, 'nodaemon'=>true, 'once'=>false),
-                                               array('h'=>'help', 'n'=>'nodaemon', 'o'=>'once'));
+$longoptions  = array('help'=>false, 'nodaemon'=>false, 'once'=>false, 'verbose'=>false);
+$shortoptions = array('h'=>'help', 'n'=>'nodaemon', 'o'=>'once', 'v'=>'verbose');
+list($options, $unrecognized) = cli_get_params($longoptions, $shortoptions);
 
 if ($unrecognized) {
     $unrecognized = implode("\n  ", $unrecognized);
@@ -49,7 +50,7 @@ if ($options['help']) {
 
 Options:
 -h, --help            Print out this help
--n, --nodaemon        Do not run as daemon (Linux with php-posix only)
+-n, --nodaemon        Do not run as daemon (Linux only)
 -o, --once            Exit while no more to judge
 
 Example:
@@ -60,11 +61,12 @@ Example:
     die;
 }
 
-if (!$options['nodaemon']) {
+if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
     // create daemon
+    verbose('Creating daemon...');
 
     if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
-        cli_error('pcntl and posix extension must be installed!');
+        cli_error('PHP pcntl and posix extension must be installed!');
     }
 
     $pid = pcntl_fork();
@@ -92,18 +94,20 @@ if (!$options['nodaemon']) {
 }
 
 // Run forever until being killed or the plugin was upgraded
-$stop = false;
+$forcestop = false;
+$upgraded = false;
 $plugin_version = get_config('local_onlinejudge2', 'version');
-while (!$stop) {
+while (!$forcestop and !$upgraded) {
 
     judge_all_unjudged();
 
     //Check interval is 5 seconds
     sleep(5);
 
-    // upgraded?
-    $stop = $plugin_version < get_config('local_onlinejudge2', 'version');
+    $upgraded = $plugin_version < get_config('local_onlinejudge2', 'version');
 }
+
+verbose('Exit');
 
 /**
  * Return one unjudged task's id and set it status as PENDING
@@ -121,6 +125,7 @@ function get_one_unjudged_task() {
         if (!empty($tasks)) {
             $task = array_pop($tasks);
             $DB->set_field('onlinejudge2_tasks', 'status', ONLINEJUDGE2_STATUS_JUDGING, array('id' => $task->id));
+            verbose(cli_heading('TASK: '.$task->id, true));
         }
 
         $transaction->allow_commit();
@@ -135,13 +140,22 @@ function get_one_unjudged_task() {
 // Judge all unjudged tasks
 function judge_all_unjudged(){
     while ($task = get_one_unjudged_task()) {
+        verbose('Judging...');
         onlinejudge2_judge($task);
+        verbose('Successfully judged');
     }
 }
 
 function sigterm_handler($signo) {
-    global $stop;
-    $stop = true;
+    global $forcestop;
+    $forcestop = true;
+    verbose('SIGTERM catched');
 }
 
+function verbose($msg) {
+    global $options;
+    if ($options['verbose']) {
+        mtrace(rtrim($msg));
+    }
+}
 ?>
