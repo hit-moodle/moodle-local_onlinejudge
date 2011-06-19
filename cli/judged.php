@@ -32,6 +32,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/clilib.php');      // cli only functions
+require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(array('help'=>false, 'nodaemon'=>true, 'once'=>false),
@@ -57,31 +58,6 @@ Example:
 
     echo $help;
     die;
-}
-
-// TODO: don't kill old daemon any more when we can run several judged process concurrently
-// Kill old daemon if it exists
-if(!empty($CFG->onlinejudge2_daemon_pid)) {
-    if (function_exists('posix_kill')) { 
-   	    // Linux
-        mtrace('Killing old judged. PID = ' . $CFG->onlinejudge2_daemon_pid);
-        posix_kill($CFG->onlinejudge2_daemon_pid, SIGTERM);
-       
-        // Wait for its quit
-        while(posix_kill($CFG->onlinejudge2_daemon_pid, 0))
-            sleep(0);
-        mtrace('done');
-        $CFG->onlinejudge2_daemon_pid = 0;
-    } 
-    else {
-        mtrace("It seems that a judged (PID: $CFG->onlinejudge2_daemon_pid) is still running.");
-        mtrace("It must be killed manually.");
-        mtrace("If it has been killed, enter 'C' to continue.");
-        //strip the whitespace character.
-        $input = trim(fgets(STDIN));
-        if ($input != 'C' && $input != 'c')
-            die;
-   }
 }
 
 if (!$options['nodaemon']) {
@@ -130,43 +106,41 @@ while (!$stop) {
 }
 
 /**
- * Get one unjudged task and set it as judged
- * If all tasks have been judged, return false
- * The function can be reentranced
+ * Return one unjudged task's id and set it status as PENDING
+ *
+ * @return an unjudged task's id or false
  */
-function get_unjudged_task() {
+function get_one_unjudged_taskid() {
     global $CFG, $DB;
-    while (!set_cron_lock('onlinejudge2_judging', time() + 10)) {}
-    
-    $tasks = $DB->get_records('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING));
-    $task = null;
-    if ($tasks != null) {
-        //for test
-        echo "tasks not null<br />";
-        // pop one task.
-        $task = array_pop($tasks);
-        // Set judged mark
-        $DB->set_field('onlinejudge2_tasks', 'judged', 1, array('id' => $task->id));
+
+    $transaction = $DB->start_delegated_transaction();
+
+    try {
+        $tasks = $DB->get_records('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING), '', 'id', 0, 1);
+
+        if (!empty($tasks)) {
+            $task = array_pop($tasks);
+            $DB->set_field('onlinejudge2_tasks', 'status', ONLINEJUDGE2_STATUS_JUDGING, array('id' => $task->id));
+        }
+
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        //TODO: reconnect db ?
+        $transaction->rollback($e); // rethrows exception
     }
 
-        set_cron_lock('onlinejudge2_judging', null);
-
-        return $task;     
+    return isset($task) ? $task->id : false;
 }
 
 // Judge all unjudged tasks
 function judge_all_unjudged(){
-        global $CFG;
-        while ($task = get_unjudged_task()) {
-            $cm = get_coursemodule_from_instance('assignment', $task->coursemodule);
-
-            $this->judge($task);
-        }
+    while ($task = get_one_unjudged_task()) {
+        onlinejudge2_judge($task);
+    }
 }
 
 function sigterm_handler($signo) {
     global $stop;
-
     $stop = true;
 }
 

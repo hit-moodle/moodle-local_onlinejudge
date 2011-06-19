@@ -260,7 +260,7 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
  * @param $taskid should be got from onlinejudge2_submit_task function.
  * @return the result after judge.
  */
-function onlinejudge2_get_judge($taskid) {
+function onlinejudge2_judge($taskid) {
     global $CFG, $DB, $judgeclasses;
     //result class
     $result = new stdClass(); 
