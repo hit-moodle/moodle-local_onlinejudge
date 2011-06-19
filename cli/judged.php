@@ -29,10 +29,37 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/clilib.php');      // cli only functions
 
+// now get cli options
+list($options, $unrecognized) = cli_get_params(array('help'=>false, 'nodaemon'=>true, 'once'=>false),
+                                               array('h'=>'help', 'n'=>'nodaemon', 'o'=>'once'));
+
+if ($unrecognized) {
+    $unrecognized = implode("\n  ", $unrecognized);
+    cli_error(get_string('cliunknowoption', 'admin', $unrecognized));
+}
+
+if ($options['help']) {
+    $help =
+"Judge all unjudged tasks.
+
+Options:
+-h, --help            Print out this help
+-n, --nodaemon        Do not run as daemon (Linux with php-posix only)
+-o, --once            Exit while no more to judge
+
+Example:
+\$sudo -u www-data /usr/bin/php local/onlinejudge2/cli/judged.php
+";
+
+    echo $help;
+    die;
+}
+
+// TODO: don't kill old daemon any more when we can run several judged process concurrently
 // Kill old daemon if it exists
 if(!empty($CFG->onlinejudge2_daemon_pid)) {
     if (function_exists('posix_kill')) { 
