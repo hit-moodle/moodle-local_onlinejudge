@@ -110,7 +110,7 @@ while (!$stop) {
  *
  * @return an unjudged task's id or false
  */
-function get_one_unjudged_taskid() {
+function get_one_unjudged_task() {
     global $CFG, $DB;
 
     $transaction = $DB->start_delegated_transaction();
