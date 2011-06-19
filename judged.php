@@ -2,15 +2,24 @@
 
 /**
  * This file can only be invoked from cli by the following command:
- *   /usr/bin/php /PATH/TO/MOODLE/local/onlinejudge2/judged.php
+ *   /usr/bin/php /PATH/TO/moodle/local/onlinejudge2/judged.php
+ *   eg:
+ *   /usr/bin/php  /var/www/moodle/local/onlinejudge2/judged.php
  * A judge daemon will be created.
  */
 
+if(! defined('CLI_SCRIPT')) {
+    define('CLI_SCRIPT', true);
+}
+
 require_once(dirname(__FILE__) . '/../../config.php');
+//require_once("../../config.php");
 global $CFG;
 require_once($CFG->dirroot.'/lib/adminlib.php');
+require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
-if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
+if (isset($_SERVER['REMOTE_ADDR'])) { 
+    // if the script is not accessed via the web.
     print_error('errorclionly', 'local_onlinejudge2');
     exit;
 }
@@ -19,17 +28,18 @@ if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
 if(!empty($CFG->onlinejudge2_daemon_pid)) {
     if (function_exists('posix_kill')) { 
    	    // Linux
-        mtrace('Killing old judged. PID = ' . $CFG->onlinejudge2_daemon_pid);
+        mtrace('Killing old judged. PID = '.$CFG->onlinejudge2_daemon_pid);
         posix_kill($CFG->onlinejudge2_daemon_pid, SIGTERM);
        
         // Wait for its quit
-        while(posix_kill($CFG->onlinejudge2_daemon_pid, 0))
+        while(posix_kill($CFG->onlinejudge2_daemon_pid, 0)){
             sleep(0);
+        }
         mtrace('done');
         $CFG->onlinejudge2_daemon_pid = 0;
     } 
     else {
-        mtrace("It seems that a judged (PID: $CFG->onlinejudge2_daemon_pid) is still running.");
+        mtrace("It seems that a judged (PID: ".$CFG->onlinejudge2_daemon_pid." ) is still running.");
         mtrace("It must be killed manually.");
         mtrace("If it has been killed, enter 'C' to continue.");
         //strip the whitespace character.
@@ -39,6 +49,9 @@ if(!empty($CFG->onlinejudge2_daemon_pid)) {
    }
 }
 
+//get unjudged task
+$task = get_unjudged_task();
+$result = onlinejudge2_get_judge($task->id);
 // Create daemon
 if (function_exists('pcntl_fork')) {
     // Linux
@@ -136,20 +149,20 @@ function get_unjudged_task() {
     global $CFG, $DB;
     while (!set_cron_lock('onlinejudge2_judging', time() + 10)) {}
     
-    $tasks = $DB->get_records('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING));
+    $task = new stdClass();
     $task = null;
+    
+    $tasks = $DB->get_records('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING));
+    
     if ($tasks != null) {
-        //for test
-        echo "tasks not null<br />";
         // pop one task.
         $task = array_pop($tasks);
         // Set judged mark
-        $DB->set_field('onlinejudge2_tasks', 'judged', 1, array('id' => $task->id));
+        //$DB->set_field('onlinejudge2_tasks', 'judged', 1, array('id' => $task->id));
     }
+    set_cron_lock('onlinejudge2_judging', null);
 
-        set_cron_lock('onlinejudge2_judging', null);
-
-        return $task;     
+    return $task;     
 }
 
 // Judge all unjudged tasks

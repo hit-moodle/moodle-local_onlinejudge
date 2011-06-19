@@ -4,7 +4,7 @@ require_once("../../config.php");
 global $CFG, $DB;
 require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 //require_once($CFG->dirroot.'/local/onlinejudge2/judged.php');
-
+echo $_SERVER['REMOTE_ADDR'];
 //sub是封装的数据包
 $task = new stdClass();
 $cm = 13;
@@ -42,8 +42,16 @@ $task->submittime = time();
 
 
 //$result = onlinejudge2_get_judge(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
-$result = onlinejudge2_get_judge(13);
-echo $result->status;
+//$result = onlinejudge2_get_judge(13);
+//$id = onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error);
+//echo $result->status;
+$res = $DB->get_record('onlinejudge2_tasks', array('id' => 14));
+if($res->id) {
+	echo "hahahahahahaha";
+	echo $res->id.'sfdsgsgsg';
+}
+echo $res->language."<br>";
+//.$res->status;
 //echo $id;
 echo "<br>";
 //echo $result->info_teacher;

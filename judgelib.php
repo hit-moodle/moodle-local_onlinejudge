@@ -239,6 +239,7 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             
             //save the task into database
             $id = $DB->insert_record('onlinejudge2_tasks', $task, true);
+            
             if(! $id) {
                 //print error info
                 mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
@@ -485,7 +486,17 @@ function get_max_cpu_times($time=0) {
     return $cputime;
 }
 
-    
+function reconnect_db()
+{
+    global $DB;
+    // Reconnect db
+    $DB->Close();
+
+    while (!$DB->NConnect())
+        sleep(5);
+
+    $DB->configure_dbconnection();
+}    
     
 
 
