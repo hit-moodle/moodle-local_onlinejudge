@@ -52,6 +52,7 @@ Options:
 -h, --help            Print out this help
 -n, --nodaemon        Do not run as daemon (Linux only)
 -o, --once            Exit while no more to judge
+-v, --verbose         Verbose output
 
 Example:
 \$sudo -u www-data /usr/bin/php local/onlinejudge2/cli/judged.php
@@ -63,7 +64,7 @@ Example:
 
 if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
     // create daemon
-    verbose('Creating daemon...');
+    verbose(cli_heading('Creating daemon', true));
 
     if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
         cli_error('PHP pcntl and posix extension must be installed!');
@@ -93,6 +94,9 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
     }
 }
 
+verbose(cli_separator(true));
+verbose('Judge daemon is running now.');
+
 // Run forever until being killed or the plugin was upgraded
 $forcestop = false;
 $upgraded = false;
@@ -101,13 +105,21 @@ while (!$forcestop and !$upgraded) {
 
     judge_all_unjudged();
 
+    if ($options['once']) {
+        break;
+    }
+
     //Check interval is 5 seconds
+    // TODO: definable by admin
     sleep(5);
 
     $upgraded = $plugin_version < get_config('local_onlinejudge2', 'version');
+    if ($upgraded) {
+        verbose('Plugin was upgraded.');
+    }
 }
 
-verbose('Exit');
+verbose('Judge daemon exits.');
 
 /**
  * Return one unjudged task's id and set it status as PENDING
