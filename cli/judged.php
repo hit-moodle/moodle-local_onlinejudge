@@ -84,10 +84,6 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
             cli_error('Can not setsid()');
         }
 
-        // Handle SIGTERM so that can be killed without pain
-        declare(ticks = 1); // tick use required as of PHP 4.3.0
-        pcntl_signal(SIGTERM, 'sigterm_handler');
-
         // reconnect DB
         unset($DB);
         setup_DB();
@@ -96,6 +92,13 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
 
 verbose(cli_separator(true));
 verbose('Judge daemon is running now.');
+
+if ($CFG->ostype != 'WINDOWS') {
+    // Handle SIGTERM and SIGINT so that can be killed without pain
+    declare(ticks = 1); // tick use required as of PHP 4.3.0
+    pcntl_signal(SIGTERM, 'sigterm_handler');
+    pcntl_signal(SIGINT, 'sigterm_handler');
+}
 
 // Run forever until being killed or the plugin was upgraded
 $forcestop = false;
@@ -161,7 +164,7 @@ function judge_all_unjudged(){
 function sigterm_handler($signo) {
     global $forcestop;
     $forcestop = true;
-    verbose('SIGTERM catched');
+    verbose("Signal $signo catched");
 }
 
 function verbose($msg) {
