@@ -156,7 +156,7 @@ function get_one_unjudged_task() {
 function judge_all_unjudged(){
     while ($task = get_one_unjudged_task()) {
         verbose('Judging...');
-        onlinejudge2_judge($task);
+        onlinejudge2_judge($task->id);
         verbose('Successfully judged');
     }
 }
