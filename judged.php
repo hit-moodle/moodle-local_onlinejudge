@@ -1,19 +1,37 @@
 <?php
 
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * This file can only be invoked from cli by the following command:
- *   /usr/bin/php /PATH/TO/MOODLE/local/onlinejudge2/judged.php
- * A judge daemon will be created.
+ * This script judges all unjudged tasks
+ *
+ * In Linux, it will create a daemon and exit
+ * In Windows, it will never exit except killed by users
+ *
+ * @package    plagiarism_moss
+ * @subpackage cli
+ * @copyright  2011 Sun Zhigang (http://sunner.cn)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
-global $CFG;
-require_once($CFG->dirroot.'/lib/adminlib.php');
+define('CLI_SCRIPT', true);
 
-if (isset($_SERVER['REMOTE_ADDR'])) { // if the script is accessed via the web.
-    print_error('errorclionly', 'local_onlinejudge2');
-    exit;
-}
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir.'/clilib.php');      // cli only functions
 
 // Kill old daemon if it exists
 if(!empty($CFG->onlinejudge2_daemon_pid)) {
