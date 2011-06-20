@@ -93,7 +93,7 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
 verbose(cli_separator(true));
 verbose('Judge daemon is running now.');
 
-if ($CFG->ostype != 'WINDOWS') {
+if ($CFG->ostype != 'WINDOWS' and method_exists('pcntl_signal')) {
     // Handle SIGTERM and SIGINT so that can be killed without pain
     declare(ticks = 1); // tick use required as of PHP 4.3.0
     pcntl_signal(SIGTERM, 'sigterm_handler');
