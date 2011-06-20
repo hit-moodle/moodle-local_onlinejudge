@@ -674,6 +674,7 @@ class assignment_onlinejudge extends assignment_upload {
 
     function cron() {
         //TODO: clean never unused testcases
+        //TODO: grade ungraded submissions
     }
 
 
