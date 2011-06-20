@@ -105,6 +105,7 @@
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
     $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';
+    $string['pluginname'] = 'Online Judge 2';
     $string['privileges'] = '<p>Students privileges:XXXX</p>
     						 <p>Teacher privileges:XXXXX</p>';
     $string['privilegesnone'] = 'You have no privilege!!!';
@@ -115,6 +116,7 @@
     $string['rejudgefailed'] = 'Can not submitted rejudge request.';
     $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
+    $string['settingsform'] = 'Online Judge 2 Settings';
     $string['statistics'] = 'Statistics';
     $string['status0'] = 'Pending...';
     $string['status1'] = '<font color=red>Accepted</font>';
