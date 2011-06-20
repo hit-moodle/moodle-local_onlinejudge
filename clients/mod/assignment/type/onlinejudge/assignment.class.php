@@ -264,14 +264,13 @@ class assignment_onlinejudge extends assignment_upload {
 
         foreach ($records as $record) {
             if ($record->usefile) {
-                $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
                 $fs = get_file_storage();
 
-                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_input', $record->id)) {
+                if ($files = $fs->get_area_files($this->context->id, 'mod_assignment', 'onlinejudge_input', $record->id)) {
                     $file = array_pop($files);
                     $record->input = $file->get_content();
                 }
-                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_output', $record->id)) {
+                if ($files = $fs->get_area_files($this->context->id, 'mod_assignment', 'onlinejudge_output', $record->id)) {
                     $file = array_pop($files);
                     $record->output = $file->get_content();
                 }
@@ -463,8 +462,7 @@ class assignment_onlinejudge extends assignment_upload {
         $table->data[] = array($item_name, $item);
 
         // Output (Show to teacher only)
-        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-        if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
+        if (has_capability('mod/assignment:grade', $this->context->id) && isset($submission->output)) {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
