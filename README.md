@@ -1,16 +1,55 @@
-THIS PLUGIN IS STILL UNDER DEVELOPMENT
+** THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE TO PRODUCTION SITES **
 
-Online Judge 2 is a local plugin for Moodle 2.x. It provides a class library, 
-called judgelib, to assess submitted source code automatically by testing them
-against customized test cases (ACM-ICPC/Online Judge style). By calling this lib, 
-all kinds of moodle plugins can get the ability of online judge.
+Summary
+=======
 
-Now, OJ2 includes an Online Judge Assignment Type which works like the offical
-Advanced Uploading of Files except the ability of online judge. To install it,
-run the following command in command line, and the current directory must be
-onlinejudge2
+The Online Judge 2 plugin for Moodle 2 is designed for courses involving programming.
+It can automatically grade submitted source code by testing them against customizable
+test cases (ACM-ICPC/Online Judge style).
 
-ln -s ../../../local/onlinejudge2/clients/mod/assignment/type/onlinejudge/ ../../mod/assignment/type/
+It contains:
+
+1. A local plugin call judgelib which provides the essential abilities of online judge.
+   It works like a library.
+2. A assignment type plugin call online judge which provides a UI to teachers and students
+   and calls the judgelib to judge submissions.
+
+
+Prerequisite
+============
+
+For Linux Users
+---------------
+
+* php-cli
+* make, gcc and g++ (optional but recommended)
+* pcntl and posix extension in php-cli (optional but recommended)
+
+For Windows Users
+-----------------
+
+* php-cli
+
+
+Installation & Upgrading
+========================
+
+* MOODLE_PATH means the root path of your moodle installation. *
+
+For Linux Users
+---------------
+
+1. Make sure the directory name of this plugin is `onlinejudge2`. If not, rename it.
+2. If the directory `MOODLE_PATH/local/onlinejudge2/` exists, remove it.
+2. Put `onlinejudge2` into `MOODLE_PATH/local/`
+3. `cd MOODLE_PATH/local/onlinejudge2 && ./install_assignment_type`
+4. Login your site as admin and the plugins can be installed/upgraded.
+5. If you want to use sandbox judge engine, then
+   `cd MOODLE_PATH/local/onlinejudge2/clients/mod/assignment/type/onlinejudge/judge/sandbox/sand/ && make`
+
+
+Links
+=====
 
 Home:
     https://github.com/hit-moodle/moodle-local_onlinejudge2
