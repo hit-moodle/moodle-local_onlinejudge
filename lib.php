@@ -31,10 +31,10 @@ defined('MOODLE_INTERNAL') || die();
 function onlinejudge2_extends_navigation(global_navigation $navigation) {
     $onlinejudge2 = $navigation->add('Onlinejudge2', new moodle_url('/local/onlinejudge2/'));
 
-    $onlinejudge2->add("配置", new moodle_url("/local/onlinejudge2/settings.php"));
-    $onlinejudge2->add("提交作业", new moodle_url("/local/onlinejudge2/judgelib.php"));
-    $onlinejudge2->add("查看状态", new moodle_url("/local/onlinejudge2/result.php"));
-
+    $onlinejudge2->add("配置", new moodle_url("/local/onlinejudge2/config.php"));
+    $onlinejudge2->add("在线评测", new moodle_url("/local/onlinejudge2/judge.php"));
+    $onlinejudge2->add("查看结果", new moodle_url("/local/onlinejudge2/result.php"));
+    $onlinejudge2->add("FAQ", new moodle_url("/local/onlinejudge2/help.php"));
 }
 
 

@@ -1,8 +1,9 @@
 <?php
 	defined('MOODLE_INTERNAL') || die();
 	
-	$string['about'] = '<p>Description about onlinejudge2,eh...</p>
-	<p>If you want to join us,see：<a href="https://git.github.com/hit-moodle/onlinejudge">our git source</a></p>' ;
+	$string['about'] = '<p>Based on Moodle, Onlinejudge2 is a tool for onlinejudging work.</p>
+	                    <p>It provides kinds of compiler(sandbox, ideone, etc...)</p>
+	                    <p>If you want to join us,see：<a href="https://git.github.com/hit-moodle/onlinejudge">git site</a></p>' ;
     $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
     $string['badtestcasefile'] = 'This file does not exist or can not be read';
@@ -104,9 +105,11 @@
     $string['nosuchlanguage'] = 'There is no such supported language';
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
-    $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';
-    $string['privileges'] = '<p>Students privileges:XXXX</p>
-    						 <p>Teacher privileges:XXXXX</p>';
+    $string['onlinejudge2'] = 'Onlinejudge2----an onlinejudge tool @ Moodle';
+    $string['onlinejudge2:manage'] = "Manage onlinejudge2's everything";
+    $string['onlinejudge2:commit'] = 'commit to onlinejudge2 for judge';
+    $string['page_result'] = 'List your onlinejudge result';
+    $string['privileges'] = '<p>Your privileges</p>';
     $string['privilegesnone'] = 'You have no privilege!!!';
     $string['ratiope'] = 'Ratio for presentation error';
     $string['rejudge'] = 'Rejudge';

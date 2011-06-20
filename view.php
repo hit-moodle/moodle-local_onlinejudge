@@ -26,39 +26,119 @@
  * @copyright 2011 Yu Zhan <yuzhanlaile@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+//此页面用于显示程序运行的详细信息
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
+require_once('styles.php');
 
-require_login(SITEID, false);
-require_capability('local/onlinejudge2:stage', get_system_context());
+global $CFG;
+require($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
+global $PAGE;
+global $DB;
+global $USER;
+require_capability('local/onlinejudge2:manage', get_system_context());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/onlinejudge2/view.php');
-$PAGE->set_title('onlinejudge2 ' . get_string('onlinejudge', 'local_onlinejudge2'));
-$PAGE->set_heading('onlinejudge2 ' . get_string('onlinejudge', 'local_onlinejudge2'));
-$PAGE->requires->js_init_call('M.local_onlinejudge2.init_tonlinejudge', array(), true);
-$PAGE->requires->yui_module('moodle-local_onlinejudge2-timeline', 'M.local_onlinejudge2.init_onlinejudge');
+$PAGE->set_title('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge2'));
+$PAGE->set_heading('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge2'));
 
 $output = $PAGE->get_renderer('local_onlinejudge2');
 
-// create a renderable object that represents the filter form
-$filter = new local_onlinejudge2_filter($PAGE->url);
-// save the filter settings into the sesssion
-$fdata = $filter->get_data();
-foreach ($fdata as $setting => $value) {
-    $USER->{'local_onlinejudge2_' . $setting} = serialize($value);
-}
-$filter->set_permalink($PAGE->url, $fdata);
-
-// just make sure that USER contains sesskey
-$sesskey = sesskey();
-// create a renderable object that represent the translation table
-$translator = new local_onlinejudge2_translator($filter, $USER);
-
 /// Output starts here
 echo $output->header();
-echo $output->render($filter);
-echo $output->render($translator);
-echo $output->box('', 'onlinejudge', 'onlinejudge');
+echo $output->heading("程序详细信息");
+
+
+$id = optional_param('id', null, PARAM_INT); //get id
+
+if(is_null($id)) {
+    mtrace('没有指定需要查看的作业，请返回...');
+    exit;
+}
+//get the record from database , based on the $id
+$task = new stdClass();
+$task = null;
+$task = $DB->get_record('onlinejudge2_tasks', array('id' => $id));
+
+//output
+//base information
+echo $output->container_start('base_info', 'base_info'); //first is class, second is id
+echo 'Base information';
+echo $output->container_end();
+//trip the langguages's suffix， eg:'cpp_ideone'=> 'cpp'
+$language = substr($task->language, 0, strrpos($task->language, '_'));
+//get compiler
+$compiler = substr($task->language, strrpos($task->language, '_')+1);
+//translate status
+$status = translate_status($task->status);
+$base_info =array(
+        'language:        '=>    $language,
+        'compiler:        '=>    $compiler,
+        'status:          '=>    $status,
+        'date(submit):    '=>    $task->submittime,
+        'date(judge):     '=>    $task->judgetime,
+);
+foreach($base_info as $name=>$value) {
+    $base_info[$name] = $name.$value;
+}
+$base_info = '<li>' . implode("</li>\n<li>", $base_info) . '</li>';
+echo html_writer::tag('ul', $base_info);
+
+//detail information
+echo $output->container_start('detail_info', 'detail_info'); //first is class, second is id
+echo 'Detail information';
+echo $output->container_end();
+
+echo "<p></p>";
+echo "source:";
+$source = $task->source; 
+//TODO format the source, use html_writer and use syntaxhighliter to show.
+echo "<table width = '300', height='200' border='2'>
+          <tr>
+              <td>
+                  $source
+              </td>
+          </tr>
+      </table>
+     ";
+echo "<p></p>";
+$detail_info =array(
+        'input:           '=>    $task->input,
+        'output:          '=>    $task->output,
+        'answer:          '=>    $task->answer,
+        'memusage:        '=>    $task->memusage,
+        'cpuusage:        '=>    $task->cpuusage,
+        'maxmem:          '=>    $task->memlimit,
+        'maxcpu:          '=>    $task->cpulimit,
+        'information:     '=>    $task->info_teacher,
+);
+if(! is_null($task->error)) {
+    array_push($detail_info, $task->error);
+}
+
+foreach($detail_info as $name=>$value) {
+    $detail_info[$name] = $name.$value;
+}
+$detail_info = '<li>' . implode("</li>\n<li>", $detail_info) . '</li>';
+echo html_writer::tag('ul', $detail_info);
+
+echo $output->heading();
+
 echo $output->footer();
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
