@@ -23,8 +23,6 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-define('NUMTESTS', 5); // Default number of test cases
-
 // Default maximum cpu time (seconds) for all assignments
 if (!isset($CFG->assignment_oj_max_cpu)) {
     set_config('assignment_oj_max_cpu', 10);
@@ -35,28 +33,9 @@ if (!isset($CFG->assignment_oj_max_mem)) {
     set_config('assignment_oj_max_mem', 256 * 1024 * 1024);
 }
 
-// Judge everytime when cron is running if set to true. Default is false. Use daemon is recommanded
-if (!isset($CFG->assignment_oj_judge_in_cron)) {
-    set_config('assignment_oj_judge_in_cron', 0);
-}
-
-
-// IDEONE.com configure
-if (!isset($CFG->assignment_oj_ideone_username)) {
-	set_config('assignment_oj_ideone_username' , 'test');
-}
-if (!isset($CFG->assignment_oj_ideone_password)) {
-	set_config('assignment_oj_ideone_password' , 'test');
-}
-if (!isset($CFG->assignment_oj_ideone_delay)) { //delay between submitting and getting result
-	set_config('assignment_oj_ideone_delay' , 3);
-}
-
-
 require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
-require_once($CFG->dirroot.'/lib/adminlib.php'); //for set_cron_lock()
 require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 /**
