@@ -129,6 +129,8 @@ define("ONLINEJUDGE2_STATUS_INTERNAL_ERROR",        21);
 define("ONLINEJUDGE2_STATUS_JUDGING",               22);
 define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
 
+define("ONLINEJUDGE2_STATUS_UNSUBMITTED",          255);
+
 // define max_mem and max_cpu
 define("ONLINEJUDGE2_MAX_CPU",                       1);
 define("ONLINEJUDGE2_MAX_MEM",                 1048576);
@@ -355,10 +357,10 @@ function onlinejudge2_get_task($taskid) {
  */
 function onlinejudge2_get_overall_status($tasks) {
 
-    $status = 0;
+    $status = ONLINEJUDGE2_STATUS_UNSUBMITTED;
     foreach ($tasks as $task) {
         if (is_null($task)) // We can't give out any status on null task
-            return 0;
+            return ONLINEJUDGE2_STATUS_UNSUBMITTED;
 
         if ($status == 0) {
             $status = $task->status;

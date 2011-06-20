@@ -134,6 +134,7 @@
     $string['status22'] = 'Judging...';
     $string['status23'] = 'Multi-status';
     $string['status24'] = 'Judged...';
+    $string['status255'] = 'Unsubmitted';
     $string['successrate'] = 'Success rate';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
