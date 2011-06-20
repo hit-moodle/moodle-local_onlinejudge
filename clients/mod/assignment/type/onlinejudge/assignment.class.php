@@ -592,7 +592,7 @@ class assignment_onlinejudge extends assignment_upload {
         }
 
         // should we update the grade?
-        if ($submission->timemarked < $result->judgetime) {
+        if ($submission->timemarked < $result->judgetime and $this->is_finalized($submisssion)) {
             $submission->grade = $result->grade;
             $submission->timemarked = time();
             $submission->mailed = 1; // do not notify student by mail
