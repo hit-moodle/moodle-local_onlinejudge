@@ -1,4 +1,4 @@
-<?php
+<?
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // This file is part of Online Judge 2//moodle.org/                      //
@@ -26,11 +26,47 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
+require('../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/local/onlinejudge2/admin/forms.php');
 
-if ($hassiteconfig) { // needs this condition or there is error on login page
-    $ADMIN->add('localplugins', new admin_externalpage('local_onlinejudge2',
-            get_string('pluginname', 'local_onlinejudge2'),
-            new moodle_url('/local/onlinejudge2/admin/settings.php')));
+admin_externalpage_setup('local_onlinejudge2');
+
+$ojsettingsform = new onlinejudge2_settings_form();
+$fromform = $ojsettingsform->get_data();
+
+echo $OUTPUT->header();
+
+// TODO: check environments
+
+if (!empty($fromform) and confirm_sesskey()) {
+
+    //Save settings
+    set_config('name', $fromform->name, 'local_hub');
+    set_config('hubenabled', 
+            empty($fromform->enabled)?0:$fromform->enabled, 'local_hub');
+    set_config('description', $fromform->desc, 'local_hub');
+    set_config('contactname', $fromform->contactname, 'local_hub');
+    set_config('contactemail', $fromform->contactemail, 'local_hub');
+    set_config('maxwscourseresult', $fromform->maxwscourseresult, 'local_hub');
+    set_config('maxcoursesperday', $fromform->maxcoursesperday, 'local_hub');
+    set_config('searchfornologin', empty($fromform->searchfornologin)?0:1, 'local_hub');
+    set_config('enablerssfeeds', 
+            empty($fromform->enablerssfeeds)?0:$fromform->enablerssfeeds, 'local_hub');
+    set_config('rsssecret',
+            empty($fromform->rsssecret)?'':$fromform->rsssecret, 'local_hub');
+    
+    set_config('language', $fromform->lang, 'local_hub');
+
+    set_config('password', 
+            empty($fromform->password)?null:$fromform->password, 'local_hub');
+
+
+
+    //display confirmation
+    echo $OUTPUT->notification(get_string('settingsupdated', 'local_hub'), 'notifysuccess');
+} else {
+    $ojsettingsform->display();
 }
+echo $OUTPUT->footer();
 

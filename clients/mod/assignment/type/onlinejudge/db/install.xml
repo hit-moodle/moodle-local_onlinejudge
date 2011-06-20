@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20110609" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
+<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20110620" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -26,13 +26,17 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="submission"/>
         <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="testcase"/>
         <FIELD NAME="testcase" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Testcase ID" PREVIOUS="submission" NEXT="task"/>
-        <FIELD NAME="task" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Corresponding Online Judge task ID" PREVIOUS="testcase"/>
+        <FIELD NAME="task" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Corresponding Online Judge task ID" PREVIOUS="testcase" NEXT="judged"/>
+        <FIELD NAME="judged" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="task"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
         <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions" REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="testcase"/>
         <KEY NAME="testcase" TYPE="foreign" FIELDS="testcase" REFTABLE="assignment_oj_testcases" REFFIELDS="id" PREVIOUS="submission"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="judged" UNIQUE="false" FIELDS="judged"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="assignment_oj_testcases" COMMENT="Testcases" PREVIOUS="assignment_oj_submissions">
       <FIELDS>

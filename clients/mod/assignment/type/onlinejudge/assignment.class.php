@@ -264,14 +264,13 @@ class assignment_onlinejudge extends assignment_upload {
 
         foreach ($records as $record) {
             if ($record->usefile) {
-                $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
                 $fs = get_file_storage();
 
-                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_input', $record->id)) {
+                if ($files = $fs->get_area_files($this->context->id, 'mod_assignment', 'onlinejudge_input', $record->id)) {
                     $file = array_pop($files);
                     $record->input = $file->get_content();
                 }
-                if ($files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_output', $record->id)) {
+                if ($files = $fs->get_area_files($this->context->id, 'mod_assignment', 'onlinejudge_output', $record->id)) {
                     $file = array_pop($files);
                     $record->output = $file->get_content();
                 }
@@ -319,11 +318,19 @@ class assignment_onlinejudge extends assignment_upload {
      * @param boolean $return Return the link or print it directly
      */
     function print_student_answer($userid, $return = false) {
-        $output = parent::print_student_answer($userid, $return);
+        $output = parent::print_student_answer($userid, true);
+
+        $submission = $this->get_submission($userid);
+        // replace draft status with onlinejudge status
+        if ($this->is_finalized($submission)) {
+            $pattern = '/(<div class="box files">).*(<div )/';
+            $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge2').'</strong>$2';
+            $output = preg_replace($pattern, $replacement, $output, 1);
+        }
 
         // TODO: Syntax Highlight source code link
 
-        return $output;
+        return $output; // Always return since parent do so too
     }
 
     /**
@@ -355,6 +362,27 @@ class assignment_onlinejudge extends assignment_upload {
             return $output;
         }
         echo $output;
+    }
+
+    /**
+     * Load the submission object for a particular user
+     *
+     * online judge result is in the return object
+     * @global object
+     * @global object
+     * @param $userid int The id of the user whose submission we want or 0 in which case USER->id is used
+     * @param $createnew boolean optional Defaults to false. If set to true a new submission object will be created in the database
+     * @param bool $teachermodified student submission set if false
+     * @return object The submission
+     */
+    function get_submission($userid=0, $createnew=false, $teachermodified=false) {
+        $submission = parent::get_submission($userid, $createnew, $teachermodified);
+
+        if (!empty($submission)) {
+            $submission->oj_result = $this->get_onlinejudge_result($submission);
+        }
+
+        return $submission;
     }
 
     /**
@@ -428,43 +456,42 @@ class assignment_onlinejudge extends assignment_upload {
         $table->data[] = array($item_name, $lang);
 
         $submission = $this->get_submission($user);
-        $result = $this->get_onlinejudge_result($submission->id);
 
         // Status
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (!empty($result->status)) {
-            $item = get_string('status'.$result->status, 'local_onlinejudge2');
+        if (!empty($submission->oj_result->status)) {
+            $item = get_string('status'.$submission->oj_result->status, 'local_onlinejudge2');
         }
         $table->data[] = array($item_name, $item);
 
         // Judge time
         $item_name = get_string('judgetime','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (!empty($result->judgetime)) {
-            $item = userdate($result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $result->judgetime)) . ')';
+        if (!empty($submission->oj_result->judgetime)) {
+            $item = userdate($submission->oj_result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $submission->oj_result->judgetime)) . ')';
         }
         $table->data[] = array($item_name, $item);
 
         // Details
         $item_name = get_string('details','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-
-        $i = 1;
-        $lines = array();
-        foreach ($result->testcases as $case) {
-            if (!is_null($case))
-                $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge2');
-            $i++;
-        }
-        if (!empty($lines)) {
-            $item = implode($lines, '<br />');
+        if (!empty($submission->oj_result->testcases)) {
+            $i = 1;
+            $lines = array();
+            foreach ($submission->oj_result->testcases as $case) {
+                if (!is_null($case))
+                    $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge2');
+                $i++;
+            }
+            if (!empty($lines)) {
+                $item = implode($lines, '<br />');
+            }
         }
         $table->data[] = array($item_name, $item);
 
         // Output (Show to teacher only)
-        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-        if (has_capability('mod/assignment:grade', $context) && isset($submission->output)) {
+        if (has_capability('mod/assignment:grade', $this->context) && isset($submission->output)) {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
@@ -514,10 +541,20 @@ class assignment_onlinejudge extends assignment_upload {
         return 0;
     }
 
-    function get_onlinejudge_result($submissionid) {
+    /**
+     * return all results of the submission
+     *
+     * it will update the grade if necessary
+     * @param object submission
+     * @return object
+     */
+    function get_onlinejudge_result($submission) {
         global $DB;
 
-        $sql = 'SELECT s.*
+        if (empty($submission))
+            return null;
+
+        $sql = 'SELECT s.*, t.feedback, t.subgrade
                 FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
                 ON s.testcase = t.id
                 WHERE s.submission = ? AND t.unused = 0 AND s.id IN (
@@ -526,20 +563,42 @@ class assignment_onlinejudge extends assignment_upload {
                     WHERE submission = ?
                     GROUP BY testcase)
                 ORDER BY s.testcase ASC';
-        $onlinejudges = $DB->get_records_sql($sql, array($submissionid, $submissionid)); 
+        $onlinejudges = $DB->get_records_sql($sql, array($submission->id, $submission->id)); 
 
         $cases = array();
         $result->judgetime = 0;
+        $result->grade = 0;
         foreach ($onlinejudges as $oj) {
             if ($task = onlinejudge2_get_task($oj->task)) {
                 $task->testcase = $oj->testcase;
-                $cases[] = $task;
+                $task->feedback = $oj->feedback;
 
-                if($task->judgetime > $result->judgetime)
+                $task->grade = $this->grade_marker($task->status, $oj->subgrade);
+                if ($task->grade != -1 && $result->grade != -1) {
+                    $result->grade += $task->grade;
+                } else {
+                    // Never count grade again
+                    $result->grade = -1;
+                }
+
+                if ($task->judgetime > $result->judgetime) {
                     $result->judgetime = $task->judgetime;
+                }
+
+                $cases[] = $task;
             } else {
                 $cases[] = null;
             }
+        }
+
+        // should we update the grade?
+        if ($submission->timemarked < $result->judgetime) {
+            $submission->grade = $result->grade;
+            $submission->timemarked = time();
+            $submission->mailed = 1; // do not notify student by mail
+            $DB->update_record('assignment_submissions', $submission);
+            // triger grade event
+            $this->update_grade($submission);
         }
 
         $result->testcases = $cases;
@@ -654,28 +713,35 @@ class assignment_onlinejudge extends assignment_upload {
 
     /**
      * return grade
-     * status means ac, wa, pe and etc.
-     * fraction means max fraction in modgrade, :-)
+     *
+     * @param int status
+     * @param float $fraction
+     * @return grade
      */
     function grade_marker($status, $fraction) {
-        $grades = array('pending' => -1,
-                        'ac'      => $fraction * $this->assignment->grade,
-                        'wa'      => 0,
-                        'pe'      => $fraction * $this->assignment->grade * $this->onlinejudge->ratiope,
-                        're'      => 0,
-                        'tle'     => 0,
-                        'mle'     => 0,
-                        'ole'     => 0,
-                        'ce'      => 0,
-                        'ie'      => -1,
-                        'rf'      => 0,
-                        'at'      => 0);
+        $grades = array(
+            ONLINEJUDGE2_STATUS_PENDING                 => -1,
+            ONLINEJUDGE2_STATUS_JUDGING                 => -1,
+            ONLINEJUDGE2_STATUS_INTERNAL_ERROR          => -1,
+            ONLINEJUDGE2_STATUS_WRONG_ANSWER            => 0,
+            ONLINEJUDGE2_STATUS_RUNTIME_ERROR           => 0,
+            ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED       => 0,
+            ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED     => 0,
+            ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED     => 0,
+            ONLINEJUDGE2_STATUS_COMPILATION_ERROR       => 0,
+            ONLINEJUDGE2_STATUS_COMPILATION_OK          => 0,
+            ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS    => 0,
+            ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION    => 0,
+            ONLINEJUDGE2_STATUS_ACCEPTED                => $fraction * $this->assignment->grade,
+            ONLINEJUDGE2_STATUS_PRESENTATION_ERROR      => $fraction * $this->assignment->grade * $this->onlinejudge->ratiope
+        );
 
         return $grades[$status];
     }
 
     function cron() {
         //TODO: clean never unused testcases
+        //TODO: grade ungraded submissions
     }
 
 

@@ -1,7 +1,7 @@
 **THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE FOR PRODUCTION SITES**
 
-Summary
-=======
+Introduction
+============
 
 The Online Judge 2 plugin for Moodle 2 is designed for courses involving programming.
 It can automatically grade submitted source code by testing them against customizable
@@ -23,11 +23,12 @@ There are two judge engines:
 
 The workflow is:
 
-1. Administors set global settings in judgelib.
+1. Administrators set global settings in judgelib.
 2. Teachers create Online Judge Assignment Activities and setup testcases etc.
 3. Students submit code in Online Judge Assignment Activities.
 4. A judge daemon judges the submissions in backgroud.
 5. Teachers and students get judge results in Online Judge Assignment Activities.
+
 
 Prerequisite
 ============
@@ -43,6 +44,16 @@ For Windows Users
 -----------------
 
 * php-cli
+
+
+Download
+========
+
+Download it from https://github.com/hit-moodle/moodle-local_onlinejudge2/archives/master
+
+or using git:
+
+`git clone git://github.com/hit-moodle/moodle-local_onlinejudge2.git onlinejudge2`
 
 
 Installation & Upgrading

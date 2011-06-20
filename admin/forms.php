@@ -1,4 +1,4 @@
-<?php
+<?
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // This file is part of Online Judge 2//moodle.org/                      //
@@ -26,11 +26,29 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
+require_once($CFG->libdir . '/formslib.php');
 
-if ($hassiteconfig) { // needs this condition or there is error on login page
-    $ADMIN->add('localplugins', new admin_externalpage('local_onlinejudge2',
-            get_string('pluginname', 'local_onlinejudge2'),
-            new moodle_url('/local/onlinejudge2/admin/settings.php')));
+/**
+ * This form displays global settings
+ */
+class onlinejudge2_settings_form extends moodleform {
+
+    public function definition() {
+
+        $mform = & $this->_form;
+
+        $mform->addElement('header', 'moodle', get_string('settingsform', 'local_onlinejudge2'));
+
+        $this->add_action_buttons(false, get_string('update'));
+    }
+
+    /**
+     * Set password to empty if hub not private
+     */
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        return $errors;
+    }
+
 }
-

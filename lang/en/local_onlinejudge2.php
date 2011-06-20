@@ -105,11 +105,18 @@
     $string['nosuchlanguage'] = 'There is no such supported language';
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
+<<<<<<< HEAD
     $string['onlinejudge2'] = 'Onlinejudge2----an onlinejudge tool @ Moodle';
     $string['onlinejudge2:manage'] = "Manage onlinejudge2's everything";
     $string['onlinejudge2:commit'] = 'commit to onlinejudge2 for judge';
     $string['page_result'] = 'List your onlinejudge result';
     $string['privileges'] = '<p>Your privileges</p>';
+=======
+    $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';
+    $string['pluginname'] = 'Online Judge 2';
+    $string['privileges'] = '<p>Students privileges:XXXX</p>
+    						 <p>Teacher privileges:XXXXX</p>';
+>>>>>>> 51fa805d2cfab4e89ab1675a83594b335d80d0ed
     $string['privilegesnone'] = 'You have no privilege!!!';
     $string['ratiope'] = 'Ratio for presentation error';
     $string['rejudge'] = 'Rejudge';
@@ -118,6 +125,7 @@
     $string['rejudgefailed'] = 'Can not submitted rejudge request.';
     $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
+    $string['settingsform'] = 'Online Judge 2 Settings';
     $string['statistics'] = 'Statistics';
     $string['status0'] = 'Pending...';
     $string['status1'] = '<font color=red>Accepted</font>';
@@ -135,6 +143,7 @@
     $string['status22'] = 'Judging...';
     $string['status23'] = 'Multi-status';
     $string['status24'] = 'Judged...';
+    $string['status255'] = 'Unsubmitted';
     $string['successrate'] = 'Success rate';
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
