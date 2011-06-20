@@ -462,7 +462,7 @@ class assignment_onlinejudge extends assignment_upload {
         $table->data[] = array($item_name, $item);
 
         // Output (Show to teacher only)
-        if (has_capability('mod/assignment:grade', $this->context->id) && isset($submission->output)) {
+        if (has_capability('mod/assignment:grade', $this->context) && isset($submission->output)) {
             $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
         }
 
