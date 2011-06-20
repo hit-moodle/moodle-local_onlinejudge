@@ -29,6 +29,10 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2011060301) {
+        global $DB;
+
+        // Allow upload one file
+        $DB->set_field('assignment', 'var1', 1, array('assignmenttype' => 'onlinejudge'));
 
         // Define field ideoneuser to be added to assignment_oj
         $table = new xmldb_table('assignment_oj');
