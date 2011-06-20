@@ -14,10 +14,6 @@ if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
     }
 }
 
-if (!isset($CFG->onlinejudge2_judge_in_cron)) {
-    set_config('onlinejudge2_judge_in_cron', 0);
-}
-
 class judge_base{
 	var $langs;
 	var $onlinejudge;
@@ -114,25 +110,6 @@ class judge_base{
         }
     }
 }
-/*
-const ONLINEJUDGE2_STATUS_PENDING                = 0;
-
-const ONLINEJUDGE2_STATUS_ACCEPTED               = 1;
-const ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION   = 2;
-const ONLINEJUDGE2_STATUS_COMPILATION_ERROR      = 3;
-const ONLINEJUDGE2_STATUS_COMPILATION_OK         = 4;
-const ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED    = 5;
-const ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED    = 6;
-const ONLINEJUDGE2_STATUS_PRESENTATION_ERROR     = 7;
-const ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS   = 8;
-const ONLINEJUDGE2_STATUS_RUNTIME_ERROR          = 9;
-const ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED      = 10;
-const ONLINEJUDGE2_STATUS_WRONG_ANSWER           = 11;
-
-const ONLINEJUDGE2_STATUS_INTERNAL_ERROR         = 21;
-const ONLINEJUDGE2_STATUS_JUDGING                = 22;
-const ONLINEJUDGE2_STATUS_MULTI_STATUS           = 23;
-*/
 
 define("ONLINEJUDGE2_STATUS_PENDING",               0 );
 
