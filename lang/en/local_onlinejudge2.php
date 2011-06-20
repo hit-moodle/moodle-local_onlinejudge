@@ -105,18 +105,15 @@
     $string['nosuchlanguage'] = 'There is no such supported language';
     $string['output'] = 'Output';
     $string['outputfile'] = 'Output file';
-<<<<<<< HEAD
     $string['onlinejudge2'] = 'Onlinejudge2----an onlinejudge tool @ Moodle';
     $string['onlinejudge2:manage'] = "Manage onlinejudge2's everything";
     $string['onlinejudge2:commit'] = 'commit to onlinejudge2 for judge';
     $string['page_result'] = 'List your onlinejudge result';
     $string['privileges'] = '<p>Your privileges</p>';
-=======
     $string['onlinejudge2'] = 'Onlinejudge2 @Moodle';
     $string['pluginname'] = 'Online Judge 2';
     $string['privileges'] = '<p>Students privileges:XXXX</p>
     						 <p>Teacher privileges:XXXXX</p>';
->>>>>>> 51fa805d2cfab4e89ab1675a83594b335d80d0ed
     $string['privilegesnone'] = 'You have no privilege!!!';
     $string['ratiope'] = 'Ratio for presentation error';
     $string['rejudge'] = 'Rejudge';
