@@ -1,4 +1,4 @@
-** THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE TO PRODUCTION SITES **
+**THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE TO PRODUCTION SITES**
 
 Summary
 =======
@@ -34,7 +34,7 @@ For Windows Users
 Installation & Upgrading
 ========================
 
-* MOODLE_PATH means the root path of your moodle installation. *
+*MOODLE_PATH means the root path of your moodle installation.*
 
 For Linux Users
 ---------------
