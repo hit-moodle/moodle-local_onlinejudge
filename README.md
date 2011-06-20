@@ -80,8 +80,8 @@ Links
 
 Home:
 
-    https://github.com/hit-moodle/moodle-local_onlinejudge2
+    <https://github.com/hit-moodle/moodle-local_onlinejudge2>
 
 Bug reports, feature requests, help wanted and other issues:
 
-    https://github.com/hit-moodle/moodle-local_onlinejudge2/issues
+    <https://github.com/hit-moodle/moodle-local_onlinejudge2/issues>
