@@ -256,8 +256,8 @@ function onlinejudge2_judge($taskid) {
     
     // check the status
     // pending
-    //if($task->status == ONLINEJUDGE2_STATUS_PENDING) {
-    if(1) {
+    if($task->status == ONLINEJUDGE2_STATUS_PENDING) {
+    //if(1) { //for test
         //get judge language, such as cpp_ideone, c_sandbox.
         $language = $task->language;
         
@@ -476,8 +476,5 @@ function reconnect_db()
 
     $DB->configure_dbconnection();
 }    
-    
 
-
-
-
+?>    
