@@ -1,4 +1,4 @@
-**THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE TO PRODUCTION SITES**
+**THIS PLUGIN IS STILL UNDER DEVELOPMENT AND NOT SUTIABLE FOR PRODUCTION SITES**
 
 Summary
 =======
@@ -14,6 +14,20 @@ It contains:
 2. A assignment type plugin call online judge which provides a UI to teachers and students
    and calls the judgelib to judge submissions.
 
+There are two judge engines:
+
+1. Sandbox compiles and executes programs on the server in a protected environment.
+   Supports C and C++ only.
+2. Ideone posts all data to ideone.com which compiles and executes programs remotely.
+   Supports 40+ languaes, such as C/C++, Java, Python, C#, JavaScript, Perl, PHP.
+
+The workflow is:
+
+1. Administors set global settings in judgelib.
+2. Teachers create Online Judge Assignment Activities and setup testcases etc.
+3. Students submit code in Online Judge Assignment Activities.
+4. A judge daemon judges the submissions in backgroud.
+5. Teachers and students get judge results in Online Judge Assignment Activities.
 
 Prerequisite
 ============
@@ -41,18 +55,33 @@ For Linux Users
 
 1. Make sure the directory name of this plugin is `onlinejudge2`. If not, rename it.
 2. If the directory `MOODLE_PATH/local/onlinejudge2/` exists, remove it.
-2. Put `onlinejudge2` into `MOODLE_PATH/local/`
-3. `cd MOODLE_PATH/local/onlinejudge2 && ./install_assignment_type`
-4. Login your site as admin and the plugins can be installed/upgraded.
-5. If you want to use sandbox judge engine, then
-   `cd MOODLE_PATH/local/onlinejudge2/clients/mod/assignment/type/onlinejudge/judge/sandbox/sand/ && make`
+3. Put `onlinejudge2` into `MOODLE_PATH/local/`
+4. `cd MOODLE_PATH/local/onlinejudge2 && ./install_assignment_type`
+5. Login your site as admin and the plugins can be installed/upgraded.
+6. `sudo -u www-data php MOODLE_PATH/local/onlinejudge2/cli/judged.php`
+7. If you want to use sandbox judge engine, then
+   `cd MOODLE_PATH/mod/assignment/type/onlinejudge/judge/sandbox/sand/ && make`
+
+For Windows Users
+---------------
+
+1. Make sure the folder name of this plugin is `onlinejudge2`. If not, rename it.
+2. If the folder `MOODLE_PATH\local\onlinejudge2\` exists, remove it.
+3. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
+4. Put `onlinejudge2` into `MOODLE_PATH\local\`
+5. copy MOODLE_PATH\local\onlinejudge2\clients\mod\assignment\type\onlinejudge\ 
+   to MOODLE_PATH\mod\assignment\type\
+6. Login your site as admin and the plugins can be installed/upgraded.
+7. `php.exe MOODLE_PATH\local\onlinejudge2\cli\judged.php`
 
 
 Links
 =====
 
 Home:
+
     https://github.com/hit-moodle/moodle-local_onlinejudge2
 
 Bug reports, feature requests, help wanted and other issues:
+
     https://github.com/hit-moodle/moodle-local_onlinejudge2/issues
