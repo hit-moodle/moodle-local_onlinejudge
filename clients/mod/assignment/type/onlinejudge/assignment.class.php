@@ -146,30 +146,17 @@ class assignment_onlinejudge extends assignment_upload {
         //ideone.com
         $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
+        $mform->setType('ideoneuser', PARAM_ALPHANUMEXT);
         $mform->setDefault('ideoneuser', $onlinejudge ? $onlinejudge->ideoneuser : '');
         $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
         $mform->setDefault('ideonepass', $onlinejudge ? $onlinejudge->ideonepass : '');
         $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
         $mform->setDefault('ideonepass2', $onlinejudge ? $onlinejudge->ideonepass : '');
+        $mform->addRule(array('ideonepass', 'ideonepass2'), get_string('ideonepassmismatch', 'assignment_onlinejudge'), 'compare');
 
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
-    }
-
-    /**
-     * Any extra validation checks needed for the settings
-     * form for this assignment type
-     *
-     */
-    function form_validation($data, $files) {
-        $errors = array();
-
-        if ($data['ideonepass'] != $data['ideonepass2']) {
-            $errors['ideonepass'] = $errors['ideonepass2'] = get_string('ideonepassmismatch', 'assignment_onlinejudge');
-        }
-
-        return $errors;
     }
 
     /**
@@ -703,12 +690,9 @@ class assignment_onlinejudge extends assignment_upload {
 
         $source = array();
         $fs = get_file_storage();
-        $files = $fs->get_directory_files($this->context->id, 'mod_assignment', 'submission', $submission->id, '/', true, false);
-        foreach ($files as $file) {
-            $source[] = $file->get_pathnamehash();
-        }
+        $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, 'sortorder, timemodified', false);
 
-        onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $source, $oj);
+        onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
     }
 
     /**
