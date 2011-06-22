@@ -11,7 +11,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
  
 // access to use global variables.
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 global $CFG; 
 require_once($CFG->libdir . '/moodlelib.php'); 
 global $DB;
@@ -47,7 +47,6 @@ class local_onlinejudge2_test extends UnitTestCase {
 	}
 	
 	function test_memlimit() {
-	    $task = new stdClass();
         $cm = 1;
         $user = 1;
         $language = 'c_sandbox';
@@ -62,24 +61,22 @@ class local_onlinejudge2_test extends UnitTestCase {
                      return 0;
                   }
                   ';
-        $task->cpulimit = 1;
-        $task->memlimit = 1048576;
+        $options->cpulimit = 1;
+        $options->memlimit = 1048576;
 
-        $task->input = null;
-        $task->output = null;
-        $task->compileonly = false;
-        $task->answer = null;
-        $task->info_teacher = null;
-        $task->info_student = null;
-        $task->cpuusage = $task->cpulimit;
-        $task->memusage = $task->memusage;
-        $task->submittime = null;
-        $task->judgetime = null;
-        //$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_delay = 100;
+        $options->input = null;
+        $options->output = null;
+        $options->compileonly = false;
+        $options->answer = null;
+        $options->info_teacher = null;
+        $options->info_student = null;
+        $options->submittime = null;
+        $options->judgetime = null;
+        //$options->onlinejudge2_ideone_username = 'yuzhanlaile2';
+        //$options->onlinejudge2_ideone_password = 'yuzhanlaile2';
+        //$options->onlinejudge2_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
+        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $options));
 	}
 	
 	function  test_cpulimit() {
@@ -235,4 +232,4 @@ class local_onlinejudge2_test extends UnitTestCase {
  
     // ... more test methods.
 }
-?>
+

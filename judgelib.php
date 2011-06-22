@@ -168,14 +168,14 @@ function onlinejudge2_get_language_name($language) {
 /**
  * Submit task to judge of specified language
  *
- * @param int $cm ID of coursemodule
- * @param int $user ID of user
+ * @param int $cmid ID of coursemodule
+ * @param int $userid ID of user
  * @param string $language ID of the language
  * @param string $source Source code
  * @param object $options include input, output and etc. 
  * @return id of the task or false
  */
-function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
+function onlinejudge2_submit_task($cmid, $userid, $language, $source, $options) {
     global $judgeclasses, $CFG, $DB;
     $id = false; //return id
     //get the languages.
@@ -198,8 +198,8 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             
             //packing the task data.
             $task = new stdClass();
-            $task->coursemodule = $cm;
-            $task->userid = $user;
+            $task->coursemodule = $cmid;
+            $task->userid = $userid;
             $task->language = $language;
             $task->source = $source;
             $task->memlimit = $options->memlimit;
@@ -209,9 +209,8 @@ function onlinejudge2_submit_task($cm, $user, $language, $source, $options) {
             $task->compileonly = $options->compileonly;
             $task->status = ONLINEJUDGE2_STATUS_PENDING;
             $task->submittime = time();
-            
+
             //other info.
-            $task->error = $error;
             $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
             $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
             $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
@@ -477,4 +476,3 @@ function reconnect_db()
     $DB->configure_dbconnection();
 }    
 
-?>    
