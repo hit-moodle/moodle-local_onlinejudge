@@ -42,31 +42,20 @@ echo $OUTPUT->header();
 if (!empty($fromform) and confirm_sesskey()) {
 
     //Save settings
-    set_config('name', $fromform->name, 'local_hub');
-    set_config('hubenabled', 
-            empty($fromform->enabled)?0:$fromform->enabled, 'local_hub');
-    set_config('description', $fromform->desc, 'local_hub');
-    set_config('contactname', $fromform->contactname, 'local_hub');
-    set_config('contactemail', $fromform->contactemail, 'local_hub');
-    set_config('maxwscourseresult', $fromform->maxwscourseresult, 'local_hub');
-    set_config('maxcoursesperday', $fromform->maxcoursesperday, 'local_hub');
-    set_config('searchfornologin', empty($fromform->searchfornologin)?0:1, 'local_hub');
-    set_config('enablerssfeeds', 
-            empty($fromform->enablerssfeeds)?0:$fromform->enablerssfeeds, 'local_hub');
-    set_config('rsssecret',
-            empty($fromform->rsssecret)?'':$fromform->rsssecret, 'local_hub');
-    
-    set_config('language', $fromform->lang, 'local_hub');
-
-    set_config('password', 
-            empty($fromform->password)?null:$fromform->password, 'local_hub');
-
-
+    set_config('maxmemlimit', $fromform->maxmemlimit, 'local_onlinejudge2');
+    set_config('maxcpulimit', $fromform->maxcpulimit, 'local_onlinejudge2');
+    set_config('ideonedelay', $fromform->ideonedelay, 'local_onlinejudge2');
 
     //display confirmation
-    echo $OUTPUT->notification(get_string('settingsupdated', 'local_hub'), 'notifysuccess');
+    echo $OUTPUT->notification(get_string('settingsupdated', 'local_onlinejudge2'), 'notifysuccess');
+    $ojsettingsform->display();
 } else {
+    $data->maxmemlimit = get_config('local_onlinejudge2', 'maxmemlimit');
+    $data->maxcpulimit = get_config('local_onlinejudge2', 'maxcpulimit');
+    $data->ideonedelay = get_config('local_onlinejudge2', 'ideonedelay');
+    $ojsettingsform->set_data($data);
     $ojsettingsform->display();
 }
+
 echo $OUTPUT->footer();
 

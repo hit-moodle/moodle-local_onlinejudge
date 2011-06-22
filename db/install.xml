@@ -9,9 +9,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="coursemodule"/>
         <FIELD NAME="coursemodule" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Related user" PREVIOUS="coursemodule" NEXT="language"/>
-        <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language" PREVIOUS="userid" NEXT="source"/>
-        <FIELD NAME="source" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Source code" PREVIOUS="language" NEXT="memlimit"/>
-        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="source" NEXT="cpulimit"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language" PREVIOUS="userid" NEXT="memlimit"/>
+        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="language" NEXT="cpulimit"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
         <FIELD NAME="input" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
         <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="answer"/>

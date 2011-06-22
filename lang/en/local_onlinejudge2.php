@@ -7,6 +7,7 @@
     $string['addtestcases'] = 'Add $a more testcase(s)';
     $string['assignmentlangs'] = 'Programming language';
     $string['badtestcasefile'] = 'This file does not exist or can not be read';
+    $string['badvalue'] = 'Incorrect value';
     $string['cannotruncompiler'] = 'Can not execute the script of compiler';
     $string['case'] = 'Case $a:';
     $string['cannotinsertrecord'] = 'cannot insert such record into database.';
@@ -24,6 +25,8 @@
     $string['duejudge'] = 'Judge after due date';
     $string['feedbackforwa'] = 'Feedback for Wrong Answer';
     $string['filereaderror'] = 'Can not read this file';
+    $string['ideonedelay'] = 'Delay between requests to ideone.com (second)';
+    $string['ideonedelay_help'] = 'After sending a judge request to ideone.com, we can not get the result immediately. How long should we wait before querying the result? 5 seconds or so is reasonable.';
     $string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge2\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
     $string['ideoneexception'] = 'Ideone exception...';
     $string['info'] = 'Information';
@@ -97,9 +100,11 @@
     $string['langvbdotnet_ideone'] = 'Visual Basic .NET (ideone.com)'; 
     $string['langwhitespace_ideone'] = 'Whitespace (ideone.com)';         
     $string['managetestcases'] = 'Manage testcases';
-    $string['maxcpuusage'] = 'Maximum CPU usage';
+    $string['maxcpulimit'] = 'Maximum CPU usage (second)';
+    $string['maxcpulimit_help'] = 'How long can a judge task keep running.';
+    $string['maxmemlimit'] = 'Maximum memory usage (MB)';
+    $string['maxmemlimit_help'] = 'How many memory can a judge task use.';
     $string['maximumfilesize'] = 'Maximum source file size';
-    $string['maxmemusage'] = 'Maximum memory usage';
     $string['memlimit'] = 'Maximum memory usage';
     $string['nosuchrecord'] = 'There is no such record in database';
     $string['nosuchlanguage'] = 'There is no such supported language';
@@ -123,6 +128,7 @@
     $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
     $string['runtimeout'] = 'Runtime output';
     $string['settingsform'] = 'Online Judge 2 Settings';
+    $string['settingsupdated'] = 'Settings updated.';
     $string['statistics'] = 'Statistics';
     $string['status0'] = 'Pending...';
     $string['status1'] = '<font color=red>Accepted</font>';
@@ -145,4 +151,3 @@
     $string['testcases'] = 'Test Cases';
     $string['typeonlinejudge'] = 'Online Judge';
     $string['usefile'] = 'Testcase from files';
-?>

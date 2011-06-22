@@ -1,8 +1,16 @@
 <?php
 
 require_once(dirname(__FILE__).'/../../config.php');
-global $CFG,$DB;
-require_once($CFG->dirroot."/lib/dml/moodle_database.php");
+
+if (!get_config('local_onlinejudge2', 'maxmemlimit')) {
+    set_config('maxmemlimit', 64, 'local_onlinejudge2');
+}
+if (!get_config('local_onlinejudge2', 'maxcpulimit')) {
+    set_config('maxcpulimit', 10, 'local_onlinejudge2');
+}
+if (!get_config('local_onlinejudge2', 'ideonedelay')) {
+    set_config('ideonedelay', 5, 'local_onlinejudge2');
+}
 
 global $judgeclasses;
 $judgeclasses = array();
@@ -166,16 +174,16 @@ function onlinejudge2_get_language_name($language) {
 }
 
 /**
- * Submit task to judge of specified language
+ * Submit task to judge
  *
  * @param int $cmid ID of coursemodule
  * @param int $userid ID of user
  * @param string $language ID of the language
- * @param string $source Source code
+ * @param array $files array of stored_file of source code
  * @param object $options include input, output and etc. 
  * @return id of the task or false
  */
-function onlinejudge2_submit_task($cmid, $userid, $language, $source, $options) {
+function onlinejudge2_submit_task($cmid, $userid, $language, $files, $options) {
     global $judgeclasses, $CFG, $DB;
     $id = false; //return id
     //get the languages.
@@ -201,7 +209,6 @@ function onlinejudge2_submit_task($cmid, $userid, $language, $source, $options) 
             $task->coursemodule = $cmid;
             $task->userid = $userid;
             $task->language = $language;
-            $task->source = $source;
             $task->memlimit = $options->memlimit;
             $task->cpulimit = $options->cpulimit;
             $task->input = $options->input;
@@ -213,10 +220,9 @@ function onlinejudge2_submit_task($cmid, $userid, $language, $source, $options) 
             //other info.
             $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
             $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
-            $task->onlinejudge_ideone_delay = $options->onlinejudge2_ideone_delay;
             
             //save the task into database
-            $id = $DB->insert_record('onlinejudge2_tasks', $task, true);
+            $id = $DB->insert_record('onlinejudge2_tasks', $task);
             
             if(! $id) {
                 //print error info

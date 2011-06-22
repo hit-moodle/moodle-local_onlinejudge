@@ -39,16 +39,44 @@ class onlinejudge2_settings_form extends moodleform {
 
         $mform->addElement('header', 'moodle', get_string('settingsform', 'local_onlinejudge2'));
 
+        $mform->addElement('text', 'maxmemlimit', get_string('maxmemlimit', 'local_onlinejudge2'));
+        $mform->addHelpButton('maxmemlimit', 'maxmemlimit', 'local_onlinejudge2');
+        $mform->addRule('maxmemlimit', null, 'required', null, 'client');
+        $mform->addRule('maxmemlimit', null, 'numeric', null, 'client');
+        $mform->addRule('maxmemlimit', null, 'nonzero', null, 'client');
+        $mform->setType('maxmemlimit', PARAM_NUMBER);
+        $mform->setDefault('maxmemlimit', 64);
+
+        $mform->addElement('text', 'maxcpulimit', get_string('maxcpulimit', 'local_onlinejudge2'));
+        $mform->addHelpButton('maxcpulimit', 'maxcpulimit', 'local_onlinejudge2');
+        $mform->addRule('maxcpulimit', null, 'required', null, 'client');
+        $mform->addRule('maxcpulimit', null, 'numeric', null, 'client');
+        $mform->addRule('maxcpulimit', null, 'nonzero', null, 'client');
+        $mform->setType('maxcpulimit', PARAM_NUMBER);
+        $mform->setDefault('maxcpulimit', 10);
+
+        $mform->addElement('text', 'ideonedelay', get_string('ideonedelay', 'local_onlinejudge2'));
+        $mform->addHelpButton('ideonedelay', 'ideonedelay', 'local_onlinejudge2');
+        $mform->addRule('ideonedelay', null, 'required', null, 'client');
+        $mform->addRule('ideonedelay', null, 'numeric', null, 'client');
+        $mform->setType('ideonedelay', PARAM_NUMBER);
+        $mform->setDefault('ideonedelay', 5);
+
         $this->add_action_buttons(false, get_string('update'));
     }
 
-    /**
-     * Set password to empty if hub not private
-     */
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
+
+        if ($data['maxmemlimit'] <= 0)
+            $errors['maxmemlimit'] = get_string('badvalue', 'local_onlinejudge2');
+        if ($data['maxcpulimit'] <= 0)
+            $errors['maxcpulimit'] = get_string('badvalue', 'local_onlinejudge2');
+        if ($data['ideonedelay'] < 0)
+            $errors['ideonedelay'] = get_string('badvalue', 'local_onlinejudge2');
 
         return $errors;
     }
 
 }
+
