@@ -128,14 +128,12 @@ class assignment_onlinejudge extends assignment_upload {
         $choices = $this->get_max_cpu_times();
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
-        $mform->setAdvanced('cpulimit');
 
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages();
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : 1048576);
-        $mform->setAdvanced('memlimit');
 
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
