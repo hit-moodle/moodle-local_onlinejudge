@@ -125,16 +125,16 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Max. CPU time
         unset($choices);
-        $choices = $this->get_max_cpu_times($CFG->assignment_oj_max_cpu);
+        $choices = $this->get_max_cpu_times();
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
         $mform->setAdvanced('cpulimit');
 
         // Max. memory usage
         unset($choices);
-        $choices = $this->get_max_memory_usages($CFG->assignment_oj_max_mem);
+        $choices = $this->get_max_memory_usages();
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : $CFG->assignment_oj_max_mem);
+        $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : 1048576);
         $mform->setAdvanced('memlimit');
 
         // Compile only?
@@ -613,34 +613,25 @@ class assignment_onlinejudge extends assignment_upload {
      * array of possible memory sizes in an array, translated to the
      * local language.
      *
-     * @uses SORT_NUMERIC
-     * @param int $sizebytes Moodle site $CGF->assignment_oj_max_mem
      * @return array
      */
-    static function get_max_memory_usages($sitebytes=0) {
-        global $CFG;
+    static function get_max_memory_usages() {
 
         // Get max size
-        $maxsize = $sitebytes;
-    
+        $maxsize = 1024*1024*get_config('local_onlinejudge2', 'maxmemlimit');
         $memusage[$maxsize] = display_size($maxsize);
-    
-        $sizelist = array(4194304, 8388608, 16777216, 33554432,
+
+        $sizelist = array(1048576, 2097152, 4194304, 8388608, 16777216, 33554432,
                           67108864, 134217728, 268435456, 536870912);
-    
-        // Allow maxbytes to be selected if it falls outside the above boundaries
-        if( isset($CFG->assignment_oj_max_mem) && !in_array($CFG->assignment_oj_max_mem, $sizelist) ){
-                $sizelist[] = $CFG->assignment_oj_max_mem;
-        }
-    
+
         foreach ($sizelist as $sizebytes) {
            if ($sizebytes < $maxsize) {
                $memusage[$sizebytes] = display_size($sizebytes);
            }
         }
-    
-        krsort($memusage, SORT_NUMERIC);
-    
+
+        ksort($memusage, SORT_NUMERIC);
+
         return $memusage;
     }
     
@@ -648,35 +639,26 @@ class assignment_onlinejudge extends assignment_upload {
      * This function returns an
      * array of possible CPU time (in seconds) in an array
      *
-     * @uses SORT_NUMERIC
-     * @param int $time Moodle site $CGF->assignment_oj_max_cpu
      * @return array
      */
-    static function get_max_cpu_times($time=0) {
-        global $CFG;
+    static function get_max_cpu_times() {
 
         // Get max size
-        $maxtime = $time;
-    
+        $maxtime = get_config('local_onlinejudge2', 'maxcpulimit');
         $cputime[$maxtime] = get_string('numseconds', 'moodle', $maxtime);
-    
+
         $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9,
                           10, 11, 12, 13, 14, 15, 20,
                           25, 30, 40, 50, 60);
-    
-        // Allow maxtime to be selected if it falls outside the above boundaries
-        if( isset($CFG->assignment_oj_max_cpu) && !in_array($CFG->assignment_oj_max_cpu, $timelist) ){
-                $cputime[] = $CFG->assignment_oj_max_cpu;
-        }
-    
+
         foreach ($timelist as $timesecs) {
            if ($timesecs < $maxtime) {
                $cputime[$timesecs] = get_string('numseconds', 'moodle', $timesecs);
            }
         }
-    
+
         ksort($cputime, SORT_NUMERIC);
-    
+
         return $cputime;
     }
 
