@@ -118,7 +118,7 @@ class judge_base{
         $file_record->filearea = 'tasks';
         $file_record->itemid = $task->id;
         foreach ($files as $key => $value) {
-            if ($file instanceof stored_file) {
+            if ($value instanceof stored_file) {
                 $fs->create_file_from_storedfile($file_record, $value);
             } else {
                 $file_record->filepath = dirname($key);
