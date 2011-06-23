@@ -12,18 +12,9 @@ if (!defined('MOODLE_INTERNAL')) {
  
 // access to use global variables.
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
-global $CFG; 
-require_once($CFG->libdir . '/moodlelib.php'); 
-global $DB;
 
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/local/onlinejudge2/judgelib.php'); // Include the code to test
-// require judge compiler
-if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
-    foreach ($plugins as $plugin=>$dir) {
-        require_once("$CFG->dirroot/local/onlinejudge2/judge/$dir/lib.php");
-    }
-}
 
 /** This class contains the test cases for the functions in judegelib.php. */
 class local_onlinejudge2_test extends UnitTestCase {
@@ -40,17 +31,17 @@ class local_onlinejudge2_test extends UnitTestCase {
         }
         $DB->get_manager()->install_from_xmldb_file($CFG->dirroot . '/local/onlinejudge2/db/install.xml');
 	}
-	
+
 	function tearDown() {
 		global $DB, $CFG;
         $DB = $this->realDB;
 	}
-	
+
 	function test_memlimit() {
         $cm = 1;
         $user = 1;
         $language = 'c_sandbox';
-        $source = '
+        $file = array('test.c' => '
                   #include <stdlib.h>
 
                  int main(void)
@@ -60,7 +51,7 @@ class local_onlinejudge2_test extends UnitTestCase {
 
                      return 0;
                   }
-                  ';
+                  ');
         $options->cpulimit = 1;
         $options->memlimit = 1048576;
 
@@ -72,11 +63,8 @@ class local_onlinejudge2_test extends UnitTestCase {
         $options->info_student = null;
         $options->submittime = null;
         $options->judgetime = null;
-        //$options->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$options->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$options->onlinejudge2_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $options));
+        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $file, $options));
 	}
 	
 	function  test_cpulimit() {
