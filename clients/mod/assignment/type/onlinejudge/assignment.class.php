@@ -4,8 +4,8 @@
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
-//            Online Judge assignment type for Moodle                    //
-//           http://code.google.com/p/sunner-projects/                   //
+//                      Online Judge for Moodle                          //
+//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -23,19 +23,19 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-// Default maximum cpu time (seconds) for all assignments
-if (!isset($CFG->assignment_oj_max_cpu)) {
-    set_config('assignment_oj_max_cpu', 10);
-}
-
-// Default memory usage (bytes) for all assignments
-if (!isset($CFG->assignment_oj_max_mem)) {
-    set_config('assignment_oj_max_mem', 256 * 1024 * 1024);
-}
+/**
+ * online judge assignment type for online judge 2
+ * 
+ * @package   local_onlinejudge2
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
-require_once($CFG->dirroot.'/lib/filelib.php');
-require_once($CFG->dirroot.'/lib/questionlib.php'); //for get_grade_options()
+require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->libdir.'/questionlib.php'); //for get_grade_options()
 require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
 
 /**

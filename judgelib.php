@@ -1,5 +1,38 @@
 <?php
 
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * online judge library
+ * 
+ * @package   local_onlinejudge2
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
+
 require_once(dirname(__FILE__).'/../../config.php');
 
 if (!get_config('local_onlinejudge2', 'maxmemlimit')) {
@@ -23,8 +56,14 @@ if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
 }
 
 class judge_base{
-	var $langs;
-	var $onlinejudge;
+    var $task;
+    var $language;
+
+    function __construct($taskid) {
+        global $DB;
+
+        $this->task = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
+    }
 
 	/**
      * Return an array of programming languages supported by this judge
@@ -37,55 +76,12 @@ class judge_base{
     }
 
     /**
-     * 
-     * 将数字id转换为编译器可以执行的语言名字，如301转换为c（不可执行名字为c_sandbox）
-     * @param integer $id
-     */
-    function translator($id){}
-    
-    /**
-     * 将status从英文翻译为id值，便于存储到数据库中
-     * @param status表示结果状态的缩写，不同编译器结果不同。
-     * @return 返回表示status的整数值。
-     */
-    function translate_status($status) {
-     }
-     
-    /**
-     * 将status从整数id值译为英文，便于显示给用户看
-     * @param statusid表示结果状态的id值，不同编译器结果不同。
-     * @return 返回表示statusid的英文描述。
-     */
-    function flip_status($statusid) {
-    
-    }
-    
-	/**
-	 * 通过传递任务id值来查看评测的结果
-	 * @param id 是数据库表onlinejudge_result中的taskid
-	 * @return 返回结果对象
-	 */
-    function get_result($taskid){
-        global $DB;
-        if(! $DB->record_exists('onlinejudge_result', array('taskid' => $taskid))) {
-            mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
-        } 
-        //result class
-        $result = new stdClass();
-        $result = null; 
-        $result = $DB->get_record('onlinejudge_result', array('taskid' => $id));
-        return $result;
-    }
-    
-    //打印结果
-    function output_result($result){}
-    
-    /**
-     * judge the source of task, and return the id of the certain database record.
+     * judge the task
+     *
      * @param task is configed by clients, include the memlimit, cpulimit, case(input,output) etc.
      * @return the id of the task in the database.
      */
-    function judge(& $task) {
+    function judge($task) {
         return false;
     }
 
