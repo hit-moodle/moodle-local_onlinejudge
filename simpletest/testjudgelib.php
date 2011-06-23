@@ -30,6 +30,12 @@ class local_onlinejudge_test extends UnitTestCase {
             $DB->get_manager()->delete_tables_from_xmldb_file($CFG->dirroot . '/local/onlinejudge/db/install.xml');
         }
         $DB->get_manager()->install_from_xmldb_file($CFG->dirroot . '/local/onlinejudge/db/install.xml');
+
+        if ($DB->get_manager()->table_exists('files')) {
+            $DB->get_manager()->delete_tables_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml');
+        }
+        $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'files');
+        $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'config_plugins');
 	}
 
 	function tearDown() {
@@ -37,11 +43,20 @@ class local_onlinejudge_test extends UnitTestCase {
         $DB = $this->realDB;
 	}
 
+    function triger_test($language, $files, $input, $output, $cpulimit, $memlimit, $expect) {
+        $options->input = $input;
+        $options->output = $output;
+        $options->cpulimit = $cpulimit;
+        $options->memlimit = $memlimit;
+
+        $taskid = onlinejudge_submit_task(1, 1, $language, $files, $options);
+        $task = onlinejudge_judge($taskid);
+
+        $this->assertEqual($task->status, $expect);
+    }
+
 	function test_memlimit() {
-        $cm = 1;
-        $user = 1;
-        $language = 'c_sandbox';
-        $file = array('test.c' => '
+        $files = array('/test.c' => '
                   #include <stdlib.h>
 
                  int main(void)
@@ -52,171 +67,9 @@ class local_onlinejudge_test extends UnitTestCase {
                      return 0;
                   }
                   ');
-        $options->cpulimit = 1;
-        $options->memlimit = 1048576;
-
-        $options->input = null;
-        $options->output = null;
-        $options->compileonly = false;
-        $options->answer = null;
-        $options->info_teacher = null;
-        $options->info_student = null;
-        $options->submittime = null;
-        $options->judgetime = null;
-
-        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $file, $options));
+        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED);
 	}
 	
-	function  test_cpulimit() {
-		$task = new stdClass();
-        $cm = 1;
-        $user = 1;
-        $language = 'c_sandbox';
-        $source = '
-                  #include "stdio.h"
-                  int main(void)
-                  {
-                      while(1)
-                          ;
-
-                      return 0;
-                  }
-                  ';
-        $task->cpulimit = 1;
-        $task->memlimit = 1048576;
-
-        $task->input = null;
-        $task->output = null;
-        $task->compileonly = false;
-        $task->answer = null;
-        $task->info_teacher = null;
-        $task->info_student = null;
-        $task->cpuusage = $task->cpulimit;
-        $task->memusage = $task->memusage;
-        $task->submittime = null;
-        $task->judgetime = null;
-        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_delay = 100;
-
-        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
-	}
-	
-    function test_stdin() {
-        $task = new stdClass();
-        $cm = 1;
-        $user = 1;
-        $language = 'c_sandbox';
-        $source = '
-                  #include <stdio.h>
-
-                  int main(void)
-                  {
-                      int c;
-                      while ( (c = getchar()) != EOF)
-                          ;
-                      return 0;
-                  }
-                  ';
-        $task->cpulimit = 1;
-        $task->memlimit = 1048576;
-
-        $task->input = null;
-        $task->output = null;
-        $task->compileonly = false;
-        $task->answer = null;
-        $task->info_teacher = null;
-        $task->info_student = null;
-        $task->cpuusage = $task->cpulimit;
-        $task->memusage = $task->memusage;
-        $task->submittime = null;
-        $task->judgetime = null;
-        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_delay = 100;
-
-        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
-    }
-    
-    function test_usefile() {
-    	//test usefile include inputfile and outputfile.
-    }
-    
-    function test_sandbox() {
-    	//test the sandbox compiler
-        $task = new stdClass();
-        $cm = 1;
-        $user = 1;
-        $language = 'c_sandbox';
-        $source = '
-                  #include <stdio.h>
-                  int main(void)
-                  {
-                      int a, b;
-                      while (scanf("%d %d", &a, &b)==2)
-                      printf("%d\n",a+b);
-                   return 0;
-                   }
-                  ';
-        $task->cpulimit = 1;
-        $task->memlimit = 1048576;
-
-        $task->input = '2 3';
-        $task->output = '5';
-        $task->compileonly = false;
-        $task->answer = null;
-        $task->info_teacher = null;
-        $task->info_student = null;
-        $task->cpuusage = $task->cpulimit;
-        $task->memusage = $task->memusage;
-        $task->submittime = null;
-        $task->judgetime = null;
-        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_delay = 100;
-
-        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
-    }
-    
-    function test_ideone() {
-    	//test the ideone compiler
-        $task = new stdClass();
-        $cm = 1;
-        $user = 1;
-        $language = 'c_ideone';
-        $source = '
-                  #include <stdio.h>
-                  int main(void)
-                  {
-                      int a, b;
-                      while (scanf("%d %d", &a, &b)==2)
-                      printf("%d\n",a+b);
-                   return 0;
-                   }
-                  ';
-        $task->cpulimit = 1;
-        $task->memlimit = 1048576;
-
-        $task->input = '2 3';
-        $task->output = '5';
-        $task->compileonly = false;
-        $task->answer = null;
-        $task->info_teacher = null;
-        $task->info_student = null;
-        $task->cpuusage = $task->cpulimit;
-        $task->memusage = $task->memusage;
-        $task->submittime = null;
-        $task->judgetime = null;
-        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge_ideone_delay = 100;
-
-        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
-    }
-    
-    function test_changeTestcase() {
-    	//test the change testcase.
-    }
  
     // ... more test methods.
 }
