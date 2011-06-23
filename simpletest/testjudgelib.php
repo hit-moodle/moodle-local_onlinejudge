@@ -14,10 +14,10 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
 // Make sure the code being tested is accessible.
-require_once($CFG->dirroot . '/local/onlinejudge2/judgelib.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include the code to test
 
 /** This class contains the test cases for the functions in judegelib.php. */
-class local_onlinejudge2_test extends UnitTestCase {
+class local_onlinejudge_test extends UnitTestCase {
 	function setUp() {
         global $DB, $CFG;
 
@@ -26,10 +26,10 @@ class local_onlinejudge2_test extends UnitTestCase {
         $DB = new $dbclass();
         $DB->connect($CFG->dbhost, $CFG->dbuser, $CFG->dbpass, $CFG->dbname, $CFG->unittestprefix);
 
-        if ($DB->get_manager()->table_exists('onlinejudge2_tasks')) {
-            $DB->get_manager()->delete_tables_from_xmldb_file($CFG->dirroot . '/local/onlinejudge2/db/install.xml');
+        if ($DB->get_manager()->table_exists('onlinejudge_tasks')) {
+            $DB->get_manager()->delete_tables_from_xmldb_file($CFG->dirroot . '/local/onlinejudge/db/install.xml');
         }
-        $DB->get_manager()->install_from_xmldb_file($CFG->dirroot . '/local/onlinejudge2/db/install.xml');
+        $DB->get_manager()->install_from_xmldb_file($CFG->dirroot . '/local/onlinejudge/db/install.xml');
 	}
 
 	function tearDown() {
@@ -64,7 +64,7 @@ class local_onlinejudge2_test extends UnitTestCase {
         $options->submittime = null;
         $options->judgetime = null;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $file, $options));
+        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $file, $options));
 	}
 	
 	function  test_cpulimit() {
@@ -95,11 +95,11 @@ class local_onlinejudge2_test extends UnitTestCase {
         $task->memusage = $task->memusage;
         $task->submittime = null;
         $task->judgetime = null;
-        //$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_delay = 100;
+        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
+        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
 	}
 	
     function test_stdin() {
@@ -131,11 +131,11 @@ class local_onlinejudge2_test extends UnitTestCase {
         $task->memusage = $task->memusage;
         $task->submittime = null;
         $task->judgetime = null;
-        //$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_delay = 100;
+        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
+        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
     }
     
     function test_usefile() {
@@ -171,11 +171,11 @@ class local_onlinejudge2_test extends UnitTestCase {
         $task->memusage = $task->memusage;
         $task->submittime = null;
         $task->judgetime = null;
-        //$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_delay = 100;
+        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
+        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
     }
     
     function test_ideone() {
@@ -207,11 +207,11 @@ class local_onlinejudge2_test extends UnitTestCase {
         $task->memusage = $task->memusage;
         $task->submittime = null;
         $task->judgetime = null;
-        //$task->onlinejudge2_ideone_username = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_password = 'yuzhanlaile2';
-        //$task->onlinejudge2_ideone_delay = 100;
+        //$task->onlinejudge_ideone_username = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_password = 'yuzhanlaile2';
+        //$task->onlinejudge_ideone_delay = 100;
 
-        $result = onlinejudge2_get_task(onlinejudge2_submit_task($cm, $user, $language, $source, $task, $error));
+        $result = onlinejudge_get_task(onlinejudge_submit_task($cm, $user, $language, $source, $task, $error));
     }
     
     function test_changeTestcase() {
