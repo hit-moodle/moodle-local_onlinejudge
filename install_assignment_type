@@ -16,6 +16,6 @@ fi
 for f in $SRCPATH/* ; do
     f=`basename $f`
     if [ ! -e $DSTPATH/$f ]; then
-        ln -s ../../../../local/onlinejudge/$SRCPATH/$f $DSTPATH/$f
+        ln -sf ../../../../local/onlinejudge/$SRCPATH/$f $DSTPATH/$f
     fi
 done
