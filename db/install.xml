@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge2/db" VERSION="20110622" COMMENT="XMLDB file for Moodle local/onlinejudge2"
+<XMLDB PATH="local/onlinejudge2/db" VERSION="20110623" COMMENT="XMLDB file for Moodle local/onlinejudge2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
     <TABLE NAME="onlinejudge2_tasks" COMMENT="Details of tasks">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="coursemodule"/>
-        <FIELD NAME="coursemodule" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Related user" PREVIOUS="coursemodule" NEXT="language"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Related user" PREVIOUS="cmid" NEXT="language"/>
         <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language" PREVIOUS="userid" NEXT="memlimit"/>
         <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="language" NEXT="cpulimit"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
         <FIELD NAME="input" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
-        <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="answer"/>
-        <FIELD NAME="answer" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="output" NEXT="compileonly"/>
-        <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="answer" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="info_teacher"/>
-        <FIELD NAME="info_teacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program runtime/compiler error, message seen by teacher" PREVIOUS="status" NEXT="info_student"/>
-        <FIELD NAME="info_student" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program runtime/compiler error, the message seen by student." PREVIOUS="info_teacher" NEXT="cpuusage"/>
-        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="info_student" NEXT="memusage"/>
+        <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="compileonly"/>
+        <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="output" NEXT="status"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="stdout"/>
+        <FIELD NAME="stdout" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="status" NEXT="stderr"/>
+        <FIELD NAME="stderr" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout" NEXT="infoteacher"/>
+        <FIELD NAME="infoteacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="stderr" NEXT="infostudent"/>
+        <FIELD NAME="infostudent" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="infoteacher" NEXT="cpuusage"/>
+        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="infostudent" NEXT="memusage"/>
         <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
         <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
         <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime" NEXT="var1"/>
@@ -30,9 +31,9 @@
         <FIELD NAME="deleted" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="var4"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="coursemodule"/>
-        <KEY NAME="coursemodule" TYPE="foreign" FIELDS="coursemodule" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="coursemodule"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>
+        <KEY NAME="cmid" TYPE="foreign" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="cmid"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
