@@ -72,7 +72,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
-        $mform->addElement('select', 'maxbytes', get_string('maximumsize', 'assignment'), $choices);
+        $mform->addElement('select', 'maxbytes', get_string('maximumfilesize', 'assignment_onlinejudge'), $choices);
         $mform->setDefault('maxbytes', $CFG->assignment_maxbytes);
 
         $mform->addElement('select', 'resubmit', get_string('allowdeleting', 'assignment'), $ynoptions);
