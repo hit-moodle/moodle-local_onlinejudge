@@ -56,13 +56,20 @@ if ($plugins = get_list_of_plugins('local/onlinejudge2/judge')) {
 }
 
 class judge_base{
+
+    // object of the task
     var $task;
+
+    // language id without judge id
     var $language;
 
-    function __construct($taskid) {
+    function __construct($taskid = null) {
         global $DB;
 
-        $this->task = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
+        if (!empty($taskid)) {
+            $this->task = $DB->get_record('onlinejudge2_tasks', array('id' => $taskid));
+            $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
+        }
     }
 
 	/**
@@ -76,15 +83,84 @@ class judge_base{
     }
 
     /**
-     * judge the task
+     * submit the judge request
+     *
+     * @param int $cmid ID of coursemodule
+     * @param int $userid ID of user
+     * @param string $language ID of the language
+     * @param array $files array of stored_file of source code or array of filename => filecontent
+     * @param object $options include input, output and etc.
+     * @return id of the task or throw exception
+     */
+    function submit($cmid, $userid, $language, $files, $options) {
+        global $DB;
+        $task = & $this->task;
+
+        $task = new stdClass();
+        $task->cmid = $cmid;
+        $task->userid = $userid;
+        $task->status = ONLINEJUDGE2_STATUS_PENDING;
+        $task->submittime = time();
+
+        if (!array_key_exists($language, $this->get_languages())) {
+            throw new onlinejudge2_exception('invalidlanguage', $language);
+        }
+        $task->lanuage = $language;
+        $this->language = substr($language, 0, strrpos($language, '_'));
+
+        $this->parse_options($options);
+
+        $task->id = $DB->insert_record('onlinejudge2_tasks', $task);
+
+        $fs = get_file_storage();
+        $file_record->contextid = get_context_instance(CONTEXT_SYSTEM)->id;
+        $file_record->component = 'local_onlinejudge2';
+        $file_record->filearea = 'tasks';
+        $file_record->itemid = $task->id;
+        foreach ($files as $key => $value) {
+            if ($file instanceof stored_file) {
+                $fs->create_file_from_storedfile($file_record, $value);
+            } else {
+                $file_record->filepath = dirname($key);
+                $file_record->filename = basename($key);
+                $fs->create_file_from_string($file_record, $value);
+            }
+        }
+
+        return $task->id;
+    }
+
+    /**
+     * Put options into $task
+     *
+     * @param object options
+     * @return throw exceptions on error
+     */
+    protected function parse_options($options) {
+        $options = (array)$options;
+
+        // only common options are parsed here.
+        // special options should be parsed by childclass
+        foreach ($options as $key=>$value) {
+            if ($key == 'memlimit' and $value > get_config('local_onlinejudge2', 'maxmemlimit')) {
+                $value = get_config('local_onlinejudge2', 'maxmemlimit');
+            }
+            if ($key == 'cpulimit' and $value > get_config('local_onlinejudge2', 'maxcpulimit')) {
+                $value = get_config('local_onlinejudge2', 'maxcpulimit');
+            }
+            $task->output = $value;
+        }
+    }
+
+    /**
+     * Judge the task
      *
      * @param task is configed by clients, include the memlimit, cpulimit, case(input,output) etc.
      * @return the id of the task in the database.
      */
-    function judge($task) {
+    function judge() {
         return false;
     }
-
     /**
      * 
      * function diff() compare the output and the answer
@@ -175,59 +251,24 @@ function onlinejudge2_get_language_name($language) {
  * @param int $cmid ID of coursemodule
  * @param int $userid ID of user
  * @param string $language ID of the language
- * @param array $files array of stored_file of source code
- * @param object $options include input, output and etc. 
- * @return id of the task or false
+ * @param array $files array of stored_file of source code or array of filename => filecontent
+ * @param object $options include input, output and etc.
+ * @return id of the task or throw exception
  */
 function onlinejudge2_submit_task($cmid, $userid, $language, $files, $options) {
     global $judgeclasses, $CFG, $DB;
-    $id = false; //return id
-    //get the languages.
-    $langs_arr = array_flip(onlinejudge2_get_languages());
 
-    //check if @param language is the the langs array.
-    if(in_array($language, $langs_arr)) {
-    	//echo $language.' in the language lib';
-        //get the judge type, such as sandbox, ideone etc.
-        $judge_type = substr($language, strrpos($language, '_')+1);
-        
-        //get the compiler, such as judge_sandbox, judge_ideone etc.
-        $judge_compiler = 'judge_'.$judge_type;
-        
-        //select the certain compiler by judge_type
-        if(in_array($judge_compiler, $judgeclasses)) {
-            //require_once("$CFG->dirroot/local/onlinejudge2/judge/$judge_type/lib.php");
-            
-            //$judge_obj = new $judge_compiler();
-            
-            //packing the task data.
-            $task = new stdClass();
-            $task->coursemodule = $cmid;
-            $task->userid = $userid;
-            $task->language = $language;
-            $task->memlimit = $options->memlimit;
-            $task->cpulimit = $options->cpulimit;
-            $task->input = $options->input;
-            $task->output = $options->output;
-            $task->compileonly = $options->compileonly;
-            $task->status = ONLINEJUDGE2_STATUS_PENDING;
-            $task->submittime = time();
-
-            //other info.
-            $task->onlinejudge2_ideone_username = $options->onlinejudge2_ideone_username;
-            $task->onlinejudge2_ideone_password = $options->onlinejudge2_ideone_password;
-            
-            //save the task into database
-            $id = $DB->insert_record('onlinejudge2_tasks', $task);
-            
-            if(! $id) {
-                //print error info
-                mtrace(get_string('nosuchrecord', 'local_onlinejudge2'));
-            }         
-        }
+    if (!array_key_exists($language, onlinejudge2_get_languages())) {
+        throw new onlinejudge2_exception('invalidlanguage', $language);
     }
-    
-    return $id;
+
+    $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
+    if (!in_array($judgeclass, $judgeclasses)) {
+        throw new onlinejudge2_exception('invalidjudgeclass', $judgeclass);
+    }
+
+    $judge = new $judgeclass();
+    return $judge->submit($cmid, $userid, $language, $files, $options);
 }
 
 /**

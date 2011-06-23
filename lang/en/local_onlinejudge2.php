@@ -43,6 +43,8 @@
     $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
     $string['input'] = 'Input';
     $string['inputfile'] = 'Input file';
+    $string['invalidlanguage'] = 'Invalid language ID ($a)';
+    $string['invalidjudgeclass'] = 'Invalid judge class ($a)';
     $string['judgetime'] = 'Judge time';
     $string['judgemethods'] = 'the supported compiler language';
     $string['langc_sandbox'] = 'C';
