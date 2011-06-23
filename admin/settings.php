@@ -4,7 +4,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -25,18 +25,19 @@
 /**
  * Global settings setup page
  * 
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require('../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/local/onlinejudge2/admin/forms.php');
+require_once($CFG->dirroot . '/local/onlinejudge/admin/forms.php');
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Invoke the default settings
 
-admin_externalpage_setup('local_onlinejudge2');
+admin_externalpage_setup('local_onlinejudge');
 
-$ojsettingsform = new onlinejudge2_settings_form();
+$ojsettingsform = new onlinejudge_settings_form();
 $fromform = $ojsettingsform->get_data();
 
 echo $OUTPUT->header();
@@ -46,17 +47,17 @@ echo $OUTPUT->header();
 if (!empty($fromform) and confirm_sesskey()) {
 
     //Save settings
-    set_config('maxmemlimit', $fromform->maxmemlimit, 'local_onlinejudge2');
-    set_config('maxcpulimit', $fromform->maxcpulimit, 'local_onlinejudge2');
-    set_config('ideonedelay', $fromform->ideonedelay, 'local_onlinejudge2');
+    set_config('maxmemlimit', $fromform->maxmemlimit, 'local_onlinejudge');
+    set_config('maxcpulimit', $fromform->maxcpulimit, 'local_onlinejudge');
+    set_config('ideonedelay', $fromform->ideonedelay, 'local_onlinejudge');
 
     //display confirmation
-    echo $OUTPUT->notification(get_string('settingsupdated', 'local_onlinejudge2'), 'notifysuccess');
+    echo $OUTPUT->notification(get_string('settingsupdated', 'local_onlinejudge'), 'notifysuccess');
     $ojsettingsform->display();
 } else {
-    $data->maxmemlimit = get_config('local_onlinejudge2', 'maxmemlimit');
-    $data->maxcpulimit = get_config('local_onlinejudge2', 'maxcpulimit');
-    $data->ideonedelay = get_config('local_onlinejudge2', 'ideonedelay');
+    $data->maxmemlimit = get_config('local_onlinejudge', 'maxmemlimit');
+    $data->maxcpulimit = get_config('local_onlinejudge', 'maxcpulimit');
+    $data->ideonedelay = get_config('local_onlinejudge', 'ideonedelay');
     $ojsettingsform->set_data($data);
     $ojsettingsform->display();
 }

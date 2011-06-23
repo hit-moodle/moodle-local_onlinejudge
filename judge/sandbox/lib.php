@@ -3,7 +3,7 @@
 require_once(dirname(dirname(__FILE__))."/../../../config.php");
 
 global $DB,$CFG;
-require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
+require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
 class judge_sandbox extends judge_base {
    // var $cases = parent::get_tests;
@@ -41,11 +41,11 @@ class judge_sandbox extends judge_base {
         $langs = array();
         // Get local languages. Linux only
         if ($CFG->ostype != 'WINDOWS') {
-            $dir = $CFG->dirroot.'/local/onlinejudge2/judge/sandbox/languages/';
+            $dir = $CFG->dirroot.'/local/onlinejudge/judge/sandbox/languages/';
             $files = get_directory_list($dir);
             $names = preg_replace('/\.(\w+)/', '_sandbox', $files); // Replace file extension with _sandbox
             foreach ($names as $name) {
-                $langs[$name] = get_string('lang'.$name, 'local_onlinejudge2');
+                $langs[$name] = get_string('lang'.$name, 'local_onlinejudge');
             }
         }
         return $langs;
@@ -96,20 +96,20 @@ class judge_sandbox extends judge_base {
             
             //select the compiler shell.
             //gcc -D_MOODLE_ONLINE_JUDGE_ 	-Wall -static -o $DEST $SOURCE -lm
-            $compiler = $CFG->dirroot.'/local/onlinejudge2/judge/sandbox/languages/'.$language.'.sh';
+            $compiler = $CFG->dirroot.'/local/onlinejudge/judge/sandbox/languages/'.$language.'.sh';
             
             if (!is_executable($compiler)) {
             	// for test
-                mtrace(get_string('cannotruncompiler', 'local_onlinejudge2'));
+                mtrace(get_string('cannotruncompiler', 'local_onlinejudge'));
                 
-                $result->info_teacher = get_string('cannotruncompiler', 'local_onlinejudge2');
-                $result->info_student = get_string('cannotruncompiler', 'local_onlinejudge2');            
+                $result->info_teacher = get_string('cannotruncompiler', 'local_onlinejudge');
+                $result->info_student = get_string('cannotruncompiler', 'local_onlinejudge');            
                 $result->cpuusage = null;
                 $result->memusage = null;
                 $result->answer = null;
                 $result->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
                 $result->judgetime = null;
-                $result->error = get_string('cannotruncompiler', 'local_onlinejudge2');
+                $result->error = get_string('cannotruncompiler', 'local_onlinejudge');
                 
                 break;
             }
@@ -153,7 +153,7 @@ class judge_sandbox extends judge_base {
             $result->judgetime = time();
             
             if($result->status == ONLINEJUDGE2_STATUS_COMPILATION_ERROR) {
-                $result->error = get_string('status3', 'local_onlinejudge2');
+                $result->error = get_string('status3', 'local_onlinejudge');
             }
             else {
                 $result->error = null;
@@ -176,7 +176,7 @@ class judge_sandbox extends judge_base {
     	global $CFG;
         //temp directory to save the testcase and source.
         if(! isset($CFG->temp_dir)) {
-            set_config('temp_dir', $CFG->dirroot.'/temp/onlinejudge2/'.$task->userid);
+            set_config('temp_dir', $CFG->dirroot.'/temp/onlinejudge/'.$task->userid);
         }
         //result class
         $result = new stdClass();
@@ -192,7 +192,7 @@ class judge_sandbox extends judge_base {
             $result->info_teacher = null;
             $result->info_student = null;
             $result->judgetime = null;
-            $result->error = get_string('cannotmakedir', 'local_onlinejudge2');
+            $result->error = get_string('cannotmakedir', 'local_onlinejudge');
             return $result;
         }      
         //get the result class.
@@ -236,19 +236,19 @@ class judge_sandbox extends judge_base {
         );
         //print_r($result);
         
-        $sand = $CFG->dirroot . '/local/onlinejudge2/judge/sandbox/sand/sand';
+        $sand = $CFG->dirroot . '/local/onlinejudge/judge/sandbox/sand/sand';
         //如果sand不可执行，则返回空的结果对象
         if (!is_executable($sand)){
-            mtrace(get_string('cannotrunsand'), 'local_onlinejudge2');
+            mtrace(get_string('cannotrunsand'), 'local_onlinejudge');
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
             
-            $ret->info_teacher = get_string('cannotrunsand', 'local_onlinejudge2');
-            $ret->info_student = get_string('cannotrunsand', 'local_onlinejudge2');            
+            $ret->info_teacher = get_string('cannotrunsand', 'local_onlinejudge');
+            $ret->info_student = get_string('cannotrunsand', 'local_onlinejudge');            
             $ret->cpuusage = null;
             $ret->memusage = null;
             $ret->answer = null;
             $ret->judgetime = null;
-            $ret->error = get_string('cannotrunsand', 'local_onlinejudge2');
+            $ret->error = get_string('cannotrunsand', 'local_onlinejudge');
             
             return $ret;
         }
@@ -270,15 +270,15 @@ class judge_sandbox extends judge_base {
         
         //如果返回的不是资源，即不成功
         if (!is_resource($proc)) {
-        	mtrace(get_string('status21', 'local_onlinejudge2'));
+        	mtrace(get_string('status21', 'local_onlinejudge'));
             $ret->status = ONLINEJUDGE2_STATUS_INTERNAL_ERROR;
             
-            $ret->info_teacher = get_string('status21', 'local_onlinejudge2');
-            $ret->info_student = get_string('status21', 'local_onlinejudge2');            
+            $ret->info_teacher = get_string('status21', 'local_onlinejudge');
+            $ret->info_student = get_string('status21', 'local_onlinejudge');            
             $ret->cpuusage = null;
             $ret->memusage = null;
             $ret->answer = null;
-            $ret->error = get_string('status21', 'local_onlinejudge2');
+            $ret->error = get_string('status21', 'local_onlinejudge');
             
             return $ret;
         }

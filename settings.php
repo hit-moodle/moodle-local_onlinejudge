@@ -21,7 +21,7 @@
 /**
  * Administration forms of the online judge
  * 
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,8 +29,8 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) { // needs this condition or there is error on login page
-    $ADMIN->add('localplugins', new admin_externalpage('local_onlinejudge2',
-            get_string('pluginname', 'local_onlinejudge2'),
-            new moodle_url('/local/onlinejudge2/admin/settings.php')));
+    $ADMIN->add('localplugins', new admin_externalpage('local_onlinejudge',
+            get_string('pluginname', 'local_onlinejudge'),
+            new moodle_url('/local/onlinejudge/admin/settings.php')));
 }
 

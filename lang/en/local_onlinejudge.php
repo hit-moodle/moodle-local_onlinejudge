@@ -5,7 +5,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -24,9 +24,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 /**
- * Strings for local_onlinejudge2
+ * Strings for local_onlinejudge
  * 
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,7 +41,7 @@ $string['cannotmakedir'] = 'cannot make directory.';
 $string['cannotrunsand'] = 'cannot run this sand';
 $string['ideonedelay'] = 'Delay between requests to ideone.com (second)';
 $string['ideonedelay_help'] = 'After sending a judge request to ideone.com, we can not get the result immediately. How long should we wait before querying the result? 5 seconds or so is reasonable.';
-$string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge2\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
+$string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
 $string['ideoneexception'] = 'Ideone exception...';
 $string['info'] = 'Information';
 $string['infoat'] = 'A good program must return 0 if no error occur.';
@@ -115,8 +115,8 @@ $string['maxcpulimit'] = 'Maximum CPU usage (second)';
 $string['maxcpulimit_help'] = 'How long can a judge task keep running.';
 $string['maxmemlimit'] = 'Maximum memory usage (MB)';
 $string['maxmemlimit_help'] = 'How many memory can a judge task use.';
-$string['pluginname'] = 'Online Judge 2';
-$string['settingsform'] = 'Online Judge 2 Settings';
+$string['pluginname'] = 'Online Judge';
+$string['settingsform'] = 'Online Judge Settings';
 $string['settingsupdated'] = 'Settings updated.';
 $string['status0'] = 'Pending...';
 $string['status1'] = '<font color=red>Accepted</font>';

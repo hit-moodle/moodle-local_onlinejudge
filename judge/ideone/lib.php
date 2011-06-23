@@ -1,6 +1,6 @@
 <?php
 global $DB,$CFG;
-require_once($CFG->dirroot."/local/onlinejudge2/judgelib.php");
+require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
 //TODO: use oj2 manager to update latest language list
 global $supported_langs;
@@ -75,7 +75,7 @@ class judge_ideone extends judge_base
 
     	$langs = array();
         foreach ($supported_langs as $langid => $var) {
-            $langs[$langid] = get_string('lang'.$langid, 'local_onlinejudge2');
+            $langs[$langid] = get_string('lang'.$langid, 'local_onlinejudge');
         }
 
         return $langs;
@@ -95,7 +95,7 @@ class judge_ideone extends judge_base
         if(in_array($language, array_flip($supported_langs))) {
             return $supported_langs[$language]; 
         }
-        echo get_string('nosuchlanguage', 'local_onlinejudge2');
+        echo get_string('nosuchlanguage', 'local_onlinejudge');
         return $id;     
     }
     
@@ -110,20 +110,20 @@ class judge_ideone extends judge_base
     {
     	global $CFG, $DB;
     	
-    	if(! isset($CFG->onlinejudge2_ideone_username)) {
-    	    set_config('onlinejudge2_ideone_username', 'yuzhanlaile2');
+    	if(! isset($CFG->onlinejudge_ideone_username)) {
+    	    set_config('onlinejudge_ideone_username', 'yuzhanlaile2');
     	}
-    	if(! isset($CFG->onlinejudge2_ideone_password)) {
-    	    set_config('onlinejudge2_ideone_password', 'yuzhanlaile2');
+    	if(! isset($CFG->onlinejudge_ideone_password)) {
+    	    set_config('onlinejudge_ideone_password', 'yuzhanlaile2');
     	}
     	// delay between submitting and getting result
-    	if(! isset($CFG->onlinejudge2_ideone_delay)) {
-    	    set_config('onlinejudge2_ideone_delay', 3);
+    	if(! isset($CFG->onlinejudge_ideone_delay)) {
+    	    set_config('onlinejudge_ideone_delay', 3);
     	}
         
     	//get the username and password 
-    	$user = $CFG->onlinejudge2_ideone_username;
-    	$pass = $CFG->onlinejudge2_ideone_password;
+    	$user = $CFG->onlinejudge_ideone_username;
+    	$pass = $CFG->onlinejudge_ideone_password;
     	
     	// create client.
         $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
@@ -189,7 +189,7 @@ class judge_ideone extends judge_base
                 $link = $webid['link'];
             }
             else {
-                mtrace(get_string('createsubmissionerror', 'local_onlinejudge2'));
+                mtrace(get_string('createsubmissionerror', 'local_onlinejudge'));
                 $result->cpuusage = null;
                 $result->memusage = null;
                 $result->answer = null;
@@ -197,7 +197,7 @@ class judge_ideone extends judge_base
                 $result->info_teacher = $webid['error'];
                 $result->info_student = $webid['error'];
                 $result->judgetime = null;
-                $result->error = get_string('createsubmissionerror', 'local_onlinejudge2');
+                $result->error = get_string('createsubmissionerror', 'local_onlinejudge');
                 return $result;
             }
             
@@ -242,9 +242,9 @@ class judge_ideone extends judge_base
                 $result->memusage = null;
                 $result->answer = null;
                 $result->judgetime = null;
-                $result->error = get_string('createsubmissionerror', 'local_onlinejudge2');
-                $result->info_teacher = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
-                $result->info_student = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge2');
+                $result->error = get_string('createsubmissionerror', 'local_onlinejudge');
+                $result->info_teacher = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge');
+                $result->info_student = $details['cmpinfo'] . '<br />'.get_string('ideonelogo', 'local_onlinejudge');
 
                 return $result;
             }
@@ -252,18 +252,18 @@ class judge_ideone extends judge_base
             // Check for wa, pe, tle, mle or accept
             if ($result->status == 'ok') {
                 if ($details['time'] > $task->cpulimit) {
-                    mtrace(get_string('status10', 'local_onlinejudge2'));
+                    mtrace(get_string('status10', 'local_onlinejudge'));
                     //change status
                     $result->status = ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED;
-                    $result->error = get_string('status10', 'local_onlinejudge2');
+                    $result->error = get_string('status10', 'local_onlinejudge');
                 }
                 //for test
                 //else if ($details['memory']*1024 > $task->memlimit) {
                 else if ($details['memory'] > $task->memlimit) { 
-                    mtrace(get_string('status5', 'local_onlinejudge2'));
+                    mtrace(get_string('status5', 'local_onlinejudge'));
                     //change status
                     $result->status = ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED;
-                    $result->error = get_string('status5', 'local_onlinejudge2');
+                    $result->error = get_string('status5', 'local_onlinejudge');
                 }
                    
                 else {
@@ -286,7 +286,7 @@ class judge_ideone extends judge_base
             $result->memusage = null;
             $result->answer = null;
             $result->judgetime = null;
-            $result->error = $result->info_teacher."<br />".get_string('ideoneexception', 'local_onlinejudge2');
+            $result->error = $result->info_teacher."<br />".get_string('ideoneexception', 'local_onlinejudge');
             
             return $result;       
         }

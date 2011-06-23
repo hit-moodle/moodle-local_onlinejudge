@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge2/db" VERSION="20110623" COMMENT="XMLDB file for Moodle local/onlinejudge2"
+<XMLDB PATH="local/onlinejudge/db" VERSION="20110623" COMMENT="XMLDB file for Moodle local/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="onlinejudge2_tasks" COMMENT="Details of tasks">
+    <TABLE NAME="onlinejudge_tasks" COMMENT="Details of tasks">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>

@@ -32,7 +32,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/clilib.php');      // cli only functions
-require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
+require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
 
 // now get cli options
 $longoptions  = array('help'=>false, 'nodaemon'=>false, 'once'=>false, 'verbose'=>false);
@@ -55,7 +55,7 @@ Options:
 -v, --verbose         Verbose output
 
 Example:
-\$sudo -u www-data /usr/bin/php local/onlinejudge2/cli/judged.php
+\$sudo -u www-data /usr/bin/php local/onlinejudge/cli/judged.php
 ";
 
     echo $help;
@@ -103,7 +103,7 @@ if ($CFG->ostype != 'WINDOWS' and method_exists('pcntl_signal')) {
 // Run forever until being killed or the plugin was upgraded
 $forcestop = false;
 $upgraded = false;
-$plugin_version = get_config('local_onlinejudge2', 'version');
+$plugin_version = get_config('local_onlinejudge', 'version');
 while (!$forcestop and !$upgraded) {
 
     judge_all_unjudged();
@@ -116,7 +116,7 @@ while (!$forcestop and !$upgraded) {
     // TODO: definable by admin
     sleep(5);
 
-    $upgraded = $plugin_version < get_config('local_onlinejudge2', 'version');
+    $upgraded = $plugin_version < get_config('local_onlinejudge', 'version');
     if ($upgraded) {
         verbose('Plugin was upgraded.');
     }
@@ -135,11 +135,11 @@ function get_one_unjudged_task() {
     $transaction = $DB->start_delegated_transaction();
 
     try {
-        $tasks = $DB->get_records('onlinejudge2_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING), '', 'id', 0, 1);
+        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING), '', 'id', 0, 1);
 
         if (!empty($tasks)) {
             $task = array_pop($tasks);
-            $DB->set_field('onlinejudge2_tasks', 'status', ONLINEJUDGE2_STATUS_JUDGING, array('id' => $task->id));
+            $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE2_STATUS_JUDGING, array('id' => $task->id));
             verbose(cli_heading('TASK: '.$task->id, true));
         }
 
@@ -156,7 +156,7 @@ function get_one_unjudged_task() {
 function judge_all_unjudged(){
     while ($task = get_one_unjudged_task()) {
         verbose('Judging...');
-        onlinejudge2_judge($task->id);
+        onlinejudge_judge($task->id);
         verbose('Successfully judged');
     }
 }

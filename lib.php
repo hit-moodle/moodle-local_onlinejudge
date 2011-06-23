@@ -18,7 +18,7 @@
 /**
  * ONLINEJUDGE2 interface library
  *
- * @package   onlinejudge2
+ * @package   onlinejudge
  * @copyright 2011 Yu Zhan <yuzhanlaile@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,13 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * add the onlinejudge plugin into navigation
  */
-function onlinejudge2_extends_navigation(global_navigation $navigation) {
-    $onlinejudge2 = $navigation->add('Onlinejudge2', new moodle_url('/local/onlinejudge2/'));
+function onlinejudge_extends_navigation(global_navigation $navigation) {
+    $onlinejudge = $navigation->add('Onlinejudge2', new moodle_url('/local/onlinejudge/'));
 
-    $onlinejudge2->add("配置", new moodle_url("/local/onlinejudge2/config.php"));
-    $onlinejudge2->add("在线评测", new moodle_url("/local/onlinejudge2/judge.php"));
-    $onlinejudge2->add("查看结果", new moodle_url("/local/onlinejudge2/result.php"));
-    $onlinejudge2->add("FAQ", new moodle_url("/local/onlinejudge2/help.php"));
+    $onlinejudge->add("配置", new moodle_url("/local/onlinejudge/config.php"));
+    $onlinejudge->add("在线评测", new moodle_url("/local/onlinejudge/judge.php"));
+    $onlinejudge->add("查看结果", new moodle_url("/local/onlinejudge/result.php"));
+    $onlinejudge->add("FAQ", new moodle_url("/local/onlinejudge/help.php"));
 }
 
 

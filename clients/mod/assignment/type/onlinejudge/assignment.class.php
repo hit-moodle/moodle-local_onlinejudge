@@ -5,7 +5,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
+//       https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -26,7 +26,7 @@
 /**
  * online judge assignment type for online judge 2
  * 
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/mod/assignment/type/upload/assignment.class.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/questionlib.php'); //for get_grade_options()
-require_once($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
+require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
 
 /**
  * Extends the upload assignment class
@@ -110,7 +110,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Programming languages
         unset($choices);
-        $choices = onlinejudge2_get_languages();
+        $choices = onlinejudge_get_languages();
         $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
         /// TODO: Set global default language
         $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
@@ -309,7 +309,7 @@ class assignment_onlinejudge extends assignment_upload {
         // replace draft status with onlinejudge status
         if ($this->is_finalized($submission)) {
             $pattern = '/(<div class="box files">).*(<div )/';
-            $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge2').'</strong>$2';
+            $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge').'</strong>$2';
             $output = preg_replace($pattern, $replacement, $output, 1);
         }
 
@@ -437,7 +437,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         // Language
         $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
-        $lang = onlinejudge2_get_language_name($this->onlinejudge->language);
+        $lang = onlinejudge_get_language_name($this->onlinejudge->language);
         $table->data[] = array($item_name, $lang);
 
         $submission = $this->get_submission($user);
@@ -446,7 +446,7 @@ class assignment_onlinejudge extends assignment_upload {
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
         if (!empty($submission->oj_result->status)) {
-            $item = get_string('status'.$submission->oj_result->status, 'local_onlinejudge2');
+            $item = get_string('status'.$submission->oj_result->status, 'local_onlinejudge');
         }
         $table->data[] = array($item_name, $item);
 
@@ -466,7 +466,7 @@ class assignment_onlinejudge extends assignment_upload {
             $lines = array();
             foreach ($submission->oj_result->testcases as $case) {
                 if (!is_null($case))
-                    $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge2');
+                    $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
                 $i++;
             }
             if (!empty($lines)) {
@@ -554,7 +554,7 @@ class assignment_onlinejudge extends assignment_upload {
         $result->judgetime = 0;
         $result->grade = 0;
         foreach ($onlinejudges as $oj) {
-            if ($task = onlinejudge2_get_task($oj->task)) {
+            if ($task = onlinejudge_get_task($oj->task)) {
                 $task->testcase = $oj->testcase;
                 $task->feedback = $oj->feedback;
 
@@ -587,7 +587,7 @@ class assignment_onlinejudge extends assignment_upload {
         }
 
         $result->testcases = $cases;
-        $result->status = onlinejudge2_get_overall_status($cases);
+        $result->status = onlinejudge_get_overall_status($cases);
 
         return $result;
     }
@@ -616,7 +616,7 @@ class assignment_onlinejudge extends assignment_upload {
     static function get_max_memory_usages() {
 
         // Get max size
-        $maxsize = 1024*1024*get_config('local_onlinejudge2', 'maxmemlimit');
+        $maxsize = 1024*1024*get_config('local_onlinejudge', 'maxmemlimit');
         $memusage[$maxsize] = display_size($maxsize);
 
         $sizelist = array(1048576, 2097152, 4194304, 8388608, 16777216, 33554432,
@@ -642,7 +642,7 @@ class assignment_onlinejudge extends assignment_upload {
     static function get_max_cpu_times() {
 
         // Get max size
-        $maxtime = get_config('local_onlinejudge2', 'maxcpulimit');
+        $maxtime = get_config('local_onlinejudge', 'maxcpulimit');
         $cputime[$maxtime] = get_string('numseconds', 'moodle', $maxtime);
 
         $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -672,7 +672,7 @@ class assignment_onlinejudge extends assignment_upload {
         $fs = get_file_storage();
         $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, 'sortorder, timemodified', false);
 
-        onlinejudge2_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
+        onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
     }
 
     /**

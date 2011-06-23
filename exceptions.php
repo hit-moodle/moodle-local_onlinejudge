@@ -5,7 +5,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge2         //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -26,16 +26,16 @@
 /**
  * Online judge related exceptions
  * 
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-class onlinejudge2_exception extends moodle_exception {
+class onlinejudge_exception extends moodle_exception {
     function __construct($errorcode, $a=NULL, $debuginfo = NULL) {
-        parent::__construct($errorcode, 'local_onlinejudge2', '', $a, $debuginfo);
+        parent::__construct($errorcode, 'local_onlinejudge', '', $a, $debuginfo);
     }
 }
 

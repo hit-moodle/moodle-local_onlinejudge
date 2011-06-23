@@ -16,13 +16,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Main onlinejudge2 translation page
+ * Main onlinejudge translation page
  *
  * Displays strings filter and the translation table. Data submitted from the
  * whole translation table are handled by savebulk.php which should redirect
  * back here.
  *
- * @package   local-onlinejudge2
+ * @package   local-onlinejudge
  * @copyright 2011 Yu Zhan <yuzhanlaile@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,18 +32,18 @@ require_once(dirname(__FILE__).'/locallib.php');
 require_once('styles.php');
 
 global $CFG;
-require($CFG->dirroot.'/local/onlinejudge2/judgelib.php');
+require($CFG->dirroot.'/local/onlinejudge/judgelib.php');
 
 global $PAGE;
 global $DB;
 global $USER;
-require_capability('local/onlinejudge2:manage', get_system_context());
+require_capability('local/onlinejudge:manage', get_system_context());
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/onlinejudge2/view.php');
-$PAGE->set_title('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge2'));
-$PAGE->set_heading('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge2'));
+$PAGE->set_url('/local/onlinejudge/view.php');
+$PAGE->set_title('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge'));
+$PAGE->set_heading('Onlinejudge2 ---- ' . get_string('page_view', 'local_onlinejudge'));
 
-$output = $PAGE->get_renderer('local_onlinejudge2');
+$output = $PAGE->get_renderer('local_onlinejudge');
 
 /// Output starts here
 echo $output->header();
@@ -59,7 +59,7 @@ if(is_null($id)) {
 //get the record from database , based on the $id
 $task = new stdClass();
 $task = null;
-$task = $DB->get_record('onlinejudge2_tasks', array('id' => $id));
+$task = $DB->get_record('onlinejudge_tasks', array('id' => $id));
 
 //output
 //base information

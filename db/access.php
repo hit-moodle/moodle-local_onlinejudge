@@ -16,9 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for onlinejudge2 local plugin
+ * Capability definitions for onlinejudge local plugin
  *
- * @package   local_onlinejudge2
+ * @package   local_onlinejudge
  * @copyright 2010 Yu Zhan <yuzhanlaile@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,35 +28,35 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
     // Ability to set-up Onlinejudge2
-    'local/onlinejudge2:manages' => array(
+    'local/onlinejudge:manages' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
     
     // Ability to view the tasks
-    'local/onlinejudge2:viewin' => array(
+    'local/onlinejudge:viewin' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
     // Ability to query the task.
-    'local/onlinejudge2:queryin' => array(
+    'local/onlinejudge:queryin' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
     // Ability to delete the task
-    'local/onlinejudge2:deletein' => array(
+    'local/onlinejudge:deletein' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()
     ),
 
     // Ability to ...
-    'local/onlinejudge2:addin' => array(
+    'local/onlinejudge:addin' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array()

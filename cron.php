@@ -22,7 +22,7 @@ function cron() {
     if (function_exists('pcntl_fork')) { // pcntl_fork supported. Use routine two
         $this->fork_daemon();
     }
-     else if ($CFG->onlinejudge2_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
+     else if ($CFG->onlinejudge_judge_in_cron) { // pcntl_fork is not supported. So use routine one if configured.
         $this->judge_all_unjudged();
     }
 }
@@ -30,7 +30,7 @@ function cron() {
 function fork_daemon() {
     global $CFG, $db;
 
-    if(empty($CFG->onlinejudge2_daemon_pid) || !posix_kill($CFG->onlinejudge2_daemon_pid, 0)){ // No daemon is running
+    if(empty($CFG->onlinejudge_daemon_pid) || !posix_kill($CFG->onlinejudge_daemon_pid, 0)){ // No daemon is running
        $pid = pcntl_fork(); 
        if ($pid == -1) {
             mtrace('Could not fork');
@@ -38,7 +38,7 @@ function fork_daemon() {
        //Reconnect db, so that the parent won't close the db connection shared with child after exit.
        reconnect_db();
 
-        set_config('onlinejudge2_daemon_pid' , $pid);
+        set_config('onlinejudge_daemon_pid' , $pid);
        } 
        else { //Child process
             $this->daemon(); 
@@ -77,10 +77,10 @@ function daemon(){
         pcntl_signal(SIGTERM, 'sigterm_handler');
     }
 
-    set_config('onlinejudge2_daemon_pid' , $pid);
+    set_config('onlinejudge_daemon_pid' , $pid);
 
     // Run forever until be killed or plugin was upgraded
-    while(!empty($CFG->onlinejudge2_daemon_pid)){
+    while(!empty($CFG->onlinejudge_daemon_pid)){
         global $db;
         $this->judge_all_unjudged();
 
@@ -92,7 +92,7 @@ function daemon(){
         sleep(5);
 
         //renew the config value which could be modified by other processes
-        $CFG->onlinejudge2_daemon_pid = get_config(NULL, 'onlinejudge2_daemon_pid');
+        $CFG->onlinejudge_daemon_pid = get_config(NULL, 'onlinejudge_daemon_pid');
     }
 }
 ?>
