@@ -13,9 +13,6 @@ if (!defined('MOODLE_INTERNAL')) {
 // access to use global variables.
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
-// Make sure the code being tested is accessible.
-require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include the code to test
-
 /** This class contains the test cases for the functions in judegelib.php. */
 class local_onlinejudge_test extends UnitTestCase {
 	function setUp() {
@@ -36,6 +33,10 @@ class local_onlinejudge_test extends UnitTestCase {
         }
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'files');
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'config_plugins');
+
+        // Make sure the code being tested is accessible.
+        require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include here to ensure set_config()
+
 	}
 
 	function tearDown() {
@@ -57,6 +58,21 @@ class local_onlinejudge_test extends UnitTestCase {
 
         $this->assertEqual($task->status, $expect);
     }
+
+	function test_accepted() {
+        $files = array('/test.c' => '
+#include <stdio.h>
+
+int main(void)
+{
+    int c;
+    while ( (c = getchar()) != EOF)
+        putchar(c);
+    return 0;
+}
+        ');
+        $this->triger_test('c_sandbox', $files, 'hello', 'hello', 1, 1024*1024, ONLINEJUDGE2_STATUS_ACCEPTED);
+	}
 
 	function test_memlimit() {
         $files = array('/test.c' => '
