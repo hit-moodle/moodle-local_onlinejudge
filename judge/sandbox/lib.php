@@ -67,9 +67,9 @@ class judge_sandbox extends judge_base {
         $this->task->compileroutput = str_replace($this->get_temp_dir().'/', '', implode("\n", $output));
         if ($return != 0) {
             // TODO: if the command can not be executed, it should be internal error
-            $this->task->status = ONLINEJUDGE2_STATUS_COMPILATION_ERROR;
+            $this->task->status = ONLINEJUDGE_STATUS_COMPILATION_ERROR;
         } else {
-            $this->task->status = ONLINEJUDGE2_STATUS_COMPILATION_OK;
+            $this->task->status = ONLINEJUDGE_STATUS_COMPILATION_OK;
         }
 
         return $replace[1];
@@ -82,13 +82,11 @@ class judge_sandbox extends judge_base {
      */
     function judge() {
 
-        $this->assert_task();
-
         $files = $this->create_temp_files();
 
         $binfile = $this->compile($files);
 
-        if ($this->task->status == ONLINEJUDGE2_STATUS_COMPILATION_OK && !$this->task->compileonly) {
+        if ($this->task->status == ONLINEJUDGE_STATUS_COMPILATION_OK && !$this->task->compileonly) {
             $this->run_in_sandbox($binfile);
         } 
 
@@ -99,15 +97,15 @@ class judge_sandbox extends judge_base {
     	global $CFG;
 
         $rval_status = array (
-                ONLINEJUDGE2_STATUS_PENDING, 
-                ONLINEJUDGE2_STATUS_ACCEPTED,
-                ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS, 
-                ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED, 
-                ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED,
-                ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED,
-                ONLINEJUDGE2_STATUS_RUNTIME_ERROR,
-                ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION,
-                ONLINEJUDGE2_STATUS_INTERNAL_ERROR
+                ONLINEJUDGE_STATUS_PENDING, 
+                ONLINEJUDGE_STATUS_ACCEPTED,
+                ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS, 
+                ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED, 
+                ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED,
+                ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED,
+                ONLINEJUDGE_STATUS_RUNTIME_ERROR,
+                ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION,
+                ONLINEJUDGE_STATUS_INTERNAL_ERROR
         );
 
         $sand = $CFG->dirroot . '/local/onlinejudge/judge/sandbox/sand/sand';

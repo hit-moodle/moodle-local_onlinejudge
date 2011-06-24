@@ -107,7 +107,6 @@ class judge_base{
      * @return updated task or false
      */
     function judge() {
-        $this->assert_task();
         return false;
     }
 
@@ -119,7 +118,7 @@ class judge_base{
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
         $output = trim($output);
         if (strcmp($answer, $output) == 0)
-            return ONLINEJUDGE2_STATUS_ACCEPTED;
+            return ONLINEJUDGE_STATUS_ACCEPTED;
         else {
             $tokens = array();
             $tok = strtok($answer, " \n\r\t");
@@ -131,11 +130,11 @@ class judge_base{
             $tok = strtok($output, " \n\r\t");
             foreach ($tokens as $anstok) {
                 if (!$tok || $tok !== $anstok)
-                    return ONLINEJUDGE2_STATUS_WRONG_ANSWER;
+                    return ONLINEJUDGE_STATUS_WRONG_ANSWER;
                 $tok = strtok(" \n\r\t");
             }
 
-            return ONLINEJUDGE2_STATUS_PRESENTATION_ERROR;
+            return ONLINEJUDGE_STATUS_PRESENTATION_ERROR;
         }
     }
 
@@ -145,9 +144,6 @@ class judge_base{
      * @return array of the full path of saved files
      */
     protected function create_temp_files() {
-
-        $this->assert_task();
-
         $dstfiles = array();
 
         $fs = get_file_storage();
@@ -170,32 +166,27 @@ class judge_base{
         return "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
     }
 
-    protected function assert_task() {
-        if (empty($this->task)) {
-            throw new onlinejudge_exception('uninitedjudge');
-        }
-    }
 }
 
-define("ONLINEJUDGE2_STATUS_PENDING",               0 );
+define("ONLINEJUDGE_STATUS_PENDING",               0 );
 
-define("ONLINEJUDGE2_STATUS_ACCEPTED",              1 );
-define("ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION",  2 );
-define("ONLINEJUDGE2_STATUS_COMPILATION_ERROR",     3 );
-define("ONLINEJUDGE2_STATUS_COMPILATION_OK",        4 );
-define("ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED",   5 );
-define("ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
-define("ONLINEJUDGE2_STATUS_PRESENTATION_ERROR",    7 );
-define("ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS",  8 );
-define("ONLINEJUDGE2_STATUS_RUNTIME_ERROR",         9 );
-define("ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED",     10);
-define("ONLINEJUDGE2_STATUS_WRONG_ANSWER",          11);
+define("ONLINEJUDGE_STATUS_ACCEPTED",              1 );
+define("ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION",  2 );
+define("ONLINEJUDGE_STATUS_COMPILATION_ERROR",     3 );
+define("ONLINEJUDGE_STATUS_COMPILATION_OK",        4 );
+define("ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED",   5 );
+define("ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
+define("ONLINEJUDGE_STATUS_PRESENTATION_ERROR",    7 );
+define("ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS",  8 );
+define("ONLINEJUDGE_STATUS_RUNTIME_ERROR",         9 );
+define("ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED",     10);
+define("ONLINEJUDGE_STATUS_WRONG_ANSWER",          11);
 
-define("ONLINEJUDGE2_STATUS_INTERNAL_ERROR",        21);
-define("ONLINEJUDGE2_STATUS_JUDGING",               22);
-define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
+define("ONLINEJUDGE_STATUS_INTERNAL_ERROR",        21);
+define("ONLINEJUDGE_STATUS_JUDGING",               22);
+define("ONLINEJUDGE_STATUS_MULTI_STATUS",          23);
 
-define("ONLINEJUDGE2_STATUS_UNSUBMITTED",          255);
+define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
 
 /**
  * Returns an sorted array of all programming languages supported
@@ -242,7 +233,7 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $options) {
 
     $task->cmid = $cmid;
     $task->userid = $userid;
-    $task->status = ONLINEJUDGE2_STATUS_PENDING;
+    $task->status = ONLINEJUDGE_STATUS_PENDING;
     $task->submittime = time();
 
     if (!array_key_exists($language, onlinejudge_get_languages())) {
@@ -313,7 +304,7 @@ function onlinejudge_get_task($taskid) {
     $result = new stdClass();
     $result = $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
 
-    if($result->status == ONLINEJUDGE2_STATUS_JUDGING) {
+    if($result->status == ONLINEJUDGE_STATUS_JUDGING) {
         echo get_string('status22', 'local_onlinejudge');
         return null;
     }
@@ -332,16 +323,16 @@ function onlinejudge_get_task($taskid) {
  */
 function onlinejudge_get_overall_status($tasks) {
 
-    $status = ONLINEJUDGE2_STATUS_UNSUBMITTED;
+    $status = ONLINEJUDGE_STATUS_UNSUBMITTED;
     foreach ($tasks as $task) {
         if (is_null($task)) // We can't give out any status on null task
-            return ONLINEJUDGE2_STATUS_UNSUBMITTED;
+            return ONLINEJUDGE_STATUS_UNSUBMITTED;
 
         if ($status == 0) {
             $status = $task->status;
         } 
         else if ($status != $task->status) {
-            $status = ONLINEJUDGE2_STATUS_MULTI_STATUS;
+            $status = ONLINEJUDGE_STATUS_MULTI_STATUS;
             break;
         }
     }

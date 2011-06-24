@@ -7,3 +7,4 @@ judge/sandbox/*/detector
 judge/sandbox/*/policy.c
 *~
 *.swp
+simpletest/ideone_secret.php

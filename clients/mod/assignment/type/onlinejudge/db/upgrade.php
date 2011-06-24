@@ -180,6 +180,86 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011060700, 'assignment', 'onlinejudge');
     }
 
+    if ($oldversion < 2011062400) {
+
+        $ideone_langs = array(
+            'ada_ideone'                     => 7,                      
+            'assembler_ideone'               => 13,                  
+            'awk_gawk_ideone'                => 104,            
+            'awk_mawk_ideone'                => 105,             
+            'bash_ideone'                    => 28,             
+            'bc_ideone'                      => 110,                        
+            'brainfxxk_ideone'               => 12,            
+            'c_ideone'                       => 11,                     
+            'csharp_ideone'                  => 27,                        
+            'cpp_ideone'                     => 1,                  
+            'c99_strict_ideone'              => 34,             
+            'clojure_ideone'                 => 111,                
+            'cobol_ideone'                   => 118,                      
+            'cobol85_ideone'                 => 106,                      
+            'common_lisp_clisp_ideone'       => 32,    
+            'd_dmd_ideone'                   => 102,                 
+            'erlang_ideone'                  => 36,                     
+            'forth_ideone'                   => 107,                     
+            'fortran_ideone'                 => 5,                 
+            'go_ideone'                      => 114,                
+            'haskell_ideone'                 => 21,                   
+            'icon_ideone'                    => 16,             
+            'intercal_ideone'                => 9,                 
+            'java_ideone'                    => 10,                    
+            'javascript_rhino_ideone'        => 35,         
+            'javascript_spidermonkey_ideone' => 112,  
+            'lua_ideone'                     => 26,                       
+            'nemerle_ideone'                 => 30,                  
+            'nice_ideone'                    => 25,                     
+            'ocaml_ideone'                   => 8,                      
+            'oz_ideone'                      => 119,                      
+            'pascal_fpc_ideone'              => 22,             
+            'pascal_gpc_ideone'              => 2,            
+            'perl_ideone'                    => 3,              
+            'php_ideone'                     => 29,            
+            'pike_ideone'                    => 19,            
+            'prolog_gnu_ideone'              => 108,   
+            'prolog_swi_ideone'              => 15,      
+            'python_ideone'                  => 4,             
+            'python3_ideone'                 => 116,             
+            'r_ideone'                       => 117,             
+            'ruby_ideone'                    => 17,             
+            'scala_ideone'                   => 39,             
+            'scheme_guile_ideone'            => 33,    
+            'smalltalk_ideone'               => 23,          
+            'tcl_ideone'                     => 38,              
+            'text_ideone'                    => 62,               
+            'unlambda_ideone'                => 115,         
+            'vbdotnet_ideone'                => 101, 
+            'whitespace_ideone'              => 6
+        );
+
+        foreach ($ideone_langs as $name => $id) {
+            $records = $DB->get_records('assignment_oj', array('language' => $name));
+            if (!empty($records)) {
+                foreach ($records as $record) {
+                    $record->language = $id.'_ideone';
+                    $DB->update_record('assignment_oj', $record);
+                }
+            }
+        }
+
+        $sandbox_langs = array('c', 'cpp', 'c_warn2err', 'cpp_warn2err');
+        foreach ($sandbox_langs as $old) {
+            $records = $DB->get_records('assignment_oj', array('language' => $old));
+            if (!empty($records)) {
+                foreach ($records as $record) {
+                    $record->language = $old.'_sandbox';
+                    $DB->update_record('assignment_oj', $record);
+                }
+            }
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011062400, 'assignment', 'onlinejudge');
+    }
+
     return true;
 }
 

@@ -158,6 +158,22 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
+     * Any extra validation checks needed for the settings
+     * form for this assignment type
+     *
+     * See lib/formslib.php, 'validation' function for details
+     */
+    function form_validation($data, $files) {
+        $errors = array();
+        // ideone.com do not support multi-files
+        // TODO: do not hardcode ideone here. judge should has support_multifile() function
+        if (substr($data['language'], -6) == 'ideone' and $data['var1'] > 1) {
+            $errors['var1'] = get_string('onefileonlyideone', 'local_onlinejudge');
+        } 
+        return $errors;
+    }
+
+    /**
      * Create a new onlinejudge type assignment activity
      *
      * @param object $assignment The data from the form
@@ -684,20 +700,20 @@ class assignment_onlinejudge extends assignment_upload {
      */
     function grade_marker($status, $fraction) {
         $grades = array(
-            ONLINEJUDGE2_STATUS_PENDING                 => -1,
-            ONLINEJUDGE2_STATUS_JUDGING                 => -1,
-            ONLINEJUDGE2_STATUS_INTERNAL_ERROR          => -1,
-            ONLINEJUDGE2_STATUS_WRONG_ANSWER            => 0,
-            ONLINEJUDGE2_STATUS_RUNTIME_ERROR           => 0,
-            ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED       => 0,
-            ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED     => 0,
-            ONLINEJUDGE2_STATUS_OUTPUT_LIMIT_EXCEED     => 0,
-            ONLINEJUDGE2_STATUS_COMPILATION_ERROR       => 0,
-            ONLINEJUDGE2_STATUS_COMPILATION_OK          => 0,
-            ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS    => 0,
-            ONLINEJUDGE2_STATUS_ABNORMAL_TERMINATION    => 0,
-            ONLINEJUDGE2_STATUS_ACCEPTED                => $fraction * $this->assignment->grade,
-            ONLINEJUDGE2_STATUS_PRESENTATION_ERROR      => $fraction * $this->assignment->grade * $this->onlinejudge->ratiope
+            ONLINEJUDGE_STATUS_PENDING                 => -1,
+            ONLINEJUDGE_STATUS_JUDGING                 => -1,
+            ONLINEJUDGE_STATUS_INTERNAL_ERROR          => -1,
+            ONLINEJUDGE_STATUS_WRONG_ANSWER            => 0,
+            ONLINEJUDGE_STATUS_RUNTIME_ERROR           => 0,
+            ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED       => 0,
+            ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED     => 0,
+            ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED     => 0,
+            ONLINEJUDGE_STATUS_COMPILATION_ERROR       => 0,
+            ONLINEJUDGE_STATUS_COMPILATION_OK          => 0,
+            ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS    => 0,
+            ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION    => 0,
+            ONLINEJUDGE_STATUS_ACCEPTED                => $fraction * $this->assignment->grade,
+            ONLINEJUDGE_STATUS_PRESENTATION_ERROR      => $fraction * $this->assignment->grade * $this->onlinejudge->ratiope
         );
 
         return $grades[$status];

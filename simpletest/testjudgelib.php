@@ -39,6 +39,8 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include here to ensure set_config()
 
+require_once('ideone_secret.php');
+
 /** This class contains the test cases for the functions in judegelib.php. */
 class local_onlinejudge_test extends UnitTestCase {
 	function setUp() {
@@ -79,6 +81,8 @@ class local_onlinejudge_test extends UnitTestCase {
         $options->output = $output;
         $options->cpulimit = $cpulimit;
         $options->memlimit = $memlimit;
+        $options->var1 = ideoneuser;
+        $options->var2 = ideonepass;
 
         $taskid = onlinejudge_submit_task(1, 1, $language, $files, $options);
         $task = onlinejudge_judge($taskid);
@@ -99,7 +103,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_sandbox', $files, 'hello', 'hello', 1, 1024*1024, ONLINEJUDGE2_STATUS_ACCEPTED);
+        $this->triger_test('c_sandbox', $files, 'hello', 'hello', 1, 1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
 	}
 
 	function test_memlimit() {
@@ -114,7 +118,7 @@ int main(void)
                      return 0;
                   }
                   ');
-        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_MEMORY_LIMIT_EXCEED);
+        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED);
 	}
 
 	function test_wrong_answer() {
@@ -129,7 +133,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_sandbox', $files, 'hello', 'hello', 1, 1024*1024, ONLINEJUDGE2_STATUS_WRONG_ANSWER);
+        $this->triger_test('c_sandbox', $files, 'hello', 'hello', 1, 1024*1024, ONLINEJUDGE_STATUS_WRONG_ANSWER);
 	}
 
 	function test_presentation_error() {
@@ -147,7 +151,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_sandbox', $files, 'hello world', 'hello world', 1, 1024*1024, ONLINEJUDGE2_STATUS_PRESENTATION_ERROR);
+        $this->triger_test('c_sandbox', $files, 'hello world', 'hello world', 1, 1024*1024, ONLINEJUDGE_STATUS_PRESENTATION_ERROR);
 	}
 
 	function test_cpulimit() {
@@ -160,7 +164,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_TIME_LIMIT_EXCEED);
+        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED);
 	}
 
 	function test_compilation_error() {
@@ -173,7 +177,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_warn2err_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_COMPILATION_ERROR);
+        $this->triger_test('c_warn2err_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE_STATUS_COMPILATION_ERROR);
 	}
 
 	function test_fork() {
@@ -187,7 +191,7 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('cpp_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS);
+        $this->triger_test('cpp_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS);
 	}
 
 	function test_fopen() {
@@ -200,7 +204,22 @@ int main(void)
     return 0;
 }
         ');
-        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE2_STATUS_RESTRICTED_FUNCTIONS);
+        $this->triger_test('c_sandbox', $files, '', '', 1, 1024*1024, ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS);
+	}
+
+	function test_ideone_accepted() {
+        $files = array('/test.c' => '
+#include <stdio.h>
+
+int main(void)
+{
+    int c;
+    while ( (c = getchar()) != EOF)
+        putchar(c);
+    return 0;
+}
+        ');
+        $this->triger_test('11_ideone', $files, 'hello', 'hello', 1, 2*1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
 	}
 
 }
