@@ -1,29 +1,37 @@
 <?php
 
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
 
 /**
- * This script judges all unjudged tasks
+ * Judges all unjudged tasks
  *
  * In Linux, it will create a daemon and exit
  * In Windows, it will never exit except killed by users
  *
- * @package    plagiarism_moss
- * @subpackage cli
+ * @package    local_onlinejudge
  * @copyright  2011 Sun Zhigang (http://sunner.cn)
+ * @author     Sun Zhigang
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -93,7 +101,7 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
 verbose(cli_separator(true));
 verbose('Judge daemon is running now.');
 
-if ($CFG->ostype != 'WINDOWS' and method_exists('pcntl_signal')) {
+if ($CFG->ostype != 'WINDOWS' and function_exists('pcntl_signal')) {
     // Handle SIGTERM and SIGINT so that can be killed without pain
     declare(ticks = 1); // tick use required as of PHP 4.3.0
     pcntl_signal(SIGTERM, 'sigterm_handler');
@@ -106,7 +114,11 @@ $upgraded = false;
 $plugin_version = get_config('local_onlinejudge', 'version');
 while (!$forcestop and !$upgraded) {
 
-    judge_all_unjudged();
+    try {
+        judge_all_unjudged();
+    } catch (Exception $e) {
+        cli_problem('Caught exception: '.$e->getMessages());
+    }
 
     if ($options['once']) {
         break;
@@ -135,12 +147,11 @@ function get_one_unjudged_task() {
     $transaction = $DB->start_delegated_transaction();
 
     try {
-        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE2_STATUS_PENDING), '', 'id', 0, 1);
+        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', 'id', 0, 1);
 
         if (!empty($tasks)) {
             $task = array_pop($tasks);
-            $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE2_STATUS_JUDGING, array('id' => $task->id));
-            verbose(cli_heading('TASK: '.$task->id, true));
+            $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE_STATUS_JUDGING, array('id' => $task->id));
         }
 
         $transaction->allow_commit();
@@ -153,11 +164,12 @@ function get_one_unjudged_task() {
 }
 
 // Judge all unjudged tasks
-function judge_all_unjudged(){
+function judge_all_unjudged() {
     while ($task = get_one_unjudged_task()) {
+        verbose(cli_heading('TASK: '.$task->id, true));
         verbose('Judging...');
-        onlinejudge_judge($task->id);
-        verbose('Successfully judged');
+        $task = onlinejudge_judge($task);
+        verbose("Successfully judged: $task->status");
     }
 }
 
@@ -173,4 +185,4 @@ function verbose($msg) {
         mtrace(rtrim($msg));
     }
 }
-?>
+
