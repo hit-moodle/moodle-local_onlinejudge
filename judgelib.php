@@ -5,7 +5,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -25,7 +25,7 @@
 
 /**
  * online judge library
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -64,11 +64,9 @@ class judge_base{
     // language id without judge id
     var $language;
 
-    function __construct($taskid = null) {
-        global $DB;
-
-        if (!empty($taskid)) {
-            $this->task = $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
+    function __construct($task = null) {
+        if (!is_null($task)) {
+            $this->task = $task;
             $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
         }
     }
@@ -154,19 +152,19 @@ class judge_base{
     }
 
     /**
-     * Judge the task
+     * Judge the current task
      *
-     * @param task is configed by clients, include the memlimit, cpulimit, case(input,output) etc.
-     * @return the id of the task in the database.
+     * @return updated task or false
      */
     function judge() {
+        $this->assert_task();
         return false;
     }
+
     /**
-     * 
-     * function diff() compare the output and the answer
+     * Compare the output and the answer
      */  
-    function diff($output, $answer) {
+    protected function diff($output, $answer) {
     	//format
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
         $output = trim($output);
@@ -188,6 +186,43 @@ class judge_base{
             }
 
             return ONLINEJUDGE2_STATUS_PRESENTATION_ERROR;
+        }
+    }
+
+    /**
+     * Save files of current task to a temp directory
+     *
+     * @return array of the full path of saved files
+     */
+    protected function create_temp_files() {
+
+        $this->assert_task();
+
+        $dstfiles = array();
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
+        foreach ($files as $file) {
+            $path = $this->get_temp_dir().$file->get_filepath();
+            $fullpath = $path.$file->get_filename();
+            if (!check_dir_exists($path)) {
+                throw new onlinejudge_exception('cannotcreatetmpdir', $dir);
+            }
+            $file->copy_content_to($fullpath);
+            $dstfiles[] = $fullpath;
+        }
+
+        return $dstfiles;
+    }
+
+    protected function get_temp_dir() {
+        global $CFG;
+        return "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
+    }
+
+    protected function assert_task() {
+        if (empty($this->task)) {
+            throw new onlinejudge_exception('uninitedjudge');
         }
     }
 }
@@ -292,8 +327,8 @@ function onlinejudge_judge($taskorid) {
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
     }
 
-    $judge = new $judgeclass();
-    return $judge->judge($task);
+    $judge = new $judgeclass($task);
+    return $judge->judge();
 }
 
 

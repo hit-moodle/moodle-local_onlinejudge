@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge/db" VERSION="20110623" COMMENT="XMLDB file for Moodle local/onlinejudge"
+<XMLDB PATH="local/onlinejudge/db" VERSION="20110624" COMMENT="XMLDB file for Moodle local/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -17,8 +17,9 @@
         <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="output" NEXT="status"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="compileonly" NEXT="stdout"/>
         <FIELD NAME="stdout" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="status" NEXT="stderr"/>
-        <FIELD NAME="stderr" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout" NEXT="infoteacher"/>
-        <FIELD NAME="infoteacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="stderr" NEXT="infostudent"/>
+        <FIELD NAME="stderr" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout" NEXT="compileroutput"/>
+        <FIELD NAME="compileroutput" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stderr" NEXT="infoteacher"/>
+        <FIELD NAME="infoteacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="compileroutput" NEXT="infostudent"/>
         <FIELD NAME="infostudent" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="infoteacher" NEXT="cpuusage"/>
         <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="infostudent" NEXT="memusage"/>
         <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
