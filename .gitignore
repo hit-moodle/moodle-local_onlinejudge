@@ -1,0 +1,9 @@
+*.a
+*.o
+judge/sandbox/*/*_test
+judge/sandbox/*/sand
+judge/sandbox/*/223
+judge/sandbox/*/detector
+judge/sandbox/*/policy.c
+*~
+*.swp
