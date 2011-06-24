@@ -39,6 +39,11 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include here to ensure set_config()
 
+// A secret file to store ideone username and password. It should contains:
+// 
+// <?
+// define('ideoneuser', 'username');
+// define('ideonepass', 'api_password');
 require_once('ideone_secret.php');
 
 /** This class contains the test cases for the functions in judegelib.php. */
