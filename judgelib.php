@@ -197,10 +197,6 @@ define("ONLINEJUDGE2_STATUS_MULTI_STATUS",          23);
 
 define("ONLINEJUDGE2_STATUS_UNSUBMITTED",          255);
 
-// define max_mem and max_cpu
-define("ONLINEJUDGE2_MAX_CPU",                       1);
-define("ONLINEJUDGE2_MAX_MEM",                 1048576);
-
 /**
  * Returns an sorted array of all programming languages supported
  *
