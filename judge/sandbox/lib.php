@@ -64,7 +64,7 @@ class judge_sandbox extends judge_base {
         $return = 0;
         exec($command.' 2>&1', $output, $return);
 
-        $this->task->compileroutput = implode("\n", $output);
+        $this->task->compileroutput = str_replace($this->get_temp_dir().'/', '', implode("\n", $output));
         if ($return != 0) {
             // TODO: if the command can not be executed, it should be internal error
             $this->task->status = ONLINEJUDGE2_STATUS_COMPILATION_ERROR;
