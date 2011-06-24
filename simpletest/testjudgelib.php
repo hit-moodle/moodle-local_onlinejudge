@@ -86,7 +86,6 @@ class local_onlinejudge_test extends UnitTestCase {
 
         $taskid = onlinejudge_submit_task(1, 1, $language, $files, $options);
         $task = onlinejudge_judge($taskid);
-        $DB->update_record('onlinejudge_tasks', $task);
 
         $this->assertEqual($task->status, $expect);
     }

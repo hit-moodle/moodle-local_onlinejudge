@@ -283,15 +283,19 @@ function onlinejudge_judge($taskorid) {
         $task = $DB->get_record('onlinejudge_tasks', array('id' => $taskorid));
     } 
 
+    $task->judgetime = time();
+
     $judgeclass = 'judge_'.substr($task->language, strrpos($task->language, '_')+1);
     if (!in_array($judgeclass, $judgeclasses)) {
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
     }
 
     $judge = new $judgeclass($task);
-    return $judge->judge();
-}
+    $task = $judge->judge();
+    $DB->update_record('onlinejudge_tasks', $task);
 
+    return $task;
+}
 
 /**
  * Return detail of the task
@@ -312,8 +316,6 @@ function onlinejudge_get_task($taskid) {
         return $result;
     }
 }
-
-
 
 /**
  * Return the overall status of a list of tasks
