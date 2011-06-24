@@ -48,7 +48,7 @@ if (!get_config('local_onlinejudge', 'ideonedelay')) {
 
 global $judgeclasses;
 $judgeclasses = array();
-//得到结果表示为judge_sandbox, judge_ideone等数组
+
 if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
     foreach ($plugins as $plugin=>$dir) {
         require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
@@ -69,7 +69,7 @@ class judge_base{
         $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
     }
 
-	/**
+    /**
      * Return an array of programming languages supported by this judge
      *
      * The array key must be the language's ID, such as c_sandbox, python_ideone.
