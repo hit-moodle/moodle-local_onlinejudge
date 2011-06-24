@@ -36,7 +36,7 @@ require_once(dirname(__FILE__)."/../../../../config.php");
 require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
 class judge_sandbox extends judge_base {
-    static $supported_languages = array(
+    protected static $supported_languages = array(
             'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCE% -lm',
             'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCE% -lm',
             'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCE% -lm',

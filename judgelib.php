@@ -59,10 +59,10 @@ if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
 class judge_base{
 
     // object of the task
-    var $task;
+    protected $task;
 
     // language id without judge id
-    var $language;
+    protected $language;
 
     function __construct($task) {
         $this->task = $task;
