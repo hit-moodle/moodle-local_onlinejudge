@@ -616,7 +616,7 @@ class assignment_onlinejudge extends assignment_upload {
     static function get_max_memory_usages() {
 
         // Get max size
-        $maxsize = 1024*1024*get_config('local_onlinejudge', 'maxmemlimit');
+        $maxsize = get_config('local_onlinejudge', 'maxmemlimit');
         $memusage[$maxsize] = display_size($maxsize);
 
         $sizelist = array(1048576, 2097152, 4194304, 8388608, 16777216, 33554432,
