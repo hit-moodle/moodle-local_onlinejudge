@@ -334,12 +334,11 @@ class assignment_onlinejudge extends assignment_upload {
         $output = parent::print_student_answer($userid, true);
 
         $submission = $this->get_submission($userid);
+
         // replace draft status with onlinejudge status
-        if ($this->is_finalized($submission)) {
-            $pattern = '/(<div class="box files">).*(<div )/';
-            $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge').'</strong>$2';
-            $output = preg_replace($pattern, $replacement, $output, 1);
-        }
+        $pattern = '/(<div class="box files">).*(<div )/';
+        $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge').'</strong>$2';
+        $output = preg_replace($pattern, $replacement, $output, 1);
 
         // TODO: Syntax Highlight source code link
 
