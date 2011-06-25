@@ -605,7 +605,7 @@ class assignment_onlinejudge extends assignment_upload {
         }
 
         // should we update the grade?
-        if ($submission->timemarked < $result->judgetime and $this->is_finalized($submisssion)) {
+        if ($submission->timemarked < $result->judgetime and $this->is_finalized($submission)) {
             $submission->grade = $result->grade;
             $submission->timemarked = time();
             $submission->mailed = 1; // do not notify student by mail
@@ -700,7 +700,13 @@ class assignment_onlinejudge extends assignment_upload {
         $fs = get_file_storage();
         $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, 'sortorder, timemodified', false);
 
-        onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
+        $tests = $this->get_testcases();
+        foreach ($tests as $test) {
+            $oj->input = $test->input;
+            $oj->output = $test->output;
+            $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
+            $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid));
+        }
     }
 
     /**
