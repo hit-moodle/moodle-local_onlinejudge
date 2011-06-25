@@ -148,7 +148,16 @@ class judge_sandbox extends judge_base {
 
         $this->task->status = $this->diff($this->task->output, $this->task->stdout);
     }
+
+    /**
+     * Return the infomation of the compiler of specified language
+     *
+     * @param string $language ID of the language
+     * @return compiler information or null
+     */
+    static function get_compiler_info($language) {
+        $language = substr($language, 0, strrpos($language, '_'));
+        return self::$supported_languages[$language];
+    }
 }
 
-
-?>

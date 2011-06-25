@@ -6,6 +6,7 @@ $string['cannotruncompiler'] = '无法执行编译器脚本';
 $string['case'] = '用例{$a}:';
 $string['compileonly'] = '只编译';
 $string['compileonly_help'] = '如选择是，提交的作业将只被编译，不被运行和测试。教师必须手工评分。';
+$string['compiler'] = '编译器';
 $string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';
 $string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
 $string['cpulimit'] = 'CPU使用时间上限';

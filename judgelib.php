@@ -188,6 +188,16 @@ class judge_base{
         return $tmpdir;
     }
 
+    /**
+     * Return the infomation of the compiler of specified language
+     *
+     * @param string $language ID of the language
+     * @return compiler information or null
+     */
+    static function get_compiler_info($language) {
+        return null;
+    }
+
 }
 
 /**
@@ -210,14 +220,26 @@ function onlinejudge_get_languages() {
 }
 
 /**
- * Return the human-readable name of specified language 
+ * Return the human-readable name of specified language
  *
  * @param string $language ID of the language
- * @return name 
+ * @return name
  */
 function onlinejudge_get_language_name($language) {
     $langs = onlinejudge_get_languages();
     return $langs[$language];
+}
+
+/**
+ * Return the infomation of the compiler of specified language
+ *
+ * @param string $language ID of the language
+ * @return compiler information or null
+ */
+function onlinejudge_get_compiler_info($language) {
+    global $judgeclasses;
+    $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
+    return $judgeclass::get_compiler_info($language);
 }
 
 /**

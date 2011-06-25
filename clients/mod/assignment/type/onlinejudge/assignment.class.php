@@ -319,7 +319,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         parent::view_intro();
 
-        //TODO: Show info of judge. E.g. compiler parameters
+        $this->view_judge_info();
     }
 
     /**
@@ -446,7 +446,47 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Display auto generated info about the submission
+     * Display judge info about the assignment
+     */
+    function view_judge_info() {
+        global $OUTPUT;
+
+        echo $OUTPUT->heading(get_string('typeonlinejudge', 'assignment_onlinejudge'), 3);
+        echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+
+        $table = new html_table();
+        $table->id = 'assignment_onlinejudge_information';
+        $table->attributes['class'] = 'generaltable';
+        $table->align = array ('right', 'left');
+        $table->size = array('20%', '');
+        $table->width = '100%';
+
+        // Language
+        $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
+        $item = onlinejudge_get_language_name($this->onlinejudge->language);
+        $table->data[] = array($item_name, $item);
+
+        // Compiler
+        if ($compiler_info = onlinejudge_get_compiler_info($this->onlinejudge->language)) {
+            $item_name = get_string('compiler','assignment_onlinejudge').':';
+            $table->data[] = array($item_name, $compiler_info);
+        }
+
+        // Limits
+        $item_name = get_string('memlimit','assignment_onlinejudge').':';
+        $item = display_size($this->onlinejudge->memlimit);
+        $table->data[] = array($item_name, $item);
+        $item_name = get_string('cpulimit','assignment_onlinejudge').':';
+        $item = $this->onlinejudge->cpulimit.' '.get_string('sec');
+        $table->data[] = array($item_name, $item);
+
+        echo html_writer::table($table);
+
+        echo $OUTPUT->box_end();
+    }
+
+    /**
+     * Display judge info about the submission
      */
     function view_summary($user=0, $return = true) {
         global $USER, $CFG, $DB, $OUTPUT;
@@ -459,11 +499,6 @@ class assignment_onlinejudge extends assignment_upload {
         $table->align = array ('right', 'left');
         $table->size = array('20%', '');
         $table->width = '100%';
-
-        // Language
-        $item_name = get_string('assignmentlangs','assignment_onlinejudge').':';
-        $lang = onlinejudge_get_language_name($this->onlinejudge->language);
-        $table->data[] = array($item_name, $lang);
 
         $submission = $this->get_submission($user);
 
