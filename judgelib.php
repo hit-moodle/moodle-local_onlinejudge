@@ -56,16 +56,6 @@ define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
 require_once(dirname(__FILE__).'/../../config.php');
 require_once(dirname(__FILE__).'/exceptions.php');
 
-if (!get_config('local_onlinejudge', 'maxmemlimit')) {
-    set_config('maxmemlimit', 64*1024*1024, 'local_onlinejudge');
-}
-if (!get_config('local_onlinejudge', 'maxcpulimit')) {
-    set_config('maxcpulimit', 10, 'local_onlinejudge');
-}
-if (!get_config('local_onlinejudge', 'ideonedelay')) {
-    set_config('ideonedelay', 5, 'local_onlinejudge');
-}
-
 global $judgeclasses;
 $judgeclasses = array();
 
@@ -90,7 +80,9 @@ class judge_base{
     }
 
     function __destruct() {
-        remove_dir($this->get_temp_dir());
+        if (!debugging()) {
+            remove_dir($this->get_temp_dir());
+        }
     }
 
     /**
