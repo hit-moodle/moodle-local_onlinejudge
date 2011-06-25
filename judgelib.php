@@ -69,6 +69,10 @@ class judge_base{
         $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
     }
 
+    function __destruct() {
+        remove_dir($this->get_temp_dir());
+    }
+
     /**
      * Return an array of programming languages supported by this judge
      *
@@ -152,7 +156,7 @@ class judge_base{
             $path = $this->get_temp_dir().$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             if (!check_dir_exists($path)) {
-                throw new onlinejudge_exception('cannotcreatetmpdir', $dir);
+                throw new onlinejudge_exception('cannotcreatetmpdir', $path);
             }
             $file->copy_content_to($fullpath);
             $dstfiles[] = $fullpath;
@@ -163,7 +167,13 @@ class judge_base{
 
     protected function get_temp_dir() {
         global $CFG;
-        return "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
+
+        $tmpdir = "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
+        if (!check_dir_exists($tmpdir)) {
+            throw new onlinejudge_exception('cannotcreatetmpdir', $tmpdir);
+        }
+
+        return $tmpdir;
     }
 
 }
