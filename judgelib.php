@@ -33,6 +33,26 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+define("ONLINEJUDGE_STATUS_PENDING",               0 );
+
+define("ONLINEJUDGE_STATUS_ACCEPTED",              1 );
+define("ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION",  2 );
+define("ONLINEJUDGE_STATUS_COMPILATION_ERROR",     3 );
+define("ONLINEJUDGE_STATUS_COMPILATION_OK",        4 );
+define("ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED",   5 );
+define("ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
+define("ONLINEJUDGE_STATUS_PRESENTATION_ERROR",    7 );
+define("ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS",  8 );
+define("ONLINEJUDGE_STATUS_RUNTIME_ERROR",         9 );
+define("ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED",     10);
+define("ONLINEJUDGE_STATUS_WRONG_ANSWER",          11);
+
+define("ONLINEJUDGE_STATUS_INTERNAL_ERROR",        21);
+define("ONLINEJUDGE_STATUS_JUDGING",               22);
+define("ONLINEJUDGE_STATUS_MULTI_STATUS",          23);
+
+define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
+
 require_once(dirname(__FILE__).'/../../config.php');
 require_once(dirname(__FILE__).'/exceptions.php');
 
@@ -177,26 +197,6 @@ class judge_base{
     }
 
 }
-
-define("ONLINEJUDGE_STATUS_PENDING",               0 );
-
-define("ONLINEJUDGE_STATUS_ACCEPTED",              1 );
-define("ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION",  2 );
-define("ONLINEJUDGE_STATUS_COMPILATION_ERROR",     3 );
-define("ONLINEJUDGE_STATUS_COMPILATION_OK",        4 );
-define("ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED",   5 );
-define("ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
-define("ONLINEJUDGE_STATUS_PRESENTATION_ERROR",    7 );
-define("ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS",  8 );
-define("ONLINEJUDGE_STATUS_RUNTIME_ERROR",         9 );
-define("ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED",     10);
-define("ONLINEJUDGE_STATUS_WRONG_ANSWER",          11);
-
-define("ONLINEJUDGE_STATUS_INTERNAL_ERROR",        21);
-define("ONLINEJUDGE_STATUS_JUDGING",               22);
-define("ONLINEJUDGE_STATUS_MULTI_STATUS",          23);
-
-define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
 
 /**
  * Returns an sorted array of all programming languages supported
