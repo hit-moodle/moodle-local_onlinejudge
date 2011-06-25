@@ -340,10 +340,9 @@ function onlinejudge_get_overall_status($tasks) {
         if (is_null($task)) // We can't give out any status on null task
             return ONLINEJUDGE_STATUS_UNSUBMITTED;
 
-        if ($status == 0) {
+        if ($status == ONLINEJUDGE_STATUS_UNSUBMITTED) {
             $status = $task->status;
-        } 
-        else if ($status != $task->status) {
+        } else if ($status != $task->status) {
             $status = ONLINEJUDGE_STATUS_MULTI_STATUS;
             break;
         }
