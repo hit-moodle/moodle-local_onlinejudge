@@ -304,9 +304,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $this->assignment->id));
         foreach ($submissions as $submission) {
-            if ($this->is_finalized($submission)) {
-                $this->request_judge($submission);
-            }
+            $this->request_judge($submission);
         }
 
         return true;
@@ -611,6 +609,12 @@ class assignment_onlinejudge extends assignment_upload {
             $DB->update_record('assignment_submissions', $submission);
             // triger grade event
             $this->update_grade($submission);
+
+            // unfinalize it
+            $updated = new stdClass();
+            $updated->id = $submission->id;
+            $updated->data2 = '';
+            $DB->update_record('assignment_submissions', $updated);
         }
 
         $result->testcases = $cases;
