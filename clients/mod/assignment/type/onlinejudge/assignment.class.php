@@ -362,7 +362,7 @@ class assignment_onlinejudge extends assignment_upload {
         $patterns[] = '/<input type="submit" name="unfinalize" .+ \\/><\\/a><\\/span>/';
         $replacements[] = get_string('waitingforjudge', 'assignment_onlinejudge');
         $patterns[] = '/(<input type="submit" name="finalize" value=")[^"]*(" \\/>)/';
-        $replacements[] = '$1'.get_string('rejudge', 'assignment_onlinejudge').'$2';
+        $replacements[] = '$1'.get_string('forcejudge', 'assignment_onlinejudge').'$2';
 
         $output = preg_replace($patterns, $replacements, $output, 1);
 

@@ -17,6 +17,7 @@ $string['duejudge'] = 'Judge after due date';
 $string['feedback'] = 'Feedback for Wrong Answer';
 $string['feedback_help'] = 'The message would be showen to the students who did not pass the testcase. It is helpful if you want to give some hints or instructions.';
 $string['filereaderror'] = 'Can not read this file';
+$string['forcejudge'] = 'Force judge';
 $string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['ideoneuser'] = 'Ideone username';
 $string['ideoneuser_help'] = 'If you choose a language which is run in ideone.com, you must provide a <a href="http://ideone.com">ideone.com</a> username.';
@@ -53,7 +54,6 @@ $string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s 
   
 Presentation error means the data outputted by the program is correct, but the seperators between each data tokens are mismatched with testcases. It is usually caused by extra white spaces or line breaks. If you want to be strict, set it to 0% and a presentation error will worth zero. If you don\'t mind such trival issues, set it to 100% and a presentation error will be equivalent to an accepted.';
 $string['readytojudge'] = 'Ready to be judged';
-$string['rejudge'] = 'Rejudge';
 $string['rejudgeall'] = 'Rejudge all';
 $string['rejudgeallnotice'] = 'Rejudging all submissions may take a long time. Do you want to continue?';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';

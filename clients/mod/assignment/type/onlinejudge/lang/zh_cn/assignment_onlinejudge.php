@@ -16,6 +16,7 @@ $string['duejudge'] = '到截止时间后才评测';
 $string['feedback'] = '给错误答案的反馈';
 $string['feedback_help'] = '没能通过测试的学生会看到这条信息。可以通过它给学生一些提示或指导，很方便。';
 $string['filereaderror'] = '此文件不可读';
+$string['forcejudge'] = '强制评测';
 $string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle在线评测</a>使用了<a href="http://sphere-research.com">Sphere Research Labs</a>的<a href="http://ideone.com">Ideone API</a> &copy; ';
 $string['ideoneuser'] = 'Ideone用户名';
 $string['ideoneuser_help'] = '如果您选择了一个在ideone.com运行的语言，那么您就必须提供一个<a href="http://ideone.com">ideone.com</a>用户名。';
@@ -54,7 +55,6 @@ $string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘�
 
 格式错误是指程序输出的数据都是正确的，但数据之间的分隔符存在错误。它通常是由多余的空格或者换行符导致的。如果严格要求，可以把比例设为0%，那么格式错误就得不到任何分数。如果不介意这些琐碎的问题，可以把比例设为100%，那么格式错误就相当于正确。';
 $string['readytojudge'] = '已准备好接受评测';
-$string['rejudge'] = '重新评测';
 $string['rejudgeall'] = '全部重新评测';
 $string['rejudgeallnotice'] = '重新评测所有作业可能会消耗较长时间。您确信要继续吗？';
 $string['rejudgefailed'] = '无法提交重新评测请求。';
