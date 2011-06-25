@@ -288,7 +288,7 @@ function onlinejudge_judge($taskorid) {
     global $CFG, $DB, $judgeclasses;
     
     if (is_object($taskorid)) {
-        $task &= $taskorid;
+        $task = $taskorid;
     } else {
         $task = $DB->get_record('onlinejudge_tasks', array('id' => $taskorid));
     } 

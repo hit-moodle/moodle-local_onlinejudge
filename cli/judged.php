@@ -117,7 +117,7 @@ while (!$forcestop and !$upgraded) {
     try {
         judge_all_unjudged();
     } catch (Exception $e) {
-        cli_problem('Caught exception: '.$e->getMessages());
+        cli_problem('Caught exception: '.$e->getMessage());
     }
 
     if ($options['once']) {
@@ -137,9 +137,9 @@ while (!$forcestop and !$upgraded) {
 verbose('Judge daemon exits.');
 
 /**
- * Return one unjudged task's id and set it status as PENDING
+ * Return one unjudged task and set it status as JUDGING
  *
- * @return an unjudged task's id or false
+ * @return an unjudged task or false
  */
 function get_one_unjudged_task() {
     global $CFG, $DB;
@@ -147,7 +147,7 @@ function get_one_unjudged_task() {
     $transaction = $DB->start_delegated_transaction();
 
     try {
-        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', 'id', 0, 1);
+        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', '*', 0, 1);
 
         if (!empty($tasks)) {
             $task = array_pop($tasks);
@@ -160,7 +160,7 @@ function get_one_unjudged_task() {
         $transaction->rollback($e); // rethrows exception
     }
 
-    return isset($task) ? $task->id : false;
+    return isset($task) ? $task : false;
 }
 
 // Judge all unjudged tasks
