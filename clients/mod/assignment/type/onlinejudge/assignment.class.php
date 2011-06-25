@@ -456,7 +456,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         $table = new html_table();
         $table->id = 'assignment_onlinejudge_information';
-        $table->attributes['class'] = 'generaltable';
+        $table->attributes['class'] = 'generalbox boxaligncenter';
         $table->align = array ('right', 'left');
         $table->size = array('20%', '');
         $table->width = '100%';
