@@ -32,16 +32,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['about'] = '<p>Based on Moodle, Onlinejudge2 is a tool for onlinejudging work.</p>
-<p>It provides kinds of compiler(sandbox, ideone, etc...)</p>
-<p>If you want to join us,see：<a href="https://git.github.com/hit-moodle/onlinejudge">git site</a></p>' ;
 $string['badvalue'] = 'Incorrect value';
 $string['cannotcreatetmpdir'] = 'Can not create temp directory {$a}';
 $string['cannotrunsand'] = 'Can not run the sand';
 $string['ideonedelay'] = 'Delay between requests to ideone.com (second)';
 $string['ideonedelay_help'] = 'After sending a judge request to ideone.com, we can not get the result immediately. How long should we wait before querying the result? 5 seconds or so is reasonable.';
 $string['ideoneerror'] = 'Ideone returns error: {$a}';
-$string['ideonelogo'] = '<a href=\"https://github.com/yuxiaoye1223/onlinejudge\">Moodle Online Judge2</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
+$string['ideonelogo'] = '<a href=\"https://github.com/hit-moodle/moodle-local_onlinejudge\">Moodle Online Judge</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
 $string['ideoneresultlink'] = 'See details at <a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>.';
 $string['info'] = 'Information';
 $string['infoat'] = 'A good program must return 0 if no error occur.';
@@ -54,12 +51,12 @@ $string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer acces
 $string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
 $string['infotle'] = 'The program has been running for a too long time.';
 $string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
-$string['invalidlanguage'] = 'Invalid language ID ({$a})';
-$string['invalidjudgeclass'] = 'Invalid judge class ({$a})';
-$string['langc_sandbox'] = 'C (locally)';
-$string['langc_warn2err_sandbox'] = 'C (locally, warnings as errors)';
-$string['langcpp_sandbox'] = 'C++ (locally)';
-$string['langcpp_warn2err_sandbox'] = 'C++ (locally, warnings as errors)';
+$string['invalidlanguage'] = 'Invalid language ID: {$a}';
+$string['invalidjudgeclass'] = 'Invalid judge class: {$a}';
+$string['langc_sandbox'] = 'C (run locally)';
+$string['langc_warn2err_sandbox'] = 'C (run locally, warnings as errors)';
+$string['langcpp_sandbox'] = 'C++ (run locally)';
+$string['langcpp_warn2err_sandbox'] = 'C++ (run locally, warnings as errors)';
 $string['maxcpulimit'] = 'Maximum CPU usage (second)';
 $string['maxcpulimit_help'] = 'How long can a judge task keep running.';
 $string['maxmemlimit'] = 'Maximum memory usage (MB)';
@@ -84,6 +81,5 @@ $string['status11'] = 'Wrong answer';
 $string['status21'] = 'Internal Error';
 $string['status22'] = 'Judging...';
 $string['status23'] = 'Multi-status';
-$string['status24'] = 'Judged...';
 $string['status255'] = 'Unsubmitted';
-$string['uninitedjudge'] = 'Judge object has not a valid $task';
+
