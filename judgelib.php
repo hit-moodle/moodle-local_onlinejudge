@@ -315,16 +315,8 @@ function onlinejudge_judge($taskorid) {
  */
 function onlinejudge_get_task($taskid) {
     global $DB;
-    $result = new stdClass();
-    $result = $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
 
-    if($result->status == ONLINEJUDGE_STATUS_JUDGING) {
-        echo get_string('status22', 'local_onlinejudge');
-        return null;
-    }
-    else {
-        return $result;
-    }
+    return $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
 }
 
 /**
