@@ -304,8 +304,8 @@ class assignment_onlinejudge extends assignment_upload {
 
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $this->assignment->id));
         foreach ($submissions as $submission) {
-            if (! $this->request_judge($submission)) {
-                return false;
+            if ($this->is_finalized($submission)) {
+                $this->request_judge($submission);
             }
         }
 
