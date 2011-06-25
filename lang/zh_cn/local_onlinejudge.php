@@ -40,6 +40,7 @@ $string['ideonedelay_help'] = '向ideone.com发送评测请求后，不可能立
 $string['ideoneerror'] = 'Ideone返回错误：{$a}';
 $string['ideonelogo'] = '<a href=\"https://github.com/hit-moodle/moodle-local_onlinejudge\">Moodle在线评测</a>使用了<a href=\"http://sphere-research.com\">Sphere Research Labs</a>提供的<a href=\"http://ideone.com\">Ideone API</a> &copy;';
 $string['ideoneresultlink'] = '在<a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>查看更多信息。';
+$string['ideoneuserrequired'] = '如果选择了用ideone.com评测，就必须输入';
 $string['info'] = '信息';
 $string['infoat'] = '一个好程序在没遇到错误的时候，必须“return 0”。';
 $string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';

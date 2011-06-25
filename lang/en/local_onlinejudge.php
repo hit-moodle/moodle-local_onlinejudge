@@ -40,6 +40,7 @@ $string['ideonedelay_help'] = 'After sending a judge request to ideone.com, we c
 $string['ideoneerror'] = 'Ideone returns error: {$a}';
 $string['ideonelogo'] = '<a href=\"https://github.com/hit-moodle/moodle-local_onlinejudge\">Moodle Online Judge</a> uses <a href=\"http://ideone.com\">Ideone API</a> &copy; by <a href=\"http://sphere-research.com\">Sphere Research Labs</a>';
 $string['ideoneresultlink'] = 'See details at <a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>.';
+$string['ideoneuserrequired'] = 'Required if ideone.com judge is selected';
 $string['info'] = 'Information';
 $string['infoat'] = 'A good program must return 0 if no error occur.';
 $string['infocompileok'] = 'It seems that the compiler likes your code.';

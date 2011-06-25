@@ -165,11 +165,23 @@ class assignment_onlinejudge extends assignment_upload {
      */
     function form_validation($data, $files) {
         $errors = array();
-        // ideone.com do not support multi-files
-        // TODO: do not hardcode ideone here. judge should has support_multifile() function
-        if (substr($data['language'], -6) == 'ideone' and $data['var1'] > 1) {
-            $errors['var1'] = get_string('onefileonlyideone', 'local_onlinejudge');
-        } 
+        if (substr($data['language'], -6) == 'ideone') {
+            // ideone.com do not support multi-files
+            // TODO: do not hardcode ideone here. judge should has support_multifile() function
+            if ($data['var1'] > 1) {
+                $errors['var1'] = get_string('onefileonlyideone', 'local_onlinejudge');
+            } 
+
+            if (empty($data['ideoneuser'])) {
+                $errors['ideoneuser'] = get_string('ideoneuserrequired', 'local_onlinejudge');
+            } 
+            if (empty($data['ideonepass'])) {
+                $errors['ideonepass'] = get_string('ideoneuserrequired', 'local_onlinejudge');
+            } 
+            if (empty($data['ideonepass2'])) {
+                $errors['ideonepass2'] = get_string('ideoneuserrequired', 'local_onlinejudge');
+            } 
+        }
         return $errors;
     }
 
