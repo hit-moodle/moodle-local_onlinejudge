@@ -117,6 +117,8 @@ while (!$forcestop and !$upgraded) {
     try {
         judge_all_unjudged();
     } catch (Exception $e) {
+        if (debugging())
+            default_exception_handler($e);
         cli_problem('Caught exception: '.$e->getMessage());
     }
 
