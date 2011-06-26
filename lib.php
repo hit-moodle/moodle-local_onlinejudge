@@ -29,14 +29,10 @@ defined('MOODLE_INTERNAL') || die();
  * add the onlinejudge plugin into navigation
  */
 function onlinejudge_extends_navigation(global_navigation $navigation) {
-    $onlinejudge = $navigation->add('Onlinejudge2', new moodle_url('/local/onlinejudge/'));
 
-    $onlinejudge->add("配置", new moodle_url("/local/onlinejudge/config.php"));
-    $onlinejudge->add("在线评测", new moodle_url("/local/onlinejudge/judge.php"));
-    $onlinejudge->add("查看结果", new moodle_url("/local/onlinejudge/result.php"));
-    $onlinejudge->add("FAQ", new moodle_url("/local/onlinejudge/help.php"));
+    if (has_capability('local/onlinejudge:viewstatus', get_system_context())) {
+        $onlinejudge = $navigation->add(get_string('pluginname', 'local_onlinejudge'), new moodle_url('/local/onlinejudge/'));
+    }
 }
-
-
 
 
