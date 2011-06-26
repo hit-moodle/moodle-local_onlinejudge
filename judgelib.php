@@ -360,21 +360,3 @@ function onlinejudge_get_overall_status($tasks) {
     return $status;
 }
 
-
-/********************    events    ******************/
-
-// when judge begin, call cron
-function event_judge_begin() {
-}
-
-// when judge over, notify the user or others
-function event_judge_over() {
-   
-}
-
-// when judge error, notify the user or others.
-function event_judge_error() {
-    
-}
-
-
