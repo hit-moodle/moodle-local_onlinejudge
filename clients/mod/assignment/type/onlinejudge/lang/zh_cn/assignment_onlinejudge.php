@@ -1,4 +1,37 @@
 <?php
+
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Strings for Online Judge Assignment Type
+ * 
+ * @package   local_onlinejudge
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['addtestcases'] = '增加 {$a} 组测试用例';
 $string['assignmentlangs'] = '编程语言';
 $string['badtestcasefile'] = '此文件不存在，或不可读';
@@ -18,23 +51,12 @@ $string['feedback'] = '给错误答案的反馈';
 $string['feedback_help'] = '没能通过测试的学生会看到这条信息。可以通过它给学生一些提示或指导，很方便。';
 $string['filereaderror'] = '此文件不可读';
 $string['forcejudge'] = '强制评测';
-$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle在线评测</a>使用了<a href="http://sphere-research.com">Sphere Research Labs</a>的<a href="http://ideone.com">Ideone API</a> &copy; ';
 $string['ideoneuser'] = 'Ideone用户名';
 $string['ideoneuser_help'] = '如果您选择了一个在ideone.com运行的语言，那么您就必须提供一个<a href="http://ideone.com">ideone.com</a>用户名。';
 $string['ideonepass'] = 'Ideone API密码';
 $string['ideonepass_help'] = '这不是ideone网站的密码，而是ideone <em>API</em>密码。在<a href="https://ideone.com/account/">https://ideone.com/account/</a>修改API密码。';
 $string['ideonepass2'] = '再次输入API密码';
 $string['ideonepassmismatch'] = '两个密码不匹配';
-$string['infoat'] = '一个好程序在没遇到错误的时候，必须“return 0”。';
-$string['infocompileok'] = '看上去，编译器好像挺喜欢你的程序。';
-$string['infoie'] = '沙箱程序出错，请报告管理员！';
-$string['infomle'] = '你使用了太多内存。';
-$string['infoole'] = '你的代码向stdout输出太多数据了。';
-$string['infope'] = '几乎完美，除了几个用错的空格、tab和换行等。';
-$string['infore'] = '[SIGSEGV, Segment fault] 下标越界、无效的指针访问或者其它更糟糕的错误。';
-$string['inforf'] = '你的程序调用了一些<em>不</em>允许使用的函数。';
-$string['infotle'] = '此程序运行得太久了。';
-$string['infowa'] = '请仔细检查您的代码。不要在输出中有手误或任何未要求的字符';
 $string['input'] = '输入';
 $string['input_help'] = '输入数据会被送入被测程序的标准输入。';
 $string['inputfile'] = '输入文件';
@@ -104,3 +126,4 @@ $string['testcases_help'] = '每个测试用例都会被单独评测。例如，
 $string['typeonlinejudge'] = '在线评测';
 $string['usefile'] = '测试用例来自文件';
 $string['waitingforjudge'] = '等待评测结果';
+

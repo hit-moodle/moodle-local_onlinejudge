@@ -1,5 +1,37 @@
 <?php
 
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Strings for Online Judge Assignment Type
+ * 
+ * @package   local_onlinejudge
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['addtestcases'] = 'Add {$a} more testcase(s)';
 $string['assignmentlangs'] = 'Programming language';
 $string['badtestcasefile'] = 'This file does not exist or can not be read';
@@ -19,23 +51,12 @@ $string['feedback'] = 'Feedback for Wrong Answer';
 $string['feedback_help'] = 'The message would be showen to the students who did not pass the testcase. It is helpful if you want to give some hints or instructions.';
 $string['filereaderror'] = 'Can not read this file';
 $string['forcejudge'] = 'Force judge';
-$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge2">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['ideoneuser'] = 'Ideone username';
 $string['ideoneuser_help'] = 'If you choose a language which is run in ideone.com, you must provide a <a href="http://ideone.com">ideone.com</a> username.';
 $string['ideonepass'] = 'Ideone API password';
 $string['ideonepass_help'] = 'It is NOT the ideone password but the ideone <em>API</em> password. Change API password at <a href="https://ideone.com/account/">https://ideone.com/account/</a>.';
 $string['ideonepass2'] = 'Retype API password';
 $string['ideonepassmismatch'] = 'The two passwords are mismatch';
-$string['infoat'] = 'A good program must return 0 if no error occur.';
-$string['infocompileok'] = 'It seems that the compiler likes your code.';
-$string['infoie'] = 'Sandbox error. Report to admin please.';
-$string['infomle'] = 'You ate too much memory.';
-$string['infoole'] = 'Your code sent too much to stdout.';
-$string['infope'] = 'Almost perfect, except some bad white spaces, tabs, new lines and etc.';
-$string['infore'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse.';
-$string['inforf'] = 'Your code calls some functions which are <em>not</em> allowed to run.';
-$string['infotle'] = 'The program has been running for a too long time.';
-$string['infowa'] = 'Double check your code. Don\'t output any typo or unrequired character.';
 $string['input'] = 'Input';
 $string['input_help'] = 'The input data will be sent to the stdin of submitted programs.';
 $string['inputfile'] = 'Input file';
@@ -92,3 +113,4 @@ $string['testcases_help'] = 'Each testcase will be applied to the submissions an
 $string['typeonlinejudge'] = 'Online Judge';
 $string['usefile'] = 'Testcase from files';
 $string['waitingforjudge'] = 'Waiting for judge';
+
