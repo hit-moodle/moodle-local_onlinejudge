@@ -146,7 +146,7 @@ class judge_sandbox extends judge_base {
             throw new onlinejudge_exception('sandboxerror', $return_value);
         }
 
-        $this->task->status = $this->diff($this->task->output, $this->task->stdout);
+        $this->task->status = $this->diff($this->task->stdout, $this->task->output);
     }
 
     /**

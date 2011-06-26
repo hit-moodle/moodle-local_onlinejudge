@@ -132,7 +132,7 @@ class judge_base{
     protected function diff($output, $answer) {
     	//format
         $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
-        $output = trim($output);
+        $output = strtr(trim($output), array("\r\n" => "\n", "\n\r" => "\n"));
         if (strcmp($answer, $output) == 0)
             return ONLINEJUDGE_STATUS_ACCEPTED;
         else {
