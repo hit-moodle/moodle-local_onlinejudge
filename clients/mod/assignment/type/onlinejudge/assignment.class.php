@@ -5,7 +5,7 @@
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
 //                      Online Judge for Moodle                          //
-//       https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -272,7 +272,7 @@ class assignment_onlinejudge extends assignment_upload {
     function get_testcases() {
         global $CFG, $DB;
 
-        $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $this->assignment->id, 'unused' => 0), 'id ASC');
+        $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $this->assignment->id), 'sortorder ASC');
         $tests = array();
 
         foreach ($records as $record) {
@@ -602,29 +602,18 @@ class assignment_onlinejudge extends assignment_upload {
         $sql = 'SELECT s.*, t.feedback, t.subgrade
                 FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
                 ON s.testcase = t.id
-                WHERE s.submission = ? AND t.unused = 0 AND s.id IN (
-                    SELECT MAX(id)
-                    FROM {assignment_oj_submissions}
-                    WHERE submission = ?
-                    GROUP BY testcase)
-                ORDER BY s.testcase ASC';
-        $onlinejudges = $DB->get_records_sql($sql, array($submission->id, $submission->id)); 
+                WHERE s.submission = ? AND s.latest = 1
+                ORDER BY t.sortorder ASC';
+        $onlinejudges = $DB->get_records_sql($sql, array($submission->id)); 
 
         $cases = array();
         $result->judgetime = 0;
-        $result->grade = 0;
         foreach ($onlinejudges as $oj) {
             if ($task = onlinejudge_get_task($oj->task)) {
                 $task->testcase = $oj->testcase;
                 $task->feedback = $oj->feedback;
 
                 $task->grade = $this->grade_marker($task->status, $oj->subgrade);
-                if ($task->grade != -1 && $result->grade != -1) {
-                    $result->grade += $task->grade;
-                } else {
-                    // Never count grade again
-                    $result->grade = -1;
-                }
 
                 if ($task->judgetime > $result->judgetime) {
                     $result->judgetime = $task->judgetime;
@@ -634,22 +623,6 @@ class assignment_onlinejudge extends assignment_upload {
             } else {
                 $cases[] = null;
             }
-        }
-
-        // should we update the grade?
-        if ($submission->timemarked < $result->judgetime) {
-            $submission->grade = $result->grade;
-            $submission->timemarked = time();
-            $submission->mailed = 1; // do not notify student by mail
-            $DB->update_record('assignment_submissions', $submission);
-            // triger grade event
-            $this->update_grade($submission);
-
-            // unfinalize it
-            $updated = new stdClass();
-            $updated->id = $submission->id;
-            $updated->data2 = '';
-            $DB->update_record('assignment_submissions', $updated);
         }
 
         $result->testcases = $cases;
@@ -738,12 +711,15 @@ class assignment_onlinejudge extends assignment_upload {
         $fs = get_file_storage();
         $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, 'sortorder, timemodified', false);
 
+        // Mark all old tasks as old
+        $DB->set_field('assignment_oj_submissions', 'latest', 0, array('submission' => $submission->id));
+
         $tests = $this->get_testcases();
         foreach ($tests as $test) {
             $oj->input = $test->input;
             $oj->output = $test->output;
-            $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, $oj);
-            $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid));
+            $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, 'assignment_onlinejudge', $oj);
+            $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid, 'latest' => 1));
         }
     }
 
@@ -814,4 +790,59 @@ class assignment_onlinejudge extends assignment_upload {
     }
 }
 
-?>
+/**
+ * Onlinejudge_task_judged event handler
+ *
+ * Update the grade and etc.
+ *
+ * @param object task
+ */
+function onlinejudge_task_judged($task) {
+    global $DB;
+
+    $sql = 'SELECT s.*
+        FROM {assignment_submissions} s LEFT JOIN {assignment_oj_submissions} o
+        ON s.id = o.submission
+        WHERE o.task = ?';
+    $submission = $DB->get_record_sql($sql, array($task->id)); 
+
+    $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
+    $ass = new assignment_onlinejudge($cm->id, NULL, $cm);
+
+    $sql = 'SELECT s.*, t.subgrade
+        FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
+        ON s.testcase = t.id
+        WHERE s.submission = ? AND s.latest = 1
+        ORDER BY t.sortorder ASC';
+    $onlinejudges = $DB->get_records_sql($sql, array($submission->id)); 
+
+    // update grade after the last task is judged
+    if ($task->id == end($onlinejudges)->task) {
+        $finalgrade = 0;
+        foreach ($onlinejudges as $oj) {
+            if ($task = onlinejudge_get_task($oj->task)) {
+                $task->grade = $ass->grade_marker($task->status, $oj->subgrade);
+                if ($task->grade != -1 && $finalgrade != -1) {
+                    $finalgrade += $task->grade;
+                } else {
+                    // Never count grade again
+                    $finalgrade = -1;
+                }
+            }
+        }
+
+        $submission->grade = $finalgrade;
+        $submission->timemarked = time();
+        $submission->mailed = 1; // do not notify student by mail
+        $DB->update_record('assignment_submissions', $submission);
+        $ass->update_grade($submission);
+
+        // unfinalize it
+        $updated = new stdClass();
+        $updated->id = $submission->id;
+        $updated->data2 = '';
+        $DB->update_record('assignment_submissions', $updated);
+    }
+
+    return true;
+}

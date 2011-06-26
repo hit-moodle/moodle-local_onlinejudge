@@ -252,7 +252,7 @@ function onlinejudge_get_compiler_info($language) {
  * @param object $options include input, output and etc.
  * @return id of the task or throw exception
  */
-function onlinejudge_submit_task($cmid, $userid, $language, $files, $options) {
+function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options) {
     global $judgeclasses, $DB;
 
     $task->cmid = $cmid;
@@ -264,6 +264,7 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $options) {
         throw new onlinejudge_exception('invalidlanguage', $language);
     }
     $task->language = $language;
+    $task->component = $component;
 
     $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
     if (!in_array($judgeclass, $judgeclasses)) {
@@ -317,6 +318,8 @@ function onlinejudge_judge($taskorid) {
     $judge = new $judgeclass($task);
     $task = $judge->judge();
     $DB->update_record('onlinejudge_tasks', $task);
+
+    events_trigger('onlinejudge_task_judged', $task);
 
     return $task;
 }
