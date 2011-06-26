@@ -317,6 +317,11 @@ function onlinejudge_judge($taskorid) {
 
     $judge = new $judgeclass($task);
     $task = $judge->judge();
+
+    // convert students' output into UTF-8 charset
+    $task->stdout = mb_convert_encoding($task->stdout, 'UTF-8', 'UTF-8, GBK');
+    $task->stderr = mb_convert_encoding($task->stderr, 'UTF-8', 'UTF-8, GBK');
+
     $DB->update_record('onlinejudge_tasks', $task);
 
     events_trigger('onlinejudge_task_judged', $task);
