@@ -1,4 +1,35 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Testcases management
+ *
+ * @package   local_onlinejudge
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../../../config.php');
 require_once("$CFG->dirroot/mod/assignment/lib.php");
@@ -37,10 +68,11 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
+global $context;
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 require_capability('mod/assignment:grade', $context);
 
-$testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id, 'unused' => '0')));
+$testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id)));
 
 if ($testform->is_cancelled()){
 
@@ -48,12 +80,16 @@ if ($testform->is_cancelled()){
 
 } else if ($fromform = $testform->get_data()){
 
-    // Mark old testcases as unused
-	$DB->set_field('assignment_oj_testcases', 'unused', '1', array('assignment' => $assignment->id));
-
 	for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
-        if (emptycase($fromform, $i))
+        if (emptycase($fromform, $i)) {
+            if ($fromform->caseid[$i] != -1) {
+                $DB->delete_records('assignment_oj_testcases', array('id' => $fromform->caseid[$i]));
+                $fs = get_file_storage();
+                $fs->delete_area_files($context->id, 'mod_assignment', 'onlinejudge_input', $fromform->caseid[$i]);
+                $fs->delete_area_files($context->id, 'mod_assignment', 'onlinejudge_output', $fromform->caseid[$i]);
+            }
             continue;
+        }
 
         if (isset($fromform->usefile[$i])) {
             $testcase->usefile = true;
@@ -68,12 +104,18 @@ if ($testform->is_cancelled()){
         $testcase->feedback = $fromform->feedback[$i];
         $testcase->subgrade = $fromform->subgrade[$i];
         $testcase->assignment = $assignment->id;
+        $testcase->id = $fromform->caseid[$i];
+        $testcase->sortorder = $i;
 
-        $testcase_id = $DB->insert_record('assignment_oj_testcases', $testcase);
+        if ($testcase->id != -1) {
+            $DB->update_record('assignment_oj_testcases', $testcase);
+        } else {
+            $testcase->id = $DB->insert_record('assignment_oj_testcases', $testcase);
+        }
 
         if ($testcase->usefile) {
-            file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase_id);
-            file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase_id);
+            file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase->id);
+            file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase->id);
         }
 
         unset($testcase);
@@ -86,7 +128,7 @@ if ($testform->is_cancelled()){
     $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
     $assignmentinstance->view_header();
 
-    $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id, 'unused' => '0'), 'id ASC');
+    $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id), 'sortorder ASC');
 
     $toform = array();
     if ($testcases) {
@@ -97,6 +139,7 @@ if ($testform->is_cancelled()){
             $toform["feedback[$i]"] = $tstValue->feedback;
             $toform["subgrade[$i]"] = $tstValue->subgrade;
             $toform["usefile[$i]"] = $tstValue->usefile;
+            $toform["caseid[$i]"] = $tstValue->id;
 
             file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_input', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
             file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_output', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
@@ -120,4 +163,52 @@ function emptycase(&$form, $i) {
     else
         return empty($form->input[$i]) && empty($form->output[$i]);
 }
-?>
+
+/**
+ * Compare two testcases
+ *
+ * @return true if identified
+ */
+function casecmp($oldcase, $newcase) {
+    if ($oldcase->usefile != $newcase->usefile) {
+        return false;
+    } else if (!$oldcase->usefile) {
+        return ($oldcase->input == $newcase->input and $oldcase->output == $newcase->output);
+    }
+
+    $oldinput = null;
+    $oldoutput = null;
+    $newinput = null;
+    $newoutput = null;
+
+    $files = file_get_drafarea_files($newcase->inputfile);
+    foreach ($files as $file) {
+        if ($file->get_filename() != '.') {
+            $newinput = $file->get_contenthash();
+        }
+    }
+    $files = file_get_drafarea_files($newcase->outputfile);
+    foreach ($files as $file) {
+        if ($file->get_filename() != '.') {
+            $newoutput = $file->get_contenthash();
+        }
+    }
+
+    $fs = get_file_storage();
+
+    $files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_input', $oldcase->id);
+    foreach ($files as $file) {
+        if ($file->get_filename() != '.') {
+            $oldinput = $file->get_contenthash();
+        }
+    }
+    $files = $fs->get_area_files($context->id, 'mod_assignment', 'onlinejudge_output', $oldcase->id);
+    foreach ($files as $file) {
+        if ($file->get_filename() != '.') {
+            $oldoutput = $file->get_contenthash();
+        }
+    }
+
+    return ($oldinput == $newinput && $oldoutput == $newoutput);
+}
+
