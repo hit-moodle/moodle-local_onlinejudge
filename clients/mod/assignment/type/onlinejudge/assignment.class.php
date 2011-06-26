@@ -241,7 +241,7 @@ class assignment_onlinejudge extends assignment_upload {
     function delete_instance($assignment) {
         global $CFG, $DB;
 
-        // DELETE submissions results
+        // delete onlinejudge submissions
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $assignment->id));
         foreach ($submissions as $submission) {
             // TODO: inform judgelib to delete related tasks
@@ -249,12 +249,18 @@ class assignment_onlinejudge extends assignment_upload {
                 return false;
         }
 
-        // DELETE tests
+        // delete testcases
+        $fs = get_file_storage();
+        $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id));
+        foreach ($testcases as $testcase) {
+            $fs->delete_area_files($this->context->id, 'mod_assignment', 'onlinejudge_input', $testcase->id);
+            $fs->delete_area_files($this->context->id, 'mod_assignment', 'onlinejudge_output', $testcase->id);
+        }
         if (!$DB->delete_records('assignment_oj_testcases', array('assignment' => $assignment->id))) {
             return false;
         }
 
-        // DELETE programming language
+        // delete onlinejudge settings
         if (!$DB->delete_records('assignment_oj', array('assignment' => $assignment->id))) {
             return false;
         }
@@ -846,3 +852,4 @@ function onlinejudge_task_judged($task) {
 
     return true;
 }
+
