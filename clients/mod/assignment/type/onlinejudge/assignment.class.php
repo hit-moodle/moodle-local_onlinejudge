@@ -745,27 +745,6 @@ class assignment_onlinejudge extends assignment_upload {
         return $grades[$status];
     }
 
-    function cron() {
-        //TODO: clean never unused testcases
-        //TODO: grade ungraded submissions
-    }
-
-
-    // Return the content of the file submitted by userid. The charset of the content is translated into UTF8.
-    // If the file doesn't exist, return false
-    function get_submission_file_content($userid)
-    {
-        if ($basedir = $this->file_area($userid)) {
-            if ($files = get_directory_list($basedir)) {
-                foreach ($files as $key => $file) {
-                    return mb_convert_encoding(file_get_contents($basedir.'/'.$file), 'UTF-8', 'UTF-8, GBK');
-                }
-            }
-        }
-
-        return false;
-    }
-
     /**
      * Adds specific settings to the settings block
      */
