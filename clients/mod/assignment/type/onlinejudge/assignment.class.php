@@ -338,10 +338,11 @@ class assignment_onlinejudge extends assignment_upload {
         $output = parent::print_student_answer($userid, true);
 
         $submission = $this->get_submission($userid);
+        $onlinejudge_result = $this->get_onlinejudge_result($submission);
 
         // replace draft status with onlinejudge status
         $pattern = '/(<div class="box files">).*(<div )/';
-        $replacement = '$1<strong>'.get_string('status'.$submission->oj_result->status, 'local_onlinejudge').'</strong>$2';
+        $replacement = '$1<strong>'.get_string('status'.$onlinejudge_result->status, 'local_onlinejudge').'</strong>$2';
         $output = preg_replace($pattern, $replacement, $output, 1);
 
         // TODO: Syntax Highlight source code link
@@ -378,27 +379,6 @@ class assignment_onlinejudge extends assignment_upload {
             return $output;
         }
         echo $output;
-    }
-
-    /**
-     * Load the submission object for a particular user
-     *
-     * online judge result is in the return object
-     * @global object
-     * @global object
-     * @param $userid int The id of the user whose submission we want or 0 in which case USER->id is used
-     * @param $createnew boolean optional Defaults to false. If set to true a new submission object will be created in the database
-     * @param bool $teachermodified student submission set if false
-     * @return object The submission
-     */
-    function get_submission($userid=0, $createnew=false, $teachermodified=false) {
-        $submission = parent::get_submission($userid, $createnew, $teachermodified);
-
-        if (!empty($submission)) {
-            $submission->oj_result = $this->get_onlinejudge_result($submission);
-        }
-
-        return $submission;
     }
 
     /**
@@ -507,44 +487,52 @@ class assignment_onlinejudge extends assignment_upload {
         $table->width = '100%';
 
         $submission = $this->get_submission($user);
+        $onlinejudge_result = $this->get_onlinejudge_result($submission);
 
         // Status
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (isset($submission->oj_result->status)) {
-            $item = get_string('status'.$submission->oj_result->status, 'local_onlinejudge');
+        if (isset($onlinejudge_result->status)) {
+            $item = get_string('status'.$onlinejudge_result->status, 'local_onlinejudge');
         }
         $table->data[] = array($item_name, $item);
 
         // Judge time
         $item_name = get_string('judgetime','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (!empty($submission->oj_result->judgetime)) {
-            $item = userdate($submission->oj_result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $submission->oj_result->judgetime)) . ')';
+        if (!empty($onlinejudge_result->judgetime)) {
+            $item = userdate($onlinejudge_result->judgetime).'&nbsp('.get_string('early', 'assignment', format_time(time() - $onlinejudge_result->judgetime)) . ')';
         }
         $table->data[] = array($item_name, $item);
 
         // Details
         $item_name = get_string('details','assignment_onlinejudge').':';
         $item = get_string('notavailable');
-        if (!empty($submission->oj_result->testcases)) {
+        if ($onlinejudge_result->status == ONLINEJUDGE_STATUS_COMPILATION_ERROR) {
+            $item = nl2br(end($onlinejudge_result->testcases)->compileroutput);
+        } else if (!empty($onlinejudge_result->testcases)) {
             $i = 1;
             $lines = array();
-            foreach ($submission->oj_result->testcases as $case) {
-                if (!is_null($case))
-                    $lines[] = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
+            foreach ($onlinejudge_result->testcases as $case) {
+                if (!is_null($case)) {
+                    $line = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
+                    $line .= ' (';
+                    if ($case->status == ONLINEJUDGE_STATUS_WRONG_ANSWER and !empty($case->feedback)) {
+                        $line .= $case->feedback;
+                    } else {
+                        $line .= get_string('info'.$case->status, 'local_onlinejudge');
+                    }
+                    $line .= ')';
+                    $lines[] = $line;
+                }
                 $i++;
             }
             if (!empty($lines)) {
                 $item = implode($lines, '<br />');
             }
         }
+        $item = format_text($item);
         $table->data[] = array($item_name, $item);
-
-        // Output (Show to teacher only)
-        if (has_capability('mod/assignment:grade', $this->context) && isset($submission->output)) {
-            $table->data[] = array(get_string('output', 'assignment_onlinejudge').':', format_text(stripslashes($submission->output), FORMAT_PLAIN));
-        }
 
         $output = html_writer::table($table);
 
