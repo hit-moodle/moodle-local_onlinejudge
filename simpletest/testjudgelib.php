@@ -66,9 +66,12 @@ class local_onlinejudge_test extends UnitTestCase {
             $DB->get_manager()->drop_table($table);
             $table = new xmldb_table('config_plugins');
             $DB->get_manager()->drop_table($table);
+            $table = new xmldb_table('events_handlers');
+            $DB->get_manager()->drop_table($table);
         }
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'files');
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'config_plugins');
+        $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'events_handlers');
         set_config('maxmemlimit', 64*1024*1024, 'local_onlinejudge');
         set_config('maxcpulimit', 10, 'local_onlinejudge');
         set_config('ideonedelay', 5, 'local_onlinejudge');
@@ -89,7 +92,7 @@ class local_onlinejudge_test extends UnitTestCase {
         $options->var1 = ideoneuser;
         $options->var2 = ideonepass;
 
-        $taskid = onlinejudge_submit_task(1, 1, $language, $files, $options);
+        $taskid = onlinejudge_submit_task(1, 1, $language, $files, 'simpletest', $options);
         $task = onlinejudge_judge($taskid);
 
         $this->assertEqual($task->status, $expect);
