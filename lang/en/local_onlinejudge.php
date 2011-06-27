@@ -32,6 +32,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['about'] = 'About';
+$string['aboutcontent'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Online Judge</a> is developped by <a href="http://www.hit.edu.cn">Harbin Institute of Technology</a>, and licensed by <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.';
 $string['badvalue'] = 'Incorrect value';
 $string['cannotcreatetmpdir'] = 'Can not create temp directory {$a}';
 $string['cannotrunsand'] = 'Can not run the sand';
@@ -58,6 +60,7 @@ $string['info21'] = 'The judge engine does not work well. Please inform the admi
 $string['info22'] = 'If you have been waiting too long, please inform the admin';
 $string['invalidlanguage'] = 'Invalid language ID: {$a}';
 $string['invalidjudgeclass'] = 'Invalid judge class: {$a}';
+$string['judgestatus'] = 'Online Judge has judged <strong>{$a->judged}</strong> tasks and there are <strong>{$a->pending}</strong> tasks in the waiting queue.';
 $string['langc_sandbox'] = 'C (run locally)';
 $string['langc_warn2err_sandbox'] = 'C (run locally, warnings as errors)';
 $string['langcpp_sandbox'] = 'C++ (run locally)';
@@ -66,6 +69,7 @@ $string['maxcpulimit'] = 'Maximum CPU usage (second)';
 $string['maxcpulimit_help'] = 'How long can a judge task keep running.';
 $string['maxmemlimit'] = 'Maximum memory usage (MB)';
 $string['maxmemlimit_help'] = 'How many memory can a judge task use.';
+$string['mystat'] = 'My Statistics';
 $string['onefileonlyideone'] = 'Ideone.com does not support multi-files';
 $string['pluginname'] = 'Online Judge';
 $string['sandboxerror'] = 'Sandbox error occurs: {$a}';

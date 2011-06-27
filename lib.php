@@ -39,9 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 function onlinejudge_extends_navigation(global_navigation $navigation) {
 
-    if (has_capability('local/onlinejudge:viewstatus', get_system_context())) {
-        $onlinejudge = $navigation->add(get_string('pluginname', 'local_onlinejudge'), new moodle_url('/local/onlinejudge/'));
-    }
+    $onlinejudge = $navigation->add(get_string('pluginname', 'local_onlinejudge'), new moodle_url('/local/onlinejudge/'));
 
     if (has_capability('moodle/site:config', get_system_context())) {
         $onlinejudge->add(get_string('settings'), new moodle_url('/local/onlinejudge/admin/settings.php'));

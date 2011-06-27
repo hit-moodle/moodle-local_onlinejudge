@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
     // Ability to view the current status
-    'local/onlinejudge:viewstatus' => array(
+    'local/onlinejudge:viewjudgestatus' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -48,4 +48,16 @@ $capabilities = array(
         )
     ),
 
+    // Ability to view own statistics
+    'local/onlinejudge:viewmystat' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+        )
+    ),
 );
+

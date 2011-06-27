@@ -32,6 +32,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['about'] = '关于';
+$string['aboutcontent'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">在线评测</a>由<a href="http://www.hit.edu.cn">哈尔滨工业大学</a>开发，采用<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>协议发布。';
 $string['badvalue'] = '无效的数值';
 $string['cannotcreatetmpdir'] = '无法创建临时目录 {$a}';
 $string['cannotrunsand'] = '无法运行sand';
@@ -58,6 +60,7 @@ $string['info21'] = '评测引擎出错，请报告管理员！';
 $string['info22'] = '如果已经等了很久，请报告管理员';
 $string['invalidlanguage'] = '无效的语言ID：{$a}';
 $string['invalidjudgeclass'] = '无效的judge类：{$a}';
+$string['judgestatus'] = '在线评测已经评测了<strong>{$a->judged}</strong>个任务。现在等待队列中还有<strong>{$a->pending}</strong>个任务。';
 $string['langc_sandbox'] = 'C (本地运行)';
 $string['langc_warn2err_sandbox'] = 'C (本地运行，警告视为错误)';
 $string['langcpp_sandbox'] = 'C++ (本地运行)';
@@ -66,6 +69,7 @@ $string['maxcpulimit'] = '最多可用CPU时间（秒）';
 $string['maxcpulimit_help'] = '一个评测任务最多可以运行多久。';
 $string['maxmemlimit'] = '最多可用内存（MB）';
 $string['maxmemlimit_help'] = '一个评测任务最多可以使用多少内存。';
+$string['mystat'] = '我的统计';
 $string['onefileonlyideone'] = 'Ideone.com不支持多文件';
 $string['pluginname'] = '在线评测';
 $string['sandboxerror'] = '沙箱错误：{$a}';
