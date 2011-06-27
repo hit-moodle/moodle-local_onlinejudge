@@ -36,6 +36,7 @@ Prerequisite
 For Linux Users
 ---------------
 
+* Moodle 2.0 or above
 * php-cli
 * make, gcc and g++ (optional but recommended)
 * pcntl and posix extension in php-cli (optional but recommended)
@@ -43,6 +44,7 @@ For Linux Users
 For Windows Users
 -----------------
 
+* Moodle 2.0 or above
 * php-cli
 
 
@@ -71,7 +73,7 @@ For Linux Users
 5. Login your site as admin and the plugins can be installed/upgraded.
 6. `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`
 7. If you want to use sandbox judge engine, then
-   `cd MOODLE_PATH/mod/assignment/type/onlinejudge/judge/sandbox/sand/ && make`
+   `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
 
 For Windows Users
 ---------------
@@ -85,6 +87,18 @@ For Windows Users
 6. Login your site as admin and the plugins can be installed/upgraded.
 7. `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php`
 
+Usage
+=====
+
+Online Judge Assignment Type
+----------------------------
+
+After installation, there will be a new assignment type called 'Online Judge' appears in the create activity drop down list. Simply click on it and follow the inline help.
+
+Judge Daemon
+------------
+
+The judge daemon has several helpful options for debugging propose. Try to add `--help` argument in the command line.
 
 Links
 =====
