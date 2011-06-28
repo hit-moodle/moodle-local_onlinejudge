@@ -284,7 +284,13 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
         if ($value instanceof stored_file) {
             $fs->create_file_from_storedfile($file_record, $value);
         } else {
-            $file_record->filepath = dirname($key).'/';
+            $file_record->filepath = dirname($key);
+            if (strpos($file_record->filepath, '/') !== 0) {
+                $file_record->filepath = '/'.$file_record->filepath;
+            }
+            if (strrpos($file_record->filepath, '/') !== strlen($file_record->filepath)-1) {
+                $file_record->filepath .= '/';
+            }
             $file_record->filename = basename($key);
             $fs->create_file_from_string($file_record, $value);
         }
