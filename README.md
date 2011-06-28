@@ -7,19 +7,24 @@ The Online Judge 2 plugin for Moodle 2 is designed for courses involving program
 It can automatically grade submitted source code by testing them against customizable
 test cases (ACM-ICPC/Online Judge style).
 
-It contains:
+It contains three modules:
 
-1. A local plugin call judgelib which provides the essential abilities of online judge.
-   It works like a library.
-2. A assignment type plugin call online judge which provides a UI to teachers and students
-   and calls the judgelib to judge submissions.
+1. *judgelib* - a local plugin which provides an online judge function library to any part
+   of Moodle.
+2. *judges* - judge engine plugins for judgelib. 
+3. *clients* - any kind of moodle plugins can work as the client of judgelib to provide UI
+   to teachers and students and call the judgelib to judge submissions.
 
-There are two judge engines:
+Now, the project includes two judge engines:
 
-1. Sandbox compiles and executes programs on the server in a protected environment.
+1. *sandbox* compiles and executes programs on the server in a protected environment.
    Supports C and C++ only.
-2. Ideone posts all data to ideone.com which compiles and executes programs remotely.
+2. *ideone* posts all data to ideone.com which compiles and executes programs remotely.
    Supports 40+ languaes, such as C/C++, Java, Python, C#, JavaScript, Perl, PHP.
+
+Now, the project includes one client:
+
+1. Online Judge Assignment Type - online judge version of the official *advanced uploading of files* assignment type.
 
 The workflow is:
 
@@ -93,7 +98,7 @@ Usage
 Online Judge Assignment Type
 ----------------------------
 
-After installation, there will be a new assignment type called 'Online Judge' appears in the create activity drop down list. Simply click on it and follow the inline help.
+After installation, there will be a new assignment type called *Online Judge* appears in the create activity drop down list. Simply click on it and follow the inline help.
 
 Judge Daemon
 ------------
