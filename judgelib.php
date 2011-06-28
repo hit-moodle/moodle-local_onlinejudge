@@ -80,7 +80,7 @@ class judge_base{
     }
 
     function __destruct() {
-        if (!debugging()) {
+        if (!debugging('', DEBUG_DEVELOPER)) {
             remove_dir($this->get_temp_dir());
         }
     }
