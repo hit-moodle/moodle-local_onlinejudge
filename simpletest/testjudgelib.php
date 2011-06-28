@@ -229,5 +229,49 @@ int main(void)
         $this->triger_test('11_ideone', $files, 'hello', 'hello', 1, 2*1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
 	}
 
+	function test_multifiles() {
+        $contents = array(
+            '/include/i.h' => '
+#define STRING "hello"
+
+void print(void);
+',
+            '/main.c' => '
+#include <stdio.h>
+#include "include/i.h"
+
+int main(void)
+{
+    print();
+    return 0;
+}
+',
+            '/print.c' => '
+#include "include/i.h"
+
+void print(void)
+{
+    printf(STRING);
+}
+'
+    );
+        $fs = get_file_storage();
+        $i = 0;
+        foreach ($contents as $key => $content) {
+            $file_record = new stdClass();
+            $file_record->contextid = 1;
+            $file_record->component = 'test';
+            $file_record->filearea = 'test';
+            $file_record->filepath = dirname($key).'/';
+            $file_record->filename = basename($key);
+            $file_record->itemid = $i;
+            $fs->create_file_from_string($file_record, $content);
+        }
+        $files = $fs->get_area_files(1, 'test', 'test');
+
+        $this->triger_test('c_sandbox', $contents, '', 'hello', 1, 1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
+        $this->triger_test('c_sandbox', $files, '', 'hello', 1, 1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
+	}
+
 }
 
