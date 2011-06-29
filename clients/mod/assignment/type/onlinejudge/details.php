@@ -43,6 +43,7 @@ $ajax = optional_param('ajax', 0, PARAM_BOOL);
 $PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
 $PAGE->set_pagelayout('popup');
 $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_title(get_string('details', 'assignment_onlinejudge'));
 
 if ($ajax) {
     @header('Content-Type: text/plain; charset=utf-8');
