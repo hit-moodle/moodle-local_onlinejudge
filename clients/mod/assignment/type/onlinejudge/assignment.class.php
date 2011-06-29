@@ -475,7 +475,7 @@ class assignment_onlinejudge extends assignment_upload {
      * Display judge info about the submission
      */
     function view_summary($user=0, $return = true) {
-        global $USER, $CFG, $DB, $OUTPUT;
+        global $USER, $CFG, $DB, $OUTPUT, $PAGE;
 
         //TODO: links on testcases to show outputs
 
@@ -516,13 +516,18 @@ class assignment_onlinejudge extends assignment_upload {
             foreach ($onlinejudge_result->testcases as $case) {
                 if (!is_null($case)) {
                     $line = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
-                    $line .= ' (';
+
+                    // details icon link
+                    $url = new moodle_url('/mod/assignment/type/onlinejudge/details.php', array(
+                        'task'   => $case->id));
+                    $icon = $OUTPUT->pix_icon('docs', get_string('more'));
+                    $line .= html_writer::tag('span', html_writer::tag('a', $icon, array('href' => $url, 'target' => '_blank',
+                            'title' => get_string('more'))), array('class' => 'detailslink'));
+
+                    // show teacher defined feedback
                     if ($case->status == ONLINEJUDGE_STATUS_WRONG_ANSWER and !empty($case->feedback)) {
-                        $line .= $case->feedback;
-                    } else {
-                        $line .= get_string('info'.$case->status, 'local_onlinejudge');
+                        $line .= ' ('.$case->feedback.')';
                     }
-                    $line .= ')';
                     $lines[] = $line;
                 }
                 $i++;
@@ -712,6 +717,8 @@ class assignment_onlinejudge extends assignment_upload {
         foreach ($tests as $test) {
             $oj->input = $test->input;
             $oj->output = $test->output;
+            $oj->var1 = $oj->ideoneuser;
+            $oj->var2 = $oj->ideonepass;
             $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, 'assignment_onlinejudge', $oj);
             $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid, 'latest' => 1));
         }
