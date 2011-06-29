@@ -96,6 +96,6 @@ $string['status21'] = 'Internal Error';
 $string['status22'] = 'Judging...';
 $string['status23'] = 'Multi-status';
 $string['status255'] = 'Unsubmitted';
-$string['stderr'] = 'Standard output';
-$string['stdout'] = 'Standard error output';
+$string['stderr'] = 'Standard error output';
+$string['stdout'] = 'Standard output';
 

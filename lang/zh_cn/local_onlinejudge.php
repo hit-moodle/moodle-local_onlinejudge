@@ -37,6 +37,7 @@ $string['aboutcontent'] = '<a href="https://github.com/hit-moodle/moodle-local_o
 $string['badvalue'] = '无效的数值';
 $string['cannotcreatetmpdir'] = '无法创建临时目录 {$a}';
 $string['cannotrunsand'] = '无法运行sand';
+$string['compileroutput'] = '编译器输出';
 $string['cpuusage'] = 'CPU使用时间';
 $string['ideonedelay'] = '发往ideone.com的访问请求之间的时间间隔（秒）';
 $string['ideonedelay_help'] = '向ideone.com发送评测请求后，不可能立即得到结果。在查询结果之前，我们应该等待多久？建议设为5秒或稍高。';
@@ -94,6 +95,6 @@ $string['status21'] = '内部错误';
 $string['status22'] = '评测中...';
 $string['status23'] = '多种状态';
 $string['status255'] = '未提交评测请求';
-$string['stderr'] = '标准输出';
-$string['stdout'] = '标准错误输出';
+$string['stderr'] = '标准错误输出';
+$string['stdout'] = '标准输出';
 
