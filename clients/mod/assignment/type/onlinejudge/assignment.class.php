@@ -477,8 +477,6 @@ class assignment_onlinejudge extends assignment_upload {
     function view_summary($user=0, $return = true) {
         global $USER, $CFG, $DB, $OUTPUT, $PAGE;
 
-        //TODO: links on testcases to show outputs
-
         $table = new html_table();
         $table->id = 'assignment_onlinejudge_summary';
         $table->attributes['class'] = 'generaltable';
@@ -518,11 +516,11 @@ class assignment_onlinejudge extends assignment_upload {
                     $line = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
 
                     // details icon link
-                    $url = new moodle_url('/mod/assignment/type/onlinejudge/details.php', array(
-                        'task'   => $case->id));
+                    $url = new moodle_url('/mod/assignment/type/onlinejudge/details.php', array('task' => $case->id));
+                    $attributes = array('href'=>$url, 'title'=>get_string('more'));
+                    $attributes['id'] = $OUTPUT->add_action_handler(new popup_action('click', $url));
                     $icon = $OUTPUT->pix_icon('docs', get_string('more'));
-                    $line .= html_writer::tag('span', html_writer::tag('a', $icon, array('href' => $url, 'target' => '_blank',
-                            'title' => get_string('more'))), array('class' => 'detailslink'));
+                    $line .= html_writer::tag('a', $icon, $attributes);
 
                     // show teacher defined feedback
                     if ($case->status == ONLINEJUDGE_STATUS_WRONG_ANSWER and !empty($case->feedback)) {
@@ -536,7 +534,7 @@ class assignment_onlinejudge extends assignment_upload {
                 $item = implode($lines, '<br />');
             }
         }
-        $item = format_text($item);
+        $item = format_text($item, FORMAT_MOODLE, array('allowid' => true)); // popup details links require id
         $table->data[] = array($item_name, $item);
 
         $output = html_writer::table($table);
