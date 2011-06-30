@@ -318,6 +318,9 @@ function onlinejudge_judge($taskorid) {
 
     $judgeclass = 'judge_'.substr($task->language, strrpos($task->language, '_')+1);
     if (!in_array($judgeclass, $judgeclasses)) {
+        $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
+        $task->infostudent = get_string('invalidjudgeclass', 'local_onlinejudge', $judgeclass);
+        $DB->update_record('onlinejudge_tasks', $task);
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
     }
 
