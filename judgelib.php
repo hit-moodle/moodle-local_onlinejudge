@@ -127,23 +127,30 @@ class judge_base{
     }
 
     /**
-     * Compare the output and the answer
+     * Compare the stdout of program and the output of testcase
      */  
-    protected function diff($output, $answer) {
+    protected function diff() {
+        $task = & $this->task;
+
+        // convert students' output into UTF-8 charset
+        $task->stdout = mb_convert_encoding($task->stdout, 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
+        $task->stderr = mb_convert_encoding($task->stderr, 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
+
     	//format
-        $answer = strtr(trim($answer), array("\r\n" => "\n", "\n\r" => "\n"));
-        $output = strtr(trim($output), array("\r\n" => "\n", "\n\r" => "\n"));
-        if (strcmp($answer, $output) == 0)
+        $task->output = strtr(trim($task->output), array("\r\n" => "\n", "\n\r" => "\n"));
+        $task->stdout = strtr(trim($task->stdout), array("\r\n" => "\n", "\n\r" => "\n"));
+
+        if (strcmp($task->output, $task->stdout) == 0)
             return ONLINEJUDGE_STATUS_ACCEPTED;
         else {
             $tokens = array();
-            $tok = strtok($answer, " \n\r\t");
+            $tok = strtok($task->output, " \n\r\t");
             while ($tok) {
                 $tokens[] = $tok;
                 $tok = strtok(" \n\r\t");
             }
 
-            $tok = strtok($output, " \n\r\t");
+            $tok = strtok($task->stdout, " \n\r\t");
             foreach ($tokens as $anstok) {
                 if (!$tok || $tok !== $anstok)
                     return ONLINEJUDGE_STATUS_WRONG_ANSWER;
@@ -334,10 +341,6 @@ function onlinejudge_judge($taskorid) {
         $DB->update_record('onlinejudge_tasks', $task);
         throw $e;
     }
-
-    // convert students' output into UTF-8 charset
-    $task->stdout = mb_convert_encoding($task->stdout, 'UTF-8', 'UTF-8, GBK');
-    $task->stderr = mb_convert_encoding($task->stderr, 'UTF-8', 'UTF-8, GBK');
 
     $DB->update_record('onlinejudge_tasks', $task);
 

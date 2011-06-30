@@ -273,5 +273,20 @@ void print(void)
         $this->triger_test('c_sandbox', $files, '', 'hello', 1, 1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
 	}
 
+	function test_gb2312() {
+        $code = '
+#include <stdio.h>
+
+int main(void)
+{
+    printf("您好，世界");
+    return 0;
+}
+        ';
+        $textlib = textlib_get_instance();
+        $files = array('/test.c' => $textlib->convert($code, 'utf-8', 'gb2312'));
+        $this->triger_test('c_sandbox', $files, '', '您好，世界', 1, 1024*1024, ONLINEJUDGE_STATUS_ACCEPTED);
+	}
+
 }
 

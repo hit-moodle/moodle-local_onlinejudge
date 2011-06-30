@@ -206,7 +206,7 @@ class judge_ideone extends judge_base
                 } else if ($task->memusage > $task->memlimit) { 
                     $task->status = ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED;
                 } else {
-                    $task->status = $this->diff($details['output'], $task->output);
+                    $task->status = $this->diff();
                 }
             }
         }
