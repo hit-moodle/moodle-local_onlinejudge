@@ -171,9 +171,7 @@ class judge_ideone extends judge_base
         if ($webid['error'] == 'OK') {
             $link = $webid['link'];
         } else {
-            $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
-            $task->infostudent = $webid['error'];
-            return $task;
+            throw new onlinejudge_exception('ideoneerror', $webid['error']);
         }
 
         // Get ideone results

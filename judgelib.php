@@ -322,7 +322,15 @@ function onlinejudge_judge($taskorid) {
     }
 
     $judge = new $judgeclass($task);
-    $task = $judge->judge();
+
+    try {
+        $task = $judge->judge();
+    } catch (Exception $e) {
+        $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
+        $task->infostudent = $e->getMessage();
+        $DB->update_record('onlinejudge_tasks', $task);
+        throw $e;
+    }
 
     // convert students' output into UTF-8 charset
     $task->stdout = mb_convert_encoding($task->stdout, 'UTF-8', 'UTF-8, GBK');
