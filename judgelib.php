@@ -53,18 +53,7 @@ define("ONLINEJUDGE_STATUS_MULTI_STATUS",          23);
 
 define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
 
-require_once(dirname(__FILE__).'/../../config.php');
 require_once(dirname(__FILE__).'/exceptions.php');
-
-global $judgeclasses;
-$judgeclasses = array();
-
-if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
-    foreach ($plugins as $plugin=>$dir) {
-        require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
-        $judgeclasses[] = "judge_$dir";
-    }
-}
 
 class judge_base{
 
@@ -214,9 +203,8 @@ class judge_base{
  * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
  */
 function onlinejudge_get_languages() {
-    global $judgeclasses;
-
     $langs = array();
+    $judgeclasses = onlinejudge_get_judge_classes();
     foreach ($judgeclasses as $judgeclass) {
         $langs = array_merge($langs, $judgeclass::get_languages());
     }
@@ -244,7 +232,7 @@ function onlinejudge_get_language_name($language) {
  * @return compiler information or null
  */
 function onlinejudge_get_compiler_info($language) {
-    global $judgeclasses;
+    $judgeclasses = onlinejudge_get_judge_classes();
     $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
     return $judgeclass::get_compiler_info($language);
 }
@@ -260,7 +248,7 @@ function onlinejudge_get_compiler_info($language) {
  * @return id of the task or throw exception
  */
 function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options) {
-    global $judgeclasses, $DB;
+    global $DB;
 
     $task->cmid = $cmid;
     $task->userid = $userid;
@@ -274,6 +262,7 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
     $task->component = $component;
 
     $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
+    $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
     }
@@ -313,7 +302,7 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
  * @return updated task
  */
 function onlinejudge_judge($taskorid) {
-    global $CFG, $DB, $judgeclasses;
+    global $CFG, $DB;
     
     if (is_object($taskorid)) {
         $task = $taskorid;
@@ -324,6 +313,7 @@ function onlinejudge_judge($taskorid) {
     $task->judgetime = time();
 
     $judgeclass = 'judge_'.substr($task->language, strrpos($task->language, '_')+1);
+    $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
         $task->infostudent = get_string('invalidjudgeclass', 'local_onlinejudge', $judgeclass);
@@ -383,5 +373,22 @@ function onlinejudge_get_overall_status($tasks) {
     }
 
     return $status;
+}
+
+function onlinejudge_get_judge_classes() {
+    global $CFG;
+
+    static $judgeclasses = array();
+
+    if (empty($judgeclasses)) {
+        if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
+            foreach ($plugins as $plugin=>$dir) {
+                require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
+                $judgeclasses[] = "judge_$dir";
+            }
+        }
+    }
+
+    return $judgeclasses;
 }
 
