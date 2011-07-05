@@ -98,7 +98,7 @@ Usage
 Online Judge Assignment Type
 ----------------------------
 
-After installation, there will be a new assignment type called *Online Judge* appears in the create activity drop down list. Simply click on it and follow the inline help.
+After installation, there will be a new assignment type called *Online Judge* appears in the *"Add an activity..."* drop down list. Simply click it and follow the inline help.
 
 Judge Daemon
 ------------
