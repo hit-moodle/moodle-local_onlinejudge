@@ -9,9 +9,10 @@
 SRCPATH="clients/mod/assignment/type/onlinejudge/"
 DSTPATH="../../mod/assignment/type/onlinejudge"
 
-if [ ! -e $DSTPATH ]; then
-    mkdir $DSTPATH
+if [ -e $DSTPATH ]; then
+    rm -rf $DSTPATH
 fi
+mkdir $DSTPATH
 
 for f in $SRCPATH/* ; do
     f=`basename $f`
