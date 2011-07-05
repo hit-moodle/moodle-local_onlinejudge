@@ -71,7 +71,7 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
          */
         $assassoff = new backup_nested_element($this->get_recommended_name());
         $onlinejudge = new backup_nested_element('onlinejudge', array('id'), array('language', 'memlimit', 'cpulimit', 'compileonly', 'ratiope', 'ideoneuser', 'ideonepass'));
-        $testcase = new backup_nested_element('testcase', array('id'), array('input', 'output', 'usefile', 'feedback', 'subgrade', 'unused'));
+        $testcase = new backup_nested_element('testcase', array('id'), array('input', 'output', 'usefile', 'feedback', 'subgrade', 'sortorder'));
 
         $subplugin->add_child($assassoff);
         $assassoff->add_child($onlinejudge);
@@ -100,7 +100,7 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
         $asssuboff = new backup_nested_element($this->get_recommended_name());
         // onlinejudge assignment type does not copy task details. So must backup from local onlinejudge
         $task = new backup_nested_element('task', array('id'), array('userid', 'language'  /* TODO: fill up*/));
-        $oj_submissions = new backup_nested_element('onlinejudge_submission', array('id'), array('testcase', 'task'));
+        $oj_submissions = new backup_nested_element('onlinejudge_submission', array('id'), array('testcase', 'task', 'latest'));
 
         $subplugin->add_child($asssuboff);
         $asssuboff->add_child($task);
