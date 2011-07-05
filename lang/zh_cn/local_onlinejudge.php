@@ -35,7 +35,6 @@
 $string['about'] = '关于';
 $string['aboutcontent'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">在线评测</a>由<a href="http://www.hit.edu.cn">哈尔滨工业大学</a>开发，采用<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>协议发布。';
 $string['badvalue'] = '无效的数值';
-$string['cannotcreatetmpdir'] = '无法创建临时目录 {$a}';
 $string['cannotrunsand'] = '无法运行sand';
 $string['compileroutput'] = '编译器输出';
 $string['cpuusage'] = 'CPU使用时间';

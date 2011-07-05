@@ -164,7 +164,7 @@ class judge_base{
             $path = $this->get_temp_dir().$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             if (!check_dir_exists($path)) {
-                throw new onlinejudge_exception('cannotcreatetmpdir', $path);
+                throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
             $file->copy_content_to($fullpath);
             $dstfiles[] = $fullpath;
@@ -178,7 +178,7 @@ class judge_base{
 
         $tmpdir = "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
         if (!check_dir_exists($tmpdir)) {
-            throw new onlinejudge_exception('cannotcreatetmpdir', $tmpdir);
+            throw new moodle_exception('errorcreatingdirectory', '', '', $path);
         }
 
         return $tmpdir;
