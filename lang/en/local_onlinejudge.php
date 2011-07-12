@@ -38,6 +38,7 @@ $string['badvalue'] = 'Incorrect value';
 $string['cannotrunsand'] = 'Can not run the sand';
 $string['compileroutput'] = 'Output of compiler';
 $string['cpuusage'] = 'CPU usage';
+$string['ideoneautherror'] = 'Wrong username or wrong password';
 $string['ideonedelay'] = 'Delay between requests to ideone.com (second)';
 $string['ideonedelay_help'] = 'After sending a judge request to ideone.com, we can not get the result immediately. How long should we wait before querying the result? 5 seconds or so is reasonable.';
 $string['ideoneerror'] = 'Ideone returns error: {$a}';

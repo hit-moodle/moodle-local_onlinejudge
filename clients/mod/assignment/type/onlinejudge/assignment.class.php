@@ -149,9 +149,6 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
         $mform->setDefault('ideonepass', $onlinejudge ? $onlinejudge->ideonepass : '');
-        $mform->addElement('password', 'ideonepass2', get_string('ideonepass2', 'assignment_onlinejudge'), array('size' => 20));
-        $mform->setDefault('ideonepass2', $onlinejudge ? $onlinejudge->ideonepass : '');
-        $mform->addRule(array('ideonepass', 'ideonepass2'), get_string('ideonepassmismatch', 'assignment_onlinejudge'), 'compare');
 
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
@@ -177,10 +174,16 @@ class assignment_onlinejudge extends assignment_upload {
             } 
             if (empty($data['ideonepass'])) {
                 $errors['ideonepass'] = get_string('ideoneuserrequired', 'local_onlinejudge');
-            } 
-            if (empty($data['ideonepass2'])) {
-                $errors['ideonepass2'] = get_string('ideoneuserrequired', 'local_onlinejudge');
-            } 
+            } else if (!empty($data['ideoneuser'])) { // test username and password
+                // creating soap client
+                $client = new SoapClient("http://ideone.com/api/1/service.wsdl");
+                // calling test function
+                $testArray = $client->testFunction($data['ideoneuser'], $data['ideonepass']);
+                if ($testArray['error'] == 'AUTH_ERROR') {
+                    $errors['ideoneuser'] = $errors['ideonepass'] = get_string('ideoneautherror', 'local_onlinejudge');
+                }
+            }
+
         }
         return $errors;
     }
