@@ -11,7 +11,7 @@ It contains three modules:
 
 1. *judgelib* - a local plugin which provides an online judge function library to any part
    of Moodle.
-2. *judges* - judge engine plugins for judgelib. 
+2. *judges* - judge engine plugins for judgelib.
 3. *clients* - any kind of moodle plugins can work as the client of judgelib to provide UI
    to teachers and students and call the judgelib to judge submissions.
 
@@ -38,16 +38,16 @@ The workflow is:
 Prerequisite
 ============
 
-For Linux Users
----------------
+In Linux
+--------
 
 * Moodle 2.0 or above
 * php-cli
 * make, gcc and g++ (optional but recommended)
 * pcntl and posix extension in php-cli (optional but recommended)
 
-For Windows Users
------------------
+In Windows
+----------
 
 * Moodle 2.0 or above
 * php-cli
@@ -68,11 +68,11 @@ Installation & Upgrading
 
 *MOODLE_PATH means the root path of your moodle installation.*
 
-For Linux Users
----------------
+In Linux
+--------
 
-1. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
-2. If the directory `MOODLE_PATH/local/onlinejudge/` exists, remove it.
+1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove it.
+2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH/local/`
 4. `cd MOODLE_PATH/local/onlinejudge && ./install_assignment_type`
 5. Login your site as admin and the plugins will be installed/upgraded.
@@ -80,15 +80,15 @@ For Linux Users
 7. If you want to use sandbox judge engine, then
    `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
 
-For Windows Users
----------------
+In Windows
+----------
 
-1. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
-2. If the folder `MOODLE_PATH\local\onlinejudge\` exists, remove it.
-3. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
+1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove it.
+2. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
+3. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
 4. Put `onlinejudge` into `MOODLE_PATH\local\`
-5. copy MOODLE_PATH\local\onlinejudge\clients\mod\assignment\type\onlinejudge\ 
-   to MOODLE_PATH\mod\assignment\type\
+5. copy `MOODLE_PATH\local\onlinejudge\clients\mod\assignment\type\onlinejudge`
+   to `MOODLE_PATH\mod\assignment\type\`
 6. Login your site as admin and the plugins will be installed/upgraded.
 7. `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php`
 
