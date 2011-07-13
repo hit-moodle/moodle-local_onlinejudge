@@ -38,7 +38,7 @@ The workflow is:
 Prerequisite
 ============
 
-In Linux
+On Linux
 --------
 
 * Moodle 2.0 or above
@@ -46,7 +46,7 @@ In Linux
 * make, gcc and g++ (optional but recommended)
 * pcntl and posix extension in php-cli (optional but recommended)
 
-In Windows
+On Windows
 ----------
 
 * Moodle 2.0 or above
@@ -68,7 +68,7 @@ Installation & Upgrading
 
 *MOODLE_PATH means the root path of your moodle installation.*
 
-In Linux
+On Linux
 --------
 
 1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove it.
@@ -80,7 +80,7 @@ In Linux
 7. If you want to use sandbox judge engine, then
    `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
 
-In Windows
+On Windows
 ----------
 
 1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove it.
