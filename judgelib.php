@@ -55,6 +55,11 @@ define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
 
 require_once(dirname(__FILE__).'/exceptions.php');
 
+$judge_plugins = get_list_of_plugins('local/onlinejudge/judge');
+foreach ($judge_plugins as $dir) {
+    require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
+}
+
 class judge_base{
 
     // object of the task
@@ -117,7 +122,7 @@ class judge_base{
 
     /**
      * Compare the stdout of program and the output of testcase
-     */  
+     */
     protected function diff() {
         $task = & $this->task;
 
@@ -191,9 +196,17 @@ class judge_base{
      * @return compiler information or null
      */
     static function get_compiler_info($language) {
-        return null;
+        return array();
     }
 
+    /**
+     * Whether the judge is avaliable
+     *
+     * @return true for yes, false for no
+     */
+    static function is_available() {
+        return false;
+    }
 }
 
 /**
@@ -297,18 +310,18 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
 
 /**
  * Judge specified task
- * 
+ *
  * @param $taskorid object of task or task id
  * @return updated task
  */
 function onlinejudge_judge($taskorid) {
     global $CFG, $DB;
-    
+
     if (is_object($taskorid)) {
         $task = $taskorid;
     } else {
         $task = $DB->get_record('onlinejudge_tasks', array('id' => $taskorid));
-    } 
+    }
 
     $task->judgetime = time();
 
@@ -383,7 +396,6 @@ function onlinejudge_get_judge_classes() {
     if (empty($judgeclasses)) {
         if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
             foreach ($plugins as $plugin=>$dir) {
-                require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
                 $judgeclasses[] = "judge_$dir";
             }
         }

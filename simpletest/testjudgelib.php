@@ -85,6 +85,12 @@ class local_onlinejudge_test extends UnitTestCase {
     function triger_test($language, $files, $input, $output, $cpulimit, $memlimit, $expect) {
         global $DB;
 
+        $judgeclass = 'judge_'.onlinejudge_judge_name($language);
+        if (!$judgeclass::is_available()) {
+            // skip unavailable judge
+            return $expect;
+        }
+
         $options->input = $input;
         $options->output = $output;
         $options->cpulimit = $cpulimit;

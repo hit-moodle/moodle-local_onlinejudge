@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__)."/../../../../config.php");
 require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
-class judge_ideone extends judge_base 
+class judge_ideone extends judge_base
 {
     //TODO: update latest language list through ideone API
     protected static $supported_languages = array(
@@ -104,6 +104,9 @@ class judge_ideone extends judge_base
 
     static function get_languages() {
     	$langs = array();
+        if (!self::is_available()) {
+            return $langs;
+        }
         foreach (self::$supported_languages as $langid => $name) {
             $langs[$langid.'_ideone'] = $name;
         }
@@ -153,12 +156,12 @@ class judge_ideone extends judge_base
          * @param user is the user name.
          * @param pass is the user's password.
          * @param source is the source code of the paste.
-         * @param language is language identifier. these identifiers can be 
+         * @param language is language identifier. these identifiers can be
          *     retrieved by using the getLanguages methods.
          * @param input is the data that will be given to the program on the stdin
          * @param run is the determines whether the source code should be executed.
-         * @param private is the determines whether the paste should be private.   
-         *     Private pastes do not appear on the recent pastes page on ideone.com. 
+         * @param private is the determines whether the paste should be private.
+         *     Private pastes do not appear on the recent pastes page on ideone.com.
          *     Notice: you can only set submission's visibility to public or private through
          *     the API (you cannot set the user's visibility).
          * @return array(
@@ -166,7 +169,7 @@ class judge_ideone extends judge_base
          *         link  => string
          *     )
          */
-        $webid = $client->createSubmission($user, $pass, $source, $language, $input, true, true); 
+        $webid = $client->createSubmission($user, $pass, $source, $language, $input, true, true);
 
         if ($webid['error'] == 'OK') {
             $link = $webid['link'];
@@ -177,14 +180,14 @@ class judge_ideone extends judge_base
         // Get ideone results
         $delay = get_config('local_onlinejudge', 'ideonedelay');
         while (1) {
-            sleep($delay); 
+            sleep($delay);
             $status = $client->getSubmissionStatus($user, $pass, $link);
             if($status['status'] == 0) {
                 break;
             }
         }
 
-        $details = $client->getSubmissionDetails($user,$pass,$link,false,false,true,true,true); 
+        $details = $client->getSubmissionDetails($user,$pass,$link,false,false,true,true,true);
         $task->stdout = $details['output'];
         $task->stderr = $details['stderr'];
         $task->compileroutput = $details['cmpinfo'];
@@ -203,7 +206,7 @@ class judge_ideone extends judge_base
             if ($task->status == ONLINEJUDGE_STATUS_COMPILATION_OK) {
                 if ($task->cpuusage > $task->cpulimit) {
                     $task->status = ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED;
-                } else if ($task->memusage > $task->memlimit) { 
+                } else if ($task->memusage > $task->memlimit) {
                     $task->status = ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED;
                 } else {
                     $task->status = $this->diff();
@@ -212,6 +215,15 @@ class judge_ideone extends judge_base
         }
 
         return $task;
+    }
+
+    /**
+     * Whether the judge is avaliable
+     *
+     * @return true for yes, false for no
+     */
+    static function is_available() {
+        return true;
     }
 }
 

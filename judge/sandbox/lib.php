@@ -35,6 +35,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__)."/../../../../config.php");
 require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
+define('SANDBOX_SAND', $CFG->dirroot.'/local/onlinejudge/judge/sandbox/sand/sand');
+
 class judge_sandbox extends judge_base {
     protected static $supported_languages = array(
         'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCE% -lm',
@@ -45,6 +47,9 @@ class judge_sandbox extends judge_base {
 
     static function get_languages() {
         $langs = array();
+        if (!self::is_available()) {
+            return $langs;
+        }
         foreach (self::$supported_languages as $key => $value) {
             $langs[$key.'_sandbox'] = get_string('lang'.$key.'_sandbox', 'local_onlinejudge');
         }
@@ -88,19 +93,19 @@ class judge_sandbox extends judge_base {
 
         if ($this->task->status == ONLINEJUDGE_STATUS_COMPILATION_OK && !$this->task->compileonly) {
             $this->run_in_sandbox($binfile);
-        } 
+        }
 
         return $this->task;
     }
-    
+
     protected function run_in_sandbox($binfile) {
     	global $CFG;
 
         $rval_status = array (
-                ONLINEJUDGE_STATUS_PENDING, 
+                ONLINEJUDGE_STATUS_PENDING,
                 ONLINEJUDGE_STATUS_ACCEPTED,
-                ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS, 
-                ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED, 
+                ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS,
+                ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED,
                 ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED,
                 ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED,
                 ONLINEJUDGE_STATUS_RUNTIME_ERROR,
@@ -108,12 +113,12 @@ class judge_sandbox extends judge_base {
                 ONLINEJUDGE_STATUS_INTERNAL_ERROR
         );
 
-        $sand = $CFG->dirroot . '/local/onlinejudge/judge/sandbox/sand/sand';
+        $sand = SANDBOX_SAND;
         if (!is_executable($sand)){
             throw new onlinejudge_exception('cannotrunsand');
         }
 
-        $sand .= ' -l cpu='.(($this->task->cpulimit)*1000).' -l memory='.$this->task->memlimit.' -l disk=512000 '.$binfile; 
+        $sand .= ' -l cpu='.(($this->task->cpulimit)*1000).' -l memory='.$this->task->memlimit.' -l disk=512000 '.$binfile;
 
         // run it in sandbox!
         $descriptorspec = array(
@@ -158,6 +163,23 @@ class judge_sandbox extends judge_base {
     static function get_compiler_info($language) {
         $language = substr($language, 0, strrpos($language, '_'));
         return self::$supported_languages[$language];
+    }
+
+    /**
+     * Whether the judge is avaliable
+     *
+     * @return true for yes, false for no
+     */
+    static function is_available() {
+        global $CFG;
+
+        if ($CFG->ostype == 'WINDOWS') {
+            return false;
+        } else if (!is_executable(SANDBOX_SAND)) {
+            return false;
+        }
+
+        return true;
     }
 }
 
