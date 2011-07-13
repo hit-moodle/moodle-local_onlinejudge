@@ -28,11 +28,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package local_onlinejudge
  */
- 
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
 }
- 
+
 // access to use global variables.
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
@@ -40,7 +40,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include here to ensure set_config()
 
 // A secret file to store ideone username and password. It should contains:
-// 
+//
 // <?
 // define('ideoneuser', 'username');
 // define('ideonepass', 'api_password');
@@ -88,7 +88,7 @@ class local_onlinejudge_test extends UnitTestCase {
         $judgeclass = 'judge_'.onlinejudge_judge_name($language);
         if (!$judgeclass::is_available()) {
             // skip unavailable judge
-            return $expect;
+            return;
         }
 
         $options->input = $input;
