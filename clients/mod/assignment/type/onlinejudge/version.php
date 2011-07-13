@@ -8,4 +8,3 @@
 $plugin->version  = 2011062400;
 $plugin->requires = 2010122900;  // Requires this Moodle version
 
-?>

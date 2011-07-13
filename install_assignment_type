@@ -1,10 +1,6 @@
 #!/bin/sh
 
-# Link all files in $SRCPATH to $DSTPATH
-#
-# We can not link the upper directory only since moodle
-# only recognizes a real directory (not link) as a plugin
-
+# Copy all files in $SRCPATH to $DSTPATH
 
 SRCPATH="clients/mod/assignment/type/onlinejudge/"
 DSTPATH="../../mod/assignment/type/onlinejudge"
@@ -12,11 +8,5 @@ DSTPATH="../../mod/assignment/type/onlinejudge"
 if [ -e $DSTPATH ]; then
     rm -rf $DSTPATH
 fi
-mkdir $DSTPATH
 
-for f in $SRCPATH/* ; do
-    f=`basename $f`
-    if [ ! -e $DSTPATH/$f ]; then
-        ln -sf ../../../../local/onlinejudge/$SRCPATH/$f $DSTPATH/$f
-    fi
-done
+cp -rp $SRCPATH $DSTPATH
