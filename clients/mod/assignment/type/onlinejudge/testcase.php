@@ -121,7 +121,7 @@ if ($testform->is_cancelled()){
         unset($testcase);
 	}
 
-	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);    
+	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
 
 } else {
 

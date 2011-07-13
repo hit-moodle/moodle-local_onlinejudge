@@ -25,7 +25,7 @@
 
 /**
  * online judge assignment type for online judge 2
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -40,7 +40,7 @@ require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
 
 /**
  * Extends the upload assignment class
- * 
+ *
  * @author Arkaitz Garro, Sunner Sun
  */
 class assignment_onlinejudge extends assignment_upload {
@@ -60,7 +60,7 @@ class assignment_onlinejudge extends assignment_upload {
 
     /**
      * Print the form for this assignment type
-     * 
+     *
      * @param $mform object Allready existant form
      */
     function setup_elements(&$mform ) {
@@ -167,11 +167,11 @@ class assignment_onlinejudge extends assignment_upload {
             // TODO: do not hardcode ideone here. judge should has support_multifile() function
             if ($data['var1'] > 1) {
                 $errors['var1'] = get_string('onefileonlyideone', 'local_onlinejudge');
-            } 
+            }
 
             if (empty($data['ideoneuser'])) {
                 $errors['ideoneuser'] = get_string('ideoneuserrequired', 'local_onlinejudge');
-            } 
+            }
             if (empty($data['ideonepass'])) {
                 $errors['ideonepass'] = get_string('ideoneuserrequired', 'local_onlinejudge');
             } else if (!empty($data['ideoneuser'])) { // test username and password
@@ -237,7 +237,7 @@ class assignment_onlinejudge extends assignment_upload {
      * Deletes a program assignment activity
      *
      * Deletes all database records, files and calendar events for this assignment.
-     * 
+     *
      * @param object $assignment The assignment to be deleted
      * @return boolean False indicates error
      */
@@ -333,7 +333,7 @@ class assignment_onlinejudge extends assignment_upload {
 
     /**
      * Print a link to student submitted file.
-     * 
+     *
      * @param int $userid User Id
      * @param boolean $return Return the link or print it directly
      */
@@ -544,7 +544,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         if($return)
             return $output;
-            
+
         echo $output;
     }
 
@@ -604,7 +604,7 @@ class assignment_onlinejudge extends assignment_upload {
                 ON s.testcase = t.id
                 WHERE s.submission = ? AND s.latest = 1
                 ORDER BY t.sortorder ASC';
-        $onlinejudges = $DB->get_records_sql($sql, array($submission->id)); 
+        $onlinejudges = $DB->get_records_sql($sql, array($submission->id));
 
         $cases = array();
         $result->judgetime = 0;
@@ -671,7 +671,7 @@ class assignment_onlinejudge extends assignment_upload {
 
         return $memusage;
     }
-    
+
     /**
      * This function returns an
      * array of possible CPU time (in seconds) in an array
@@ -785,7 +785,7 @@ function onlinejudge_task_judged($task) {
         FROM {assignment_submissions} s LEFT JOIN {assignment_oj_submissions} o
         ON s.id = o.submission
         WHERE o.task = ?';
-    $submission = $DB->get_record_sql($sql, array($task->id)); 
+    $submission = $DB->get_record_sql($sql, array($task->id));
 
     $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
     $ass = new assignment_onlinejudge($cm->id, NULL, $cm);
@@ -795,7 +795,7 @@ function onlinejudge_task_judged($task) {
         ON s.testcase = t.id
         WHERE s.submission = ? AND s.latest = 1
         ORDER BY t.sortorder ASC';
-    $onlinejudges = $DB->get_records_sql($sql, array($submission->id)); 
+    $onlinejudges = $DB->get_records_sql($sql, array($submission->id));
 
     // update grade after the last task is judged
     if ($task->id == end($onlinejudges)->task) {

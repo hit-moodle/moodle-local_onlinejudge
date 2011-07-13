@@ -1,4 +1,4 @@
-<?php  
+<?php
 
 require_once($CFG->dirroot.'/mod/assignment/lib.php');
 require_once($CFG->dirroot.'/mod/assignment/type/onlinejudge/assignment.class.php');
@@ -12,4 +12,3 @@ $settings->add(new admin_setting_configselect('assignment_oj_max_mem', get_strin
                                              get_string('configmaxmem', 'assignment_onlinejudge'), ASSIGNMENT_ONLINEJUDGE_MAX_MEM,
                                              assignment_onlinejudge::get_max_memory_usages(ASSIGNMENT_ONLINEJUDGE_MAX_MEM)));
 
-?>

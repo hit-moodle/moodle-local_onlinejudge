@@ -51,7 +51,7 @@ if ( $confirm == 1 && confirm_sesskey()){
     $assignmentinstance->view_header();
     echo $OUTPUT->heading(get_string('rejudgeall', 'assignment_onlinejudge'));
     echo $OUTPUT->confirm(get_string('rejudgeallnotice', 'assignment_onlinejudge'), new moodle_url('rejudge.php', $optionsyes),new moodle_url( '../../view.php', $optionsno));
-} 
+}
 
 $assignmentinstance->view_footer();
 

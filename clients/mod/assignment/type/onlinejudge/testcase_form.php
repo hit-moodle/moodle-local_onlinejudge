@@ -47,7 +47,7 @@ class testcase_form extends moodleform {
 	function definition() {
 		global $CFG, $COURSE,$cm,$id;
 
-		$mform =& $this->_form; // Don't forget the underscore! 
+		$mform =& $this->_form; // Don't forget the underscore!
 
 		$repeatarray = array();
 		$repeatarray[] = &$mform->createElement('header', 'testcases', get_string('testcases', 'assignment_onlinejudge').'{no}');
@@ -96,3 +96,4 @@ class testcase_form extends moodleform {
 		$mform->closeHeaderBefore('buttonar');
 	}
 }
+
