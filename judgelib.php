@@ -233,7 +233,7 @@ function onlinejudge_get_language_name($language) {
  */
 function onlinejudge_get_compiler_info($language) {
     $judgeclasses = onlinejudge_get_judge_classes();
-    $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
+    $judgeclass = 'judge_'.onlinejudge_judge_name($language);
     return $judgeclass::get_compiler_info($language);
 }
 
@@ -261,7 +261,7 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
     $task->language = $language;
     $task->component = $component;
 
-    $judgeclass = 'judge_'.substr($language, strrpos($language, '_')+1);
+    $judgeclass = 'judge_'.onlinejudge_judge_name($language);
     $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
@@ -312,7 +312,7 @@ function onlinejudge_judge($taskorid) {
 
     $task->judgetime = time();
 
-    $judgeclass = 'judge_'.substr($task->language, strrpos($task->language, '_')+1);
+    $judgeclass = 'judge_'.onlinejudge_judge_name($task->language);
     $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
@@ -392,3 +392,9 @@ function onlinejudge_get_judge_classes() {
     return $judgeclasses;
 }
 
+/**
+ * Parse judge engine name from language
+ */
+function onlinejudge_judge_name($language) {
+    return  substr($language, strrpos($language, '_')+1);
+}
