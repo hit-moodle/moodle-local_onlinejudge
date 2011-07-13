@@ -74,6 +74,7 @@ $string['output'] = '输出';
 $string['output_help'] = '输出数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。';
 $string['outputfile'] = '输出文件';
 $string['outputfile_help'] = '此文件中的数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。如果此文件不可读，这条测试用例会被忽略。';
+$string['pluginname'] = '在线评测';
 $string['ratiope'] = '格式错误得分比例';
 $string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例
 

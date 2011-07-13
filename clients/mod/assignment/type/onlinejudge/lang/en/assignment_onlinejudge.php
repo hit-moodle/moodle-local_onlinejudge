@@ -25,7 +25,7 @@
 
 /**
  * Strings for Online Judge Assignment Type
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -73,9 +73,10 @@ $string['output'] = 'Output';
 $string['output_help'] = 'The output data will be compared with submissions\' stdout to judge correctness.';
 $string['outputfile'] = 'Output file';
 $string['outputfile_help'] = 'The data in the file will be compared submissions\' stdout to judge correctness. If the file is missing, the testcase will be skipped.';
+$string['pluginname'] = 'Online Judge';
 $string['ratiope'] = 'Ratio for presentation error';
 $string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s max grade times this ratio.
-  
+
 Presentation error means the data outputted by the program is correct, but the seperators between each data tokens are mismatched with testcases. It is usually caused by extra white spaces or line breaks. If you want to be strict, set it to 0% and a presentation error will worth zero. If you don\'t mind such trival issues, set it to 100% and a presentation error will be equivalent to an accepted.';
 $string['readytojudge'] = 'Ready to be judged';
 $string['rejudgeall'] = 'Rejudge all';
