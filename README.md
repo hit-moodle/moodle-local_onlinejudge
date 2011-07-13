@@ -87,7 +87,7 @@ In Windows
 2. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
 3. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
 4. Put `onlinejudge` into `MOODLE_PATH\local\`
-5. Enter folder `MOODLE_PATH\local\onlinejudge\` and run `install_assignment_type`
+5. Enter folder `MOODLE_PATH\local\onlinejudge\` and run `install_assignment_type.bat`
 6. Login your site as admin and the plugins will be installed/upgraded.
 7. `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php`
 
