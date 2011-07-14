@@ -2,8 +2,9 @@
 
 rem Copy all files in %SRCPATH% to %DSTPATH%
 
-set SRCPATH="clients\mod\assignment\type\onlinejudge"
-set DSTPATH="..\..\mod\assignment\type\onlinejudge"
+set SCRIPTPATH="%~dp0"
+set SRCPATH="%SCRIPTPATH%..\clients\mod\assignment\type\onlinejudge"
+set DSTPATH="%SCRIPTPATH%..\..\..\mod\assignment\type\onlinejudge" 
 
 if exist %DSTPATH% rmdir /S /Q %DSTPATH%
 mkdir %DSTPATH%

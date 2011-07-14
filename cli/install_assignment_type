@@ -2,8 +2,9 @@
 
 # Copy all files in $SRCPATH to $DSTPATH
 
-SRCPATH="clients/mod/assignment/type/onlinejudge/"
-DSTPATH="../../mod/assignment/type/onlinejudge"
+SCRIPTPATH=`dirname $0`
+SRCPATH="$SCRIPTPATH/../clients/mod/assignment/type/onlinejudge/"
+DSTPATH="$SCRIPTPATH/../../../mod/assignment/type/onlinejudge"
 
 if [ -e $DSTPATH ]; then
     rm -rf $DSTPATH
