@@ -74,7 +74,7 @@ On Linux
 1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove it.
 2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH/local/`
-4. `cd MOODLE_PATH/local/onlinejudge && ./install_assignment_type`
+4. `cd MOODLE_PATH/local/onlinejudge && ./cli/install_assignment_type`
 5. Login your site as admin and the plugins will be installed/upgraded.
 6. `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`
 7. If you want to use sandbox judge engine, then
@@ -87,9 +87,9 @@ On Windows
 2. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
 3. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
 4. Put `onlinejudge` into `MOODLE_PATH\local\`
-5. Enter folder `MOODLE_PATH\local\onlinejudge\` and run `install_assignment_type.bat`
+5. Enter folder `MOODLE_PATH\local\onlinejudge\` and run `cli\install_assignment_type.bat`
 6. Login your site as admin and the plugins will be installed/upgraded.
-7. `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php`
+7. `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`
 
 Usage
 =====
