@@ -410,3 +410,17 @@ function onlinejudge_get_judge_classes() {
 function onlinejudge_judge_name($language) {
     return  substr($language, strrpos($language, '_')+1);
 }
+
+/**
+ * Delete related records
+ *
+ * @param int $cmid
+ */
+function onlinejudge_delete_coursemodule($cmid) {
+    global $DB;
+
+    // Mark them as deleted only and keep the statistics.
+    // Delete them really in cron
+    return $DB->set_field('onlinejudge_tasks', 'deleted', 1, array('cmid' => $cmid));
+}
+
