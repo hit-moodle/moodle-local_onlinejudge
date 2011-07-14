@@ -815,6 +815,7 @@ function onlinejudge_task_judged($task) {
         $submission->grade = $finalgrade;
         $submission->timemarked = time();
         $submission->mailed = 1; // do not notify student by mail
+        $submission->teacher = get_admin()->id;
         $DB->update_record('assignment_submissions', $submission);
         $ass->update_grade($submission);
 
