@@ -112,11 +112,11 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->course_module = $this->task->get_moduleid();
+        $data->cmid = $this->task->get_moduleid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('onlinejudge2_tasks', $data);
-        $this->set_mapping($this->get_namefor('tasks'), $oldid, $newitemid);
+        $newitemid = $DB->insert_record('onlinejudge_tasks', $data);
+        $this->set_mapping($this->get_namefor('task'), $oldid, $newitemid);
     }
 
     /**
@@ -129,7 +129,7 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
 
         $data->testcase = $this->get_mappingid($this->get_namefor('testcase'), $data->testcase);
         $data->task = $this->get_mappingid($this->get_namefor('task'), $data->task);
-        $data->submission = $this->get_new_parentid('submission');
+        $data->submission = $this->get_mappingid('assignment_submission', $data->submission);
 
         $DB->insert_record('assignment_oj_submissions', $data);
     }

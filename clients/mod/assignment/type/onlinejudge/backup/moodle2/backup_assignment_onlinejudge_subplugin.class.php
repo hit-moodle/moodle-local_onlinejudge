@@ -99,8 +99,16 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
         // type of the subplugin, name of the subplugin and name of the connection point (recommended)
         $asssuboff = new backup_nested_element($this->get_recommended_name());
         // onlinejudge assignment type does not copy task details. So must backup from local onlinejudge
-        $task = new backup_nested_element('task', array('id'), array('userid', 'language'  /* TODO: fill up*/));
-        $oj_submissions = new backup_nested_element('onlinejudge_submission', array('id'), array('testcase', 'task', 'latest'));
+        $task = new backup_nested_element(
+            'task',
+            array('id'),
+            array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output',
+                  'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput',
+                  'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime',
+                  'var1', 'var2', 'var3', 'var4', 'deleted'
+            )
+        );
+        $oj_submissions = new backup_nested_element('onlinejudge_submission', array('id'), array('submission', 'testcase', 'task', 'latest'));
 
         $subplugin->add_child($asssuboff);
         $asssuboff->add_child($task);
@@ -108,8 +116,8 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
 
         $task->set_source_sql('
             SELECT *
-            FROM {onlinejudge2_tasks}
-            WHERE coursemodule = ?',
+            FROM {onlinejudge_tasks}
+            WHERE cmid = ?',
             array(backup::VAR_MODID));
         $oj_submissions->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
 
@@ -118,3 +126,4 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
         return $subplugin; // And we return the root subplugin element
     }
 }
+
