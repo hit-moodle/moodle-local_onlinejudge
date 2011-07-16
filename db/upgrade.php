@@ -36,7 +36,8 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
     global $CFG, $DB, $OUTPUT;
 
     $dbman = $DB->get_manager();
-    $result = true;
 
-    return $result;
+    echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');
+
+    return true;
 }

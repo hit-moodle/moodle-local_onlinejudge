@@ -99,4 +99,5 @@ $string['status23'] = 'Multi-status';
 $string['status255'] = 'Unsubmitted';
 $string['stderr'] = 'Standard error output';
 $string['stdout'] = 'Standard output';
+$string['upgradenotify'] = 'Do NOT forget to execute cli/install_assignment_type and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
 
