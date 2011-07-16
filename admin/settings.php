@@ -50,14 +50,14 @@ if (!empty($fromform) and confirm_sesskey()) {
     set_config('maxmemlimit', $fromform->maxmemlimit*1024*1024, 'local_onlinejudge');
     set_config('maxcpulimit', $fromform->maxcpulimit, 'local_onlinejudge');
     set_config('ideonedelay', $fromform->ideonedelay, 'local_onlinejudge');
+    set_config('defaultlanguage', $fromform->defaultlanguage, 'local_onlinejudge');
 
     //display confirmation
     echo $OUTPUT->notification(get_string('settingsupdated', 'local_onlinejudge'), 'notifysuccess');
     $ojsettingsform->display();
 } else {
-    $data->maxmemlimit = get_config('local_onlinejudge', 'maxmemlimit')/1024/1024;
-    $data->maxcpulimit = get_config('local_onlinejudge', 'maxcpulimit');
-    $data->ideonedelay = get_config('local_onlinejudge', 'ideonedelay');
+    $data = get_config('local_onlinejudge');
+    $data->maxmemlimit /= 1024*1024;
     $ojsettingsform->set_data($data);
     $ojsettingsform->display();
 }

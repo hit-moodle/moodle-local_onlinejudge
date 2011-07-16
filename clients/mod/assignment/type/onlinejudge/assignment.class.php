@@ -100,8 +100,6 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->setDefault('emailteachers', 0);
 
         // Get existing onlinejudge settings
-        $cm = null;
-        $onlinejudge = null;
         $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
             $cm = $DB->get_record('course_modules', array('id' => $update));
@@ -112,43 +110,42 @@ class assignment_onlinejudge extends assignment_upload {
         unset($choices);
         $choices = onlinejudge_get_languages();
         $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignment_onlinejudge'), $choices);
-        /// TODO: Set global default language
-        $mform->setDefault('language', $onlinejudge ? $onlinejudge->language : 'c');
+        $mform->setDefault('language', isset($onlinejudge) ? $onlinejudge->language : get_config('local_onlinejudge', 'defaultlanguage'));
 
         // Presentation error grade ratio
         unset($choices);
         $choices = get_grade_options()->gradeoptions; // Steal from question lib
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignment_onlinejudge'), $choices);
         $mform->addHelpButton('ratiope', 'ratiope', 'assignment_onlinejudge');
-        $mform->setDefault('ratiope', $onlinejudge ? $onlinejudge->ratiope : 0);
+        $mform->setDefault('ratiope', isset($onlinejudge) ? $onlinejudge->ratiope : 0);
         $mform->setAdvanced('ratiope');
 
         // Max. CPU time
         unset($choices);
         $choices = $this->get_max_cpu_times();
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('cpulimit', $onlinejudge ? $onlinejudge->cpulimit : 1);
+        $mform->setDefault('cpulimit', isset($onlinejudge) ? $onlinejudge->cpulimit : 1);
 
         // Max. memory usage
         unset($choices);
         $choices = $this->get_max_memory_usages();
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignment_onlinejudge'), $choices);
-        $mform->setDefault('memlimit', $onlinejudge ? $onlinejudge->memlimit : 1048576);
+        $mform->setDefault('memlimit', isset($onlinejudge) ? $onlinejudge->memlimit : 1048576);
 
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignment_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compileonly', 'compileonly', 'assignment_onlinejudge');
-        $mform->setDefault('compileonly', $onlinejudge ? $onlinejudge->compileonly : 0);
+        $mform->setDefault('compileonly', isset($onlinejudge) ? $onlinejudge->compileonly : 0);
         $mform->setAdvanced('compileonly');
 
         //ideone.com
         $mform->addElement('text', 'ideoneuser', get_string('ideoneuser', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideoneuser', 'ideoneuser', 'assignment_onlinejudge');
         $mform->setType('ideoneuser', PARAM_ALPHANUMEXT);
-        $mform->setDefault('ideoneuser', $onlinejudge ? $onlinejudge->ideoneuser : '');
+        $mform->setDefault('ideoneuser', isset($onlinejudge) ? $onlinejudge->ideoneuser : '');
         $mform->addElement('password', 'ideonepass', get_string('ideonepass', 'assignment_onlinejudge'), array('size' => 20));
         $mform->addHelpButton('ideonepass', 'ideonepass', 'assignment_onlinejudge');
-        $mform->setDefault('ideonepass', $onlinejudge ? $onlinejudge->ideonepass : '');
+        $mform->setDefault('ideonepass', isset($onlinejudge) ? $onlinejudge->ideonepass : '');
 
         $course_context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);

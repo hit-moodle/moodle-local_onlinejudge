@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
 /**
  * This form displays global settings
@@ -65,6 +66,9 @@ class onlinejudge_settings_form extends moodleform {
         $mform->addRule('ideonedelay', null, 'numeric', null, 'client');
         $mform->setType('ideonedelay', PARAM_NUMBER);
         $mform->setDefault('ideonedelay', 5);
+
+        $choices = onlinejudge_get_languages();
+        $mform->addElement('select', 'defaultlanguage', get_string('defaultlanguage', 'local_onlinejudge'), $choices);
 
         $this->add_action_buttons(false, get_string('update'));
     }
