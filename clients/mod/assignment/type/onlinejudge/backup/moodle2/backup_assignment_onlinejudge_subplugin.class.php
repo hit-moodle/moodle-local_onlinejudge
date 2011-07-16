@@ -88,8 +88,6 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
 
     /**
      * Returns the subplugin information to attach at submission element
-     *
-     * TODO: the function is not tested fully
      */
     protected function define_submission_subplugin_structure() {
 

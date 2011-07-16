@@ -42,8 +42,6 @@ $fromform = $ojsettingsform->get_data();
 
 echo $OUTPUT->header();
 
-// TODO: check environments
-
 if (!empty($fromform) and confirm_sesskey()) {
 
     //Save settings
