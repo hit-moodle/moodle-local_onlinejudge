@@ -40,7 +40,7 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2010070400) {
-        echo 'You MUST upgrade to the latest onlinejudge for moodle 1.9.x first. Download it from https://github.com/hit-moodle/onlinejudge';
+        $OUTPUT->notification('You MUST upgrade to the latest onlinejudge for moodle 1.9.x in moodle 1.9.x first. Download it from https://github.com/hit-moodle/onlinejudge');
         return false;
     }
 
