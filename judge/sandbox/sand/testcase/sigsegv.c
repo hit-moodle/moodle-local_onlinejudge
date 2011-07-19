@@ -1,9 +1,6 @@
+#include <stdio.h>
+
 int main(void)
 {
-    int *p = 0;
-
-    while (1)
-        *(p++) = 0;
-
-    return 0;
+    return *(volatile int*)0; // address 0 must be unexecutable
 }

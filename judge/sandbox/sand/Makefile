@@ -103,7 +103,7 @@ cpulimit_test: testcase/cpulimit.c
 	$(CC) $(CCFLAGS) --static -o $@ $+
 
 sigsegv: sigsegv_test sand
-	./runtest.sh 6 $<
+	./runtest.sh 6 $< > /dev/null
 
 sigsegv_test: testcase/sigsegv.c
 	$(CC) $(CCFLAGS) --static -o $@ $+

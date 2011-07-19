@@ -188,7 +188,7 @@ proc_probe(pid_t pid, int opt, proc_t * const pproc)
         
     /* Must be the parent process in order to probe registers and floating point
        registers; and the status of target process must be 'T' (aka traced) */
-    if ((pproc->ppid != getpid()) || (pproc->state != 'T'))
+    if ((pproc->ppid != getpid()) || ((pproc->state != 'T') && (pproc->state != 't')))
     {
         FUNC_RET((opt == PROBE_STAT), "proc_probe()");
     }
