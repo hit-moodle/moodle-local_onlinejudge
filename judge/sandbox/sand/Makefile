@@ -63,7 +63,7 @@ sand.o: sand.c
 policy_print.o: policy_print.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy_print.c
 
-test: stdin stdout fork open memlimit cpulimit sigsegv return1
+test: stdin stdout fork open memlimit cpulimit sigsegv return1 interclean
 	@echo All testcases are OK
 
 stdin: stdin_test sand
