@@ -1,7 +1,7 @@
 ################################################################################
 # The Sandbox Libraries Makefile                                               #
 #                                                                              #
-# Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                      #
+# Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                      #
 # All rights reserved.                                                         #
 #                                                                              #
 # Redistribution and use in source and binary forms, with or without           #
@@ -33,9 +33,10 @@
 
 # initialization
 CC = cc
-CCFLAGS = -Wall -ansi -std=gnu99 -g0 -O3 -shared -fPIC -pthread 
+CCFLAGS = -m32 -Wall -ansi -std=gnu99 -g0 -O3 -shared -fPIC -pthread 
 CCINCS = -I src
-CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
+CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITH_NATIVE_MONITOR \
+         -D WITHOUT_TSC_COUNTER
 AR = ar
 ARFLAGS = rcvs
 AWK = gawk
@@ -48,8 +49,8 @@ INSTALL = install -D
 
 # buid sources and targets
 LIBRARY = sandbox
-VERSION = 0.2.14
-RELEASE = 2
+VERSION = 0.2.17
+RELEASE = 1
 $(LIBRARY)_hdr = src/platform.h src/sandbox.h src/symbols.h
 $(LIBRARY)_src = $($(LIBRARY)_hdr:.h=.c)
 $(LIBRARY)_obj = $($(LIBRARY)_src:.c=.o)

@@ -1,7 +1,7 @@
 ################################################################################
 # Sandbox Library Source File (symbols.c) Generator Script                     #
 #                                                                              #
-# Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                      #
+# Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                      #
 # All rights reserved.                                                         #
 #                                                                              #
 # Redistribution and use in source and binary forms, with or without           #
@@ -33,7 +33,7 @@
 
 BEGIN {
     print "/*******************************************************************************"
-    print " * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *"
+    print " * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *"
     print " * All rights reserved.                                                        *"
     print " *                                                                             *"
     print " * Redistribution and use in source and binary forms, with or without          *"

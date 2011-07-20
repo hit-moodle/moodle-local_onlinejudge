@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2004-2007 LIU Yu, pineapple.liu@gmail.com                     *
+ * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *
  * All rights reserved.                                                        *
  *                                                                             *
  * Redistribution and use in source and binary forms, with or without          *
@@ -33,8 +33,6 @@
  */
 
 #include "symbols.h"
-
-//#ifndef NDEBUG
 
 const char *
 s_event_type_name(int event)
@@ -94,5 +92,3 @@ s_result_name(int result)
     };
     return table[result];
 }
-
-//#endif /* !defined NDEBUG */
