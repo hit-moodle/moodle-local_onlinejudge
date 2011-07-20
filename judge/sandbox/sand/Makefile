@@ -37,7 +37,7 @@ CCFLAGS = -m32 -Wall -ansi -std=gnu99 -g0 -O3
 CCINCS = -I ./libsandbox/src
 CCDEFS = -D SANDBOX -D NDEBUG -D WITH_NATIVE_TRACER -D WITHOUT_TSC_COUNTER
 
-all: test
+all: test interclean
 
 libsandbox: FORCE
 	$(MAKE) -C libsandbox libsandbox.a
@@ -59,11 +59,11 @@ detector: libsandbox policy_print.o sand.o
 
 sand.o: sand.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c sand.c
-    
+
 policy_print.o: policy_print.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy_print.c
 
-test: stdin stdout fork open memlimit cpulimit sigsegv return1 interclean
+test: stdin stdout fork open memlimit cpulimit sigsegv return1
 	@echo All testcases are OK
 
 stdin: stdin_test sand
@@ -74,7 +74,7 @@ stdin_test: testcase/stdin.c
 
 stdout: stdout_test sand
 	./runtest.sh 1 $< > /dev/null
-	 
+
 stdout_test: testcase/stdout.c
 	$(CC) $(CCFLAGS) --static -o $@ $+
 
