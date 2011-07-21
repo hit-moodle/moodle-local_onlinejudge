@@ -99,6 +99,9 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addHelpButton('emailteachers', 'emailteachers', 'assignment');
         $mform->setDefault('emailteachers', 0);
 
+        // force to show request grading button
+        $mform->addElement('hidden', 'var4', 1);
+
         // Get existing onlinejudge settings
         $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
