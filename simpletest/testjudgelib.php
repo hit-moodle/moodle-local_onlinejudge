@@ -41,7 +41,7 @@ require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php'); // Include here
 
 // A secret file to store ideone username and password. It should contains:
 //
-// <?
+// <?php
 // define('ideoneuser', 'username');
 // define('ideonepass', 'api_password');
 require_once('ideone_secret.php');
