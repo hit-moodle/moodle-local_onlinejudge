@@ -45,8 +45,6 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2011060301) {
-        global $DB;
-
         // Allow upload one file
         $DB->set_field('assignment', 'var1', 1, array('assignmenttype' => 'onlinejudge'));
 
@@ -110,8 +108,6 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2011060500) {
-        global $DB;
-
         // Set var4 to 1 which makes the new onlinejudge work
         $sql = 'UPDATE {assignment}
                 SET var4 = \'1\'
