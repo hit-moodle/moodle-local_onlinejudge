@@ -394,7 +394,10 @@ class assignment_onlinejudge extends assignment_upload {
 
         $submission = $this->get_submission($USER->id);
 
-        if ($this->isopen() and $this->can_finalize($submission)) {
+        $tests = $this->get_testcases();
+        if (empty($tests)) {
+            echo $OUTPUT->heading(get_string('notestcases','assignment_onlinejudge'), 3);
+        } else if ($this->isopen() and $this->can_finalize($submission)) {
             //print final submit button
             echo $OUTPUT->heading(get_string('readytojudge','assignment_onlinejudge'), 3);
             echo '<div style="text-align:center">';

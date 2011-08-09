@@ -68,6 +68,7 @@ $string['maxcpuusage'] = 'Maximum CPU usage';
 $string['maximumfilesize'] = 'Maximum source file size';
 $string['maxmemusage'] = 'Maximum memory usage';
 $string['memlimit'] = 'Maximum memory usage';
+$string['notestcases'] = 'No defined testcases';
 $string['onlinejudgeinfo'] = 'Online Judge Information';
 $string['output'] = 'Output';
 $string['output_help'] = 'The output data will be compared with submissions\' stdout to judge correctness.';
