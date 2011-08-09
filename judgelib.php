@@ -342,11 +342,11 @@ function onlinejudge_judge($taskorid) {
         $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
         $task->infostudent = $e->getMessage();
         $DB->update_record('onlinejudge_tasks', $task);
+        events_trigger('onlinejudge_task_judged', $task);
         throw $e;
     }
 
     $DB->update_record('onlinejudge_tasks', $task);
-
     events_trigger('onlinejudge_task_judged', $task);
 
     return $task;
