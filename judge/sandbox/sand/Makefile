@@ -43,7 +43,7 @@ libsandbox: FORCE
 	$(MAKE) -C libsandbox libsandbox.a
 
 sand: policy.o sand.o libsandbox
-	$(CC) $(CCFLAGS) $(CCDEFS) -D POLICY3 $(CCINCS)  -o sand sand.o policy.o ./libsandbox/libsandbox.a
+	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS)  -o sand sand.o policy.o ./libsandbox/libsandbox.a
 
 policy.o: policy.c
 	$(CC) $(CCFLAGS) $(CCDEFS) $(CCINCS) -c policy.c
