@@ -54,7 +54,7 @@ class assignment_onlinejudge extends assignment_upload {
         $this->type = 'onlinejudge';
 
         if (isset($this->assignment->id)) {
-            $this->onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->id));
+            $this->onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->id), '*', MUST_EXIST);
         }
     }
 
@@ -105,7 +105,7 @@ class assignment_onlinejudge extends assignment_upload {
         // Get existing onlinejudge settings
         $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
-            $cm = $DB->get_record('course_modules', array('id' => $update));
+            $cm = $DB->get_record('course_modules', array('id' => $update), '*', MUST_EXIST);
             $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $cm->instance));
         }
 
@@ -708,7 +708,7 @@ class assignment_onlinejudge extends assignment_upload {
     function request_judge($submission) {
         global $DB;
 
-        $oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
+        $oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment), '*', MUST_EXIST);
 
         $source = array();
         $fs = get_file_storage();
@@ -788,7 +788,7 @@ function onlinejudge_task_judged($task) {
         FROM {assignment_submissions} s LEFT JOIN {assignment_oj_submissions} o
         ON s.id = o.submission
         WHERE o.task = ?';
-    $submission = $DB->get_record_sql($sql, array($task->id));
+    $submission = $DB->get_record_sql($sql, array($task->id), MUST_EXIST);
 
     $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
     $ass = new assignment_onlinejudge($cm->id, NULL, $cm);
