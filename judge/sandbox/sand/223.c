@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define HEAP_ALLOC_SIZE     (1024 * 1024 * 1024)    /* 1GB */
+#define HEAP_ALLOC_SIZE     (1024 * 1024 * 64)    /* 64MB */
 
 int main(void)
 {
