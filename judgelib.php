@@ -183,7 +183,7 @@ class judge_base{
 
         $tmpdir = "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
         if (!check_dir_exists($tmpdir)) {
-            throw new moodle_exception('errorcreatingdirectory', '', '', $path);
+            throw new moodle_exception('errorcreatingdirectory', '', '', $tmpdir);
         }
 
         return $tmpdir;
