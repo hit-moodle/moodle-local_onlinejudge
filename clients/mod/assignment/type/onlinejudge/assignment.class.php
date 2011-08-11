@@ -371,27 +371,6 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
-     * Print the request grade button
-     *
-     * This function is forked from upload type. Keep syncing if necessary
-     */
-    function view_final_submission() {
-        global $CFG, $USER, $OUTPUT;
-
-        $submission = $this->get_submission($USER->id);
-
-        $tests = $this->get_testcases();
-        if (empty($tests)) {
-            echo $OUTPUT->heading(get_string('notestcases','assignment_onlinejudge'), 3);
-        } else if (!$this->isopen()) {
-            echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
-
-        } else {
-            //no submission yet
-        }
-    }
-
-    /**
      * Forked from upload. Don't forget to keep sync
      */
     function view_upload_form() {
@@ -399,7 +378,10 @@ class assignment_onlinejudge extends assignment_upload {
 
         $submission = $this->get_submission($USER->id);
 
-        if ($this->can_upload_file($submission)) {
+        $tests = $this->get_testcases();
+        if (empty($tests)) {
+            echo $OUTPUT->heading(get_string('notestcases','assignment_onlinejudge'), 3);
+        } else if ($this->can_upload_file($submission)) {
             $fs = get_file_storage();
             // edit files in another page
             if ($submission) {
