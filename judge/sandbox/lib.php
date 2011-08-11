@@ -60,7 +60,7 @@ class judge_sandbox extends judge_base {
     	global $CFG;
 
         $search = array('%SOURCE%', '%DEST%');
-        $replace = array(implode(' ', $files), $this->get_temp_dir().'/a.out');
+        $replace = array('"'.implode('" "', $files).'"', '"'.$this->get_temp_dir().'/a.out"');
         // construct compiler command
         $command = str_replace($search, $replace, self::$supported_languages[$this->language]);
 
