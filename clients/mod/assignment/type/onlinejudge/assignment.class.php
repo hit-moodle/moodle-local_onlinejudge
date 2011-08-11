@@ -99,9 +99,6 @@ class assignment_onlinejudge extends assignment_upload {
         $mform->addHelpButton('emailteachers', 'emailteachers', 'assignment');
         $mform->setDefault('emailteachers', 0);
 
-        // force to show request grading button
-        $mform->addElement('hidden', 'var4', 1);
-
         // Get existing onlinejudge settings
         $update = optional_param('update', 0, PARAM_INT);
         if (!empty($update)) {
@@ -363,18 +360,7 @@ class assignment_onlinejudge extends assignment_upload {
     function print_user_files($userid=0, $return=false) {
         $output = parent::print_user_files($userid, true);
 
-        $patterns = array();
-        $replacements = array();
-
         // TODO: Syntax Highlighert source code link
-
-        // Replace upload strings with onlinejudge strings
-        $patterns[] = '/<input type="submit" name="unfinalize" .+ \\/><\\/a><\\/span>/';
-        $replacements[] = get_string('waitingforjudge', 'assignment_onlinejudge');
-        $patterns[] = '/(<input type="submit" name="finalize" value=")[^"]*(" \\/>)/';
-        $replacements[] = '$1'.get_string('forcejudge', 'assignment_onlinejudge').'$2';
-
-        $output = preg_replace($patterns, $replacements, $output, 1);
 
         $output .= $this->view_summary($userid);
 
@@ -397,44 +383,95 @@ class assignment_onlinejudge extends assignment_upload {
         $tests = $this->get_testcases();
         if (empty($tests)) {
             echo $OUTPUT->heading(get_string('notestcases','assignment_onlinejudge'), 3);
-        } else if ($this->isopen() and $this->can_finalize($submission)) {
-            //print final submit button
-            echo $OUTPUT->heading(get_string('readytojudge','assignment_onlinejudge'), 3);
-            echo '<div style="text-align:center">';
-            echo '<form method="post" action="upload.php">';
-            echo '<fieldset class="invisiblefieldset">';
-            echo '<input type="hidden" name="id" value="'.$this->cm->id.'" />';
-            echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-            echo '<input type="hidden" name="action" value="finalize" />';
-            echo '<input type="hidden" name="confirm" value="1" />';
-            echo '<input type="submit" name="formarking" value="'.get_string('requestjudge', 'assignment_onlinejudge').'" />';
-            echo '</fieldset>';
-            echo '</form>';
-            echo '</div>';
         } else if (!$this->isopen()) {
             echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
 
-        } else if ($this->drafts_tracked() and $state = $this->is_finalized($submission)) {
-            if ($state == ASSIGNMENT_STATUS_SUBMITTED) {
-                echo $OUTPUT->heading(get_string('waitingforjudge','assignment_onlinejudge'), 3);
-            } else {
-                echo $OUTPUT->heading(get_string('nomoresubmissions','assignment'), 3);
-            }
         } else {
             //no submission yet
         }
     }
 
-    function finalize($forcemode=null) {
-        global $USER, $DB, $OUTPUT;
-        $userid = optional_param('userid', $USER->id, PARAM_INT);
-        $submission = $this->get_submission($userid);
+    /**
+     * Forked from upload. Don't forget to keep sync
+     */
+    function view_upload_form() {
+        global $CFG, $USER, $OUTPUT;
 
-        if ($this->can_finalize($submission)) {
-            $this->request_judge($submission);
+        $submission = $this->get_submission($USER->id);
+
+        if ($this->can_upload_file($submission)) {
+            $fs = get_file_storage();
+            // edit files in another page
+            if ($submission) {
+                if ($files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, "timemodified", false)) {
+                    $str = get_string('editthesefiles', 'assignment');
+                } else {
+                    $str = get_string('uploadfiles', 'assignment');
+                }
+            } else {
+                $str = get_string('uploadfiles', 'assignment');
+            }
+            echo $OUTPUT->single_button(new moodle_url('/mod/assignment/type/onlinejudge/upload.php', array('contextid'=>$this->context->id, 'userid'=>$USER->id)), $str, 'get');
+        }
+    }
+
+    /**
+     * Forked from upload. Don't forget to keep sync
+     */
+    function upload_file($mform, $options) {
+        global $CFG, $USER, $DB, $OUTPUT;
+
+        $returnurl  = new moodle_url('/mod/assignment/view.php', array('id'=>$this->cm->id));
+        $submission = $this->get_submission($USER->id);
+
+        if (!$this->can_upload_file($submission)) {
+            $this->view_header(get_string('upload'));
+            echo $OUTPUT->notification(get_string('uploaderror', 'assignment'));
+            echo $OUTPUT->continue_button($returnurl);
+            $this->view_footer();
+            die;
         }
 
-        parent::finalize($forcemode);
+        if ($formdata = $mform->get_data()) {
+            $fs = get_file_storage();
+            $submission = $this->get_submission($USER->id, true); //create new submission if needed
+            $fs->delete_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id);
+            $formdata = file_postupdate_standard_filemanager($formdata, 'files', $options, $this->context, 'mod_assignment', 'submission', $submission->id);
+            $updates = new stdClass();
+            $updates->id = $submission->id;
+            $updates->timemodified = time();
+            $DB->update_record('assignment_submissions', $updates);
+            add_to_log($this->course->id, 'assignment', 'upload',
+                    'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
+            $this->update_grade($submission);
+            if (!$this->drafts_tracked()) {
+                $this->email_teachers($submission);
+            }
+
+            $this->request_judge($submission);
+
+            // send files to event system
+            $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id);
+            // Let Moodle know that assessable files were  uploaded (eg for plagiarism detection)
+            $eventdata = new stdClass();
+            $eventdata->modulename   = 'assignment';
+            $eventdata->cmid         = $this->cm->id;
+            $eventdata->itemid       = $submission->id;
+            $eventdata->courseid     = $this->course->id;
+            $eventdata->userid       = $USER->id;
+            if ($files) {
+                $eventdata->files        = $files;
+            }
+            events_trigger('assessable_file_uploaded', $eventdata);
+            $returnurl  = new moodle_url('/mod/assignment/view.php', array('id'=>$this->cm->id));
+            redirect($returnurl);
+        }
+
+        $this->view_header(get_string('upload'));
+        echo $OUTPUT->notification(get_string('uploaderror', 'assignment'));
+        echo $OUTPUT->continue_button($returnurl);
+        $this->view_footer();
+        die;
     }
 
     /**
@@ -821,12 +858,6 @@ function onlinejudge_task_judged($task) {
         $submission->teacher = get_admin()->id;
         $DB->update_record('assignment_submissions', $submission);
         $ass->update_grade($submission);
-
-        // unfinalize it
-        $updated = new stdClass();
-        $updated->id = $submission->id;
-        $updated->data2 = '';
-        $DB->update_record('assignment_submissions', $updated);
     }
 
     return true;

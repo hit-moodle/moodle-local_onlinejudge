@@ -272,6 +272,17 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011062400, 'assignment', 'onlinejudge');
     }
 
+    if ($oldversion < 2011081100) {
+        // Set var4 to 0 since never using finalize feature
+        $sql = 'UPDATE {assignment}
+                SET var4 = \'0\'
+                WHERE assignmenttype = \'onlinejudge\'';
+        $DB->execute($sql);
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011081100, 'assignment', 'onlinejudge');
+    }
+
     return true;
 }
 
