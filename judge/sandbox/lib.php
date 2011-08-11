@@ -39,10 +39,10 @@ define('SANDBOX_SAND', $CFG->dirroot.'/local/onlinejudge/judge/sandbox/sand/sand
 
 class judge_sandbox extends judge_base {
     protected static $supported_languages = array(
-        'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCE% -lm',
-        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCE% -lm',
-        'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCE% -lm',
-        'cpp_warn2err' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCE% -lm'
+        'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -lm -o %DEST% %SOURCES%',
+        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -lm -o %DEST% %SOURCES%',
+        'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -static -lm -o %DEST% %SOURCES%',
+        'cpp_warn2err' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -lm -o %DEST% %SOURCES%'
     );
 
     static function get_languages() {
@@ -59,7 +59,7 @@ class judge_sandbox extends judge_base {
     protected function compile($files) {
     	global $CFG;
 
-        $search = array('%SOURCE%', '%DEST%');
+        $search = array('%SOURCES%', '%DEST%');
         $replace = array('"'.implode('" "', $files).'"', '"'.$this->get_temp_dir().'/a.out"');
         // construct compiler command
         $command = str_replace($search, $replace, self::$supported_languages[$this->language]);
