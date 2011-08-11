@@ -302,8 +302,6 @@ class assignment_onlinejudge extends assignment_upload {
 
     /**
      * Rejudge all submissions
-     *
-     * @return bool
      */
     function rejudge_all() {
         global $DB;
@@ -312,8 +310,6 @@ class assignment_onlinejudge extends assignment_upload {
         foreach ($submissions as $submission) {
             $this->request_judge($submission);
         }
-
-        return true;
     }
 
     /**
