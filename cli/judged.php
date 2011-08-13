@@ -37,6 +37,9 @@
 
 define('CLI_SCRIPT', true);
 
+// Ensure errors are well explained
+$CFG->debug = DEBUG_NORMAL;
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/clilib.php');      // cli only functions
