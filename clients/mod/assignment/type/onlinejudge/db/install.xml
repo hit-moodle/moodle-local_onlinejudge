@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20110626" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
+<XMLDB PATH="mod/assignment/type/onlinejudge/db" VERSION="20110814" COMMENT="XMLDB file for Moodle mod/assignment/type/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -47,7 +47,7 @@
         <FIELD NAME="usefile" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="output" NEXT="feedback"/>
         <FIELD NAME="feedback" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="usefile" NEXT="subgrade"/>
         <FIELD NAME="subgrade" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="10" COMMENT="How many percent of the full grade can be gotten after passing this testcase" PREVIOUS="feedback" NEXT="sortorder"/>
-        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="subgrade"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="subgrade"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
