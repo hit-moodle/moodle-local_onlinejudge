@@ -37,13 +37,15 @@
 
 define('CLI_SCRIPT', true);
 
-// Ensure errors are well explained
-$CFG->debug = DEBUG_NORMAL;
-
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/clilib.php');      // cli only functions
 require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+
+// Ensure errors are well explained
+if ($CFG->debug < DEBUG_NORMAL) {
+    $CFG->debug = DEBUG_NORMAL;
+}
 
 // now get cli options
 $longoptions  = array('help'=>false, 'nodaemon'=>false, 'once'=>false, 'verbose'=>false);
