@@ -77,7 +77,7 @@ class judge_sandbox extends judge_base {
             $this->task->status = ONLINEJUDGE_STATUS_COMPILATION_OK;
         }
 
-        return $replace[1];
+        return trim($replace[1], '"');
     }
 
     /**
@@ -118,7 +118,7 @@ class judge_sandbox extends judge_base {
             throw new onlinejudge_exception('cannotrunsand');
         }
 
-        $sand .= ' -l cpu='.(($this->task->cpulimit)*1000).' -l memory='.$this->task->memlimit.' -l disk=512000 '.$binfile;
+        $sand .= ' -l cpu='.(($this->task->cpulimit)*1000).' -l memory='.$this->task->memlimit.' -l disk=512000 "'.$binfile.'"';
 
         // run it in sandbox!
         $descriptorspec = array(
