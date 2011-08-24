@@ -356,7 +356,7 @@ class assignment_onlinejudge extends assignment_upload {
     function print_user_files($userid=0, $return=false) {
         $output = parent::print_user_files($userid, true);
 
-        // TODO: Syntax Highlighert source code link
+        // TODO: Syntax Highlight source code link
 
         $output .= $this->view_summary($userid);
 
