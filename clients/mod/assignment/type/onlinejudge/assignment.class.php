@@ -498,6 +498,10 @@ class assignment_onlinejudge extends assignment_upload {
     function view_summary($user=0, $return = true) {
         global $USER, $CFG, $DB, $OUTPUT, $PAGE;
 
+        if ($user == 0) {
+            $user = $USER->id;
+        }
+
         $table = new html_table();
         $table->id = 'assignment_onlinejudge_summary';
         $table->attributes['class'] = 'generaltable';
