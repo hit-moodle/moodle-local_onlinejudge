@@ -101,8 +101,8 @@ class judge_base{
         // only common options are parsed here.
         // special options should be parsed by childclass
         foreach ($options as $key=>$value) {
-            if ($key == 'memlimit' and $value > get_config('local_onlinejudge', 'maxmemlimit')) {
-                $value = get_config('local_onlinejudge', 'maxmemlimit');
+            if ($key == 'memlimit' and $value > 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit')) {
+                $value = 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit');
             }
             if ($key == 'cpulimit' and $value > get_config('local_onlinejudge', 'maxcpulimit')) {
                 $value = get_config('local_onlinejudge', 'maxcpulimit');

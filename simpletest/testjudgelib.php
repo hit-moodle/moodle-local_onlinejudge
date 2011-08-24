@@ -72,7 +72,7 @@ class local_onlinejudge_test extends UnitTestCase {
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'files');
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'config_plugins');
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'events_handlers');
-        set_config('maxmemlimit', 64*1024*1024, 'local_onlinejudge');
+        set_config('maxmemlimit', 64, 'local_onlinejudge');
         set_config('maxcpulimit', 10, 'local_onlinejudge');
         set_config('ideonedelay', 5, 'local_onlinejudge');
 	}

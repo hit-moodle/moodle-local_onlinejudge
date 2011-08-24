@@ -33,8 +33,5 @@
  */
 
 function xmldb_local_onlinejudge_install() {
-    set_config('maxmemlimit', 32*1024*1024, 'local_onlinejudge');
-    set_config('maxcpulimit', 10, 'local_onlinejudge');
-    set_config('ideonedelay', 5, 'local_onlinejudge');
 }
 

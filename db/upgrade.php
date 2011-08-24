@@ -37,6 +37,17 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2011082416) {
+
+        // old version store memory limit in bytes
+        if ($value = get_config('local_onlinejudge', 'maxmemlimit')) {
+            set_config('maxmemlimit', $value / 1024 / 1024, 'local_onlinejudge');
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011082416, 'local', 'onlinejudge');
+    }
+
     echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');
 
     return true;
