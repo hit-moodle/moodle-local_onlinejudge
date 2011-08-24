@@ -49,7 +49,7 @@ INSTALL = install -D
 
 # buid sources and targets
 LIBRARY = sandbox
-VERSION = 0.2.17
+VERSION = 0.2.18
 RELEASE = 1
 $(LIBRARY)_hdr = src/platform.h src/sandbox.h src/symbols.h
 $(LIBRARY)_src = $($(LIBRARY)_hdr:.h=.c)

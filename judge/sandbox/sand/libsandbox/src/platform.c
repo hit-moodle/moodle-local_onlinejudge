@@ -32,6 +32,7 @@
 #include "platform.h"
 #include "sandbox.h"
 #include <assert.h>            /* assert() */
+#include <ctype.h>             /* toupper() */
 #include <fcntl.h>             /* open(), close(), O_RDONLY */
 #include <stdio.h>             /* read(), sscanf(), sprintf() */
 #include <string.h>            /* memset(), strsep() */
@@ -194,7 +195,7 @@ proc_probe(pid_t pid, int opt, proc_t * const pproc)
         
     /* Must be the parent process in order to probe registers and floating point
        registers; and the status of target process must be 'T' (aka traced) */
-    if ((pproc->ppid != getpid()) || ((pproc->state != 'T') && (pproc->state != 't')))
+    if ((pproc->ppid != getpid()) || (toupper(pproc->state) != 'T'))
     {
         FUNC_RET((opt == PROBE_STAT), "proc_probe()");
     }

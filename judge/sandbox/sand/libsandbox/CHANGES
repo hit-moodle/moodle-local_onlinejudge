@@ -1,3 +1,7 @@
+[2011/08/15] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c changed proc_probe() to ignore case when checking process status
+  * in sandbox.spec and Makefile update version to 0.2.18
+
 [2009/11/27] LIU Yu, <pineapple.liu@gmail.com>
   * in sandbox.h added a vsize_peak field in struct stat_t
   * in sandbox.h changed data fields in event_t and action_t to unsigned long

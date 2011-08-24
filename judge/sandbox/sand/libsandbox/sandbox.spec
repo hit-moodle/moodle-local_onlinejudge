@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                                  #
 ################################################################################
 %define name libsandbox
-%define version 0.2.17
+%define version 0.2.18
 %define release 1
 
 Summary: The Sandbox Libraries
