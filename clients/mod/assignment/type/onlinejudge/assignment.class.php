@@ -366,6 +366,19 @@ class assignment_onlinejudge extends assignment_upload {
         echo $output;
     }
 
+    function submissions($mode) {
+        $forcejudge = optional_param('forcejudge', FALSE, PARAM_TEXT);
+        if ($forcejudge) {
+            $user = required_param('userid', PARAM_INT);
+            $this->request_judge($this->get_submission($user));
+
+            $offset = required_param('offset', PARAM_INT);
+            $id = required_param('id', PARAM_INT);
+            redirect('submissions.php?id='.$id.'&userid='. $user . '&mode=single&offset='.$offset);
+        }
+        parent::submissions($mode);
+    }
+
     /**
      * Forked from upload. Don't forget to keep sync
      */
@@ -517,6 +530,10 @@ class assignment_onlinejudge extends assignment_upload {
         $item = get_string('notavailable');
         if (isset($onlinejudge_result->status)) {
             $item = get_string('status'.$onlinejudge_result->status, 'local_onlinejudge');
+            // Show forcejudge button in submissions.php page only
+            if (strstr($PAGE->url, '/mod/assignment/submissions.php') and has_capability('mod/assignment:grade', $this->context)) {
+                $item .= '<input type="submit" name="forcejudge" value="'.get_string('forcejudge', 'assignment_onlinejudge').'" />';
+            }
         }
         $table->data[] = array($item_name, $item);
 
