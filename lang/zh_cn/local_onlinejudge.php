@@ -66,6 +66,14 @@ $string['infostudent'] = '信息';
 $string['infoteacher'] = '信息';
 $string['invalidlanguage'] = '无效的语言ID：{$a}';
 $string['invalidjudgeclass'] = '无效的judge类：{$a}';
+$string['judgedcrashnotify'] = '后台评测进程崩溃通知';
+$string['judgedcrashnotify_help'] = '软件缺陷和升级都会导致后台进程崩溃或退出。如果发生这种情况，谁将收到通知？这个人应该有权限访问服务器的shell，并且能启动后台进程。';
+$string['judgednotifybody'] = '在{$a->count}个待测任务中，最早的任务已经在队列中等待了{$a->period}了。
+
+可能是后台评测进程崩溃或退出。
+
+您必须马上重新启动它！';
+$string['judgednotifysubject'] = '有{$a->count}个待测任务已经等待得太久';
 $string['judgestatus'] = '在线评测已经评测了<strong>{$a->judged}</strong>个任务。现在等待队列中还有<strong>{$a->pending}</strong>个任务。';
 $string['langc_sandbox'] = 'C (本地运行)';
 $string['langc_warn2err_sandbox'] = 'C (本地运行，警告视为错误)';
@@ -76,6 +84,7 @@ $string['maxcpulimit_help'] = '一个被测程序最多可以运行多长时间�
 $string['maxmemlimit'] = '最多可用内存（MB）';
 $string['maxmemlimit_help'] = '一个被测程序最多可以使用多少内存。';
 $string['memusage'] = '内存使用量';
+$string['messageprovider:judgedcrashed'] = '在线评测后台进程崩溃通知';
 $string['mystat'] = '我的统计';
 $string['onefileonlyideone'] = 'Ideone.com不支持多文件';
 $string['onlinejudge:viewjudgestatus'] = '查看在线评测状态';

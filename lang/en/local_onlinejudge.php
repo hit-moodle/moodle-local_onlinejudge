@@ -66,6 +66,14 @@ $string['infostudent'] = 'Information';
 $string['infoteacher'] = 'Information';
 $string['invalidlanguage'] = 'Invalid language ID: {$a}';
 $string['invalidjudgeclass'] = 'Invalid judge class: {$a}';
+$string['judgedcrashnotify'] = 'Judge daemon crashed notification';
+$string['judgedcrashnotify_help'] = 'Judge daemon may be crashed or quit due to software bugs or upgrading. If so, who will receive the notification? It should be a person who can access the shell of the server and launch the judge daemon.';
+$string['judgednotifybody'] = 'Among the {$a->count} pending tasks, the oldest task has been in the waiting queue for {$a->period}.
+
+It is possible that the judge daemon of online judge was crashed or quitted.
+
+You must launch it as soon as possible!';
+$string['judgednotifysubject'] = '{$a->count} pending tasks have been waiting too long';
 $string['judgestatus'] = 'Online Judge has judged <strong>{$a->judged}</strong> tasks and there are <strong>{$a->pending}</strong> tasks in the waiting queue.';
 $string['langc_sandbox'] = 'C (run locally)';
 $string['langc_warn2err_sandbox'] = 'C (run locally, warnings as errors)';
@@ -76,6 +84,7 @@ $string['maxcpulimit_help'] = 'How long can a program been judged keep running.'
 $string['maxmemlimit'] = 'Maximum memory usage (MB)';
 $string['maxmemlimit_help'] = 'How many memory can a program been judged use.';
 $string['memusage'] = 'Memory usage';
+$string['messageprovider:judgedcrashed'] = 'Online judge daemon crashed notification';
 $string['mystat'] = 'My Statistics';
 $string['onefileonlyideone'] = 'Ideone.com does not support multi-files';
 $string['onlinejudge:viewjudgestatus'] = 'View judge status';

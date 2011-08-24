@@ -40,6 +40,8 @@ if ($hassiteconfig) { // needs this condition or there is error on login page
     $choices = onlinejudge_get_languages();
     $temp->add(new admin_setting_configselect('local_onlinejudge/defaultlanguage', get_string('defaultlanguage', 'local_onlinejudge'), get_string('defaultlanguage_help', 'local_onlinejudge'), '', $choices));
 
+    $temp->add(new admin_setting_users_with_capability('local_onlinejudge/judgedcrashnotify', get_string('judgedcrashnotify', 'local_onlinejudge'), get_string('judgedcrashnotify_help', 'local_onlinejudge'), array(), 'moodle/site:config'));
+
     $ADMIN->add('localplugins', $temp);
 }
 
