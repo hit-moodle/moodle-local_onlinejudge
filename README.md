@@ -15,30 +15,28 @@ It contains three modules:
 3. *clients* - any kind of moodle plugins can work as the client of judgelib to provide UI
    to teachers and students and call the judgelib to judge submissions.
 
-Now, the project includes two judge engines:
+Now, this plugin includes two judge engines:
 
-1. *sandbox* compiles and executes programs on the server in a protected environment.
-   Supports C and C++ only.
-2. *ideone* posts all data to ideone.com which compiles and executes programs remotely.
-   Supports 40+ languaes, such as C/C++, Java, Python, C#, JavaScript, Perl, PHP.
+1. *sandbox* compiles and executes C/C++ programs in a protected environment of the server. Supports Linux 32/64-bit only.
+2. *ideone* posts all data to ideone.com which compiles and executes programs remotely. Supports 40+ languaes, such as C/C++, Java, Python, C#, JavaScript, Perl, PHP. Works in both Windows and Linux.
 
-Now, the project includes one client:
+Now, this plugin includes one client:
 
-1. Online Judge Assignment Type - online judge version of the official *advanced uploading of files* assignment type.
+1. Online Judge Assignment Type - online judge version of the official *advanced uploading of files* assignment activity.
 
 The workflow is:
 
-1. Administrators set global settings in judgelib.
-2. Teachers create Online Judge Assignment Activities and setup testcases etc.
+1. Administrators install and config it.
+2. Teachers create *Online Judge Assignment Activities* and setup testcases etc.
 3. Students submit code in Online Judge Assignment Activities.
-4. A judge daemon judges the submissions in backgroud.
+4. The judge daemon judges the submissions in background.
 5. Teachers and students get judge results in Online Judge Assignment Activities.
 
 
 Prerequisite
 ============
 
-On Linux
+In Linux
 --------
 
 * Moodle 2.0 or above
@@ -46,7 +44,7 @@ On Linux
 * make, gcc and g++ (optional but recommended)
 * pcntl and posix extension in php-cli (optional but recommended)
 
-On Windows
+In Windows
 ----------
 
 * Moodle 2.0 or above
@@ -63,33 +61,32 @@ or using git:
 `git clone git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge`
 
 
-Installation & Upgrading
+Installation / Upgrading
 ========================
 
 *MOODLE_PATH means the root path of your moodle installation.*
+*Do NOT forget this bold step during upgrading.*
 
-On Linux
+In Linux
 --------
 
 1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove it.
 2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH/local/`
-4. run `MOODLE_PATH/local/onlinejudge/cli/install_assignment_type`. *Do NOT forget to do this during upgrading.*
+4. * run `MOODLE_PATH/local/onlinejudge/cli/install_assignment_type`. *
 5. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
-6. In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`. *Do NOT forget to do this during upgrading.*
-7. If you want to use sandbox judge engine, then
-   `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
+6. * In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`, to launch the judge daemon.*
+7. If you would like to use sandbox judge engine, then `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
 
-On Windows
+In Windows
 ----------
 
 1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove it.
-2. If the folder `MOODLE_PATH\mod\assignment\type\onlinejudge` exists, remove it.
-3. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
-4. Put `onlinejudge` into `MOODLE_PATH\local\`
-5. Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assignment_type.bat`. *Do NOT forget to do this during upgrading.*
-6. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
-7. In command prompt `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`. *Do NOT forget to do this during upgrading.*
+2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
+3. Put `onlinejudge` into `MOODLE_PATH\local\`
+4. * Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assignment_type.bat`. *
+5. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
+6. * In command prompt, `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the judge daemon. *
 
 Usage
 =====
@@ -102,7 +99,7 @@ After installation, there will be a new assignment type called *Online Judge* ap
 Judge Daemon
 ------------
 
-The judge daemon has several helpful options for debugging propose. Try to add `--help` argument in the command line.
+The judge daemon has several helpful options for debugging propose. Try argument `--help`.
 
 Links
 =====
