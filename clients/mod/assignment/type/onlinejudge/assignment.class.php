@@ -558,7 +558,7 @@ class assignment_onlinejudge extends assignment_upload {
                     $line = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
 
                     // details icon link
-                    $url = new moodle_url('/mod/assignment/type/onlinejudge/details.php', array('task' => $case->id));
+                    $url = new moodle_url('/local/onlinejudge/details.php', array('task' => $case->id));
                     $attributes = array('href'=>$url, 'title'=>get_string('more'));
                     $attributes['id'] = $OUTPUT->add_action_handler(new popup_action('click', $url));
                     $icon = $OUTPUT->pix_icon('docs', get_string('more'));
