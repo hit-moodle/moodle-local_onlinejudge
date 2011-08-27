@@ -32,18 +32,25 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__).'/../../../../config.php');
+require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
 
 require_login(SITEID, false);
 
-$task = required_param('task', PARAM_INT);
+$taskid = required_param('task', PARAM_INT);
 $ajax = optional_param('ajax', 0, PARAM_BOOL);
+
+$task = onlinejudge_get_task($taskid);
+if (empty($task)) {
+    print_error('invalidtaskid', 'local_onlinejudge', '', $taskid);
+}
+
+$context = get_context_instance(CONTEXT_MODULE, $task->cmid);
 
 $PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
 $PAGE->set_pagelayout('popup');
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
-$PAGE->set_title(get_string('details', 'assignment_onlinejudge'));
+$PAGE->set_context($context);
+$PAGE->set_title(get_string('details', 'local_onlinejudge'));
 
 if ($ajax) {
     @header('Content-Type: text/plain; charset=utf-8');
@@ -51,24 +58,23 @@ if ($ajax) {
     echo $OUTPUT->header();
 }
 
-$task = onlinejudge_get_task($task);
-
-if (empty($task)) {
-    print_error('invaliddetailsparams', 'assignment_onlinejudge');
-}
-
 if ($task->userid != $USER->id) {
-    require_capability('mod/assignment:grade', get_system_context());
+    require_capability('local/onlinejudge:viewsensitive', $context);
 }
+
+// fields of table tasks which should be shown to teachers
+$sensitive_fields = array('stdout', 'stderr', 'infoteacher');
+// fields of table tasks which should be shown to students
+$normal_fields = array('compileroutput', 'memusage', 'cpuusage', 'infostudent');
 
 $task = (array)$task; // Easier to enum
 
 $table = new html_table();
 $table->attributes['class'] = 'generaltable';
 
-// details to students first
 foreach ($task as $key => $content) {
-    if ($key != 'compileroutput' and $key != 'memusage' and $key != 'cpuusage' and $key != 'infostudent') {
+    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields))
+        or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
         continue;
     }
 
@@ -76,13 +82,19 @@ foreach ($task as $key => $content) {
     $contentcell = new html_table_cell();
 
     $titlecell->text = get_string($key, 'local_onlinejudge');
-
-    $formatter = 'format_'.$key;
-    if (function_exists($formatter)) {
-        $content = $formatter($content);
-        if (!$content)
-            continue;
+    if (in_array($key, $sensitive_fields)) {
+        $titlecell->text .= '*';
     }
+
+    if (empty($content)) {
+        $content = get_string('notavailable');
+    } else {
+        $formatter = 'format_'.$key;
+        if (function_exists($formatter)) {
+            $content = $formatter($content);
+        }
+    }
+
     $contentcell->text = $content;
 
     $row = new html_table_row(array($titlecell, $contentcell));
@@ -91,37 +103,8 @@ foreach ($task as $key => $content) {
 
 echo html_writer::table($table);
 
-
-//details to teachers
-if (has_capability('mod/assignment:grade', get_system_context())) {
-    echo $OUTPUT->heading(get_string('teacheronly', 'assignment_onlinejudge'), 3);
-
-    $table = new html_table();
-    $table->attributes['class'] = 'generaltable';
-
-    foreach ($task as $key => $content) {
-        if ($key != 'stdout' and $key != 'stderr' and $key != 'infoteacher') {
-            continue;
-        }
-
-        $titlecell   = new html_table_cell();
-        $contentcell = new html_table_cell();
-
-        $titlecell->text = get_string($key, 'local_onlinejudge');
-
-        $formatter = 'format_'.$key;
-        if (function_exists($formatter)) {
-            $content = $formatter($content);
-            if (!$content)
-                continue;
-        }
-        $contentcell->text = $content;
-
-        $row = new html_table_row(array($titlecell, $contentcell));
-        $table->data[] = $row;
-    }
-
-    echo html_writer::table($table);
+if (has_capability('local/onlinejudge:viewsensitive', $context)) {
+    print_string('notesensitive', 'local_onlinejudge');
 }
 
 if (!$ajax) {
@@ -129,30 +112,14 @@ if (!$ajax) {
 }
 
 function format_compileroutput($string) {
-    if (empty($string)) {
-        return false;
-    }
     return nl2br($string);
 }
 
-function format_infostudent($string) {
-    if (empty($string)) {
-        return false;
-    }
-    return $string;
-}
-
 function format_cpuusage($string) {
-    if (strlen($string) == 0) {
-        return false;
-    }
     return $string.' '.get_string('sec');
 }
 
 function format_memusage($string) {
-    if (strlen($string) == 0) {
-        return false;
-    }
     return display_size($string);
 }
 
@@ -162,9 +129,5 @@ function format_stdout($string) {
 
 function format_stderr($string) {
     return format_compileroutput($string);
-}
-
-function format_infoteacher($string) {
-    return format_infostudent($string);
 }
 

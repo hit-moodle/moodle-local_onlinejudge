@@ -59,5 +59,16 @@ $capabilities = array(
             'student' => CAP_ALLOW,
         )
     ),
+
+    // Ability to view senstitive details
+    'local/onlinejudge:viewsensitive' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
 );
 

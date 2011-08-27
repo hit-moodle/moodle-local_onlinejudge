@@ -44,7 +44,6 @@ $string['configmaxcpu'] = 'Default maximum assignment cpu time for all assignmen
 $string['configmaxmem'] = 'Default maximum assignment memory usage for all assignments on the site (subject to other local settings)';
 $string['cpulimit'] = 'Maximum CPU time';
 $string['denytoreadfile'] = 'You have not the permission to read this file.';
-$string['details'] = 'Details';
 $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
 $string['feedback'] = 'Feedback for Wrong Answer';
@@ -61,7 +60,6 @@ $string['input'] = 'Input';
 $string['input_help'] = 'The input data will be sent to the stdin of submitted programs.';
 $string['inputfile'] = 'Input file';
 $string['inputfile_help'] = 'The data in the file will be sent to the stdin of submitted programs. If the file is missing, the testcase will be skipped.';
-$string['invaliddetailsparams'] = 'Invalid params';
 $string['judgetime'] = 'Judge time';
 $string['managetestcases'] = 'Manage testcases';
 $string['maxcpuusage'] = 'Maximum CPU usage';
@@ -111,7 +109,6 @@ If the assignment\'s max grade is set to 50, and this testcase\'s grade is set t
 
 The sum of all testcases\' grades is <em>not</em> required to be 100%. Therefore, you can leave some points for manual grading if the sum is below 100%. And also, you can make the sum be over 100% so that not all testcases are required to pass.';
 $string['successrate'] = 'Success rate';
-$string['teacheronly'] = 'For teachers only:';
 $string['testcases'] = 'Test Cases';
 $string['testcases_help'] = 'Each testcase will be applied to the submissions and judged seperately. E.g. if there are three testcases, one submission will run three times to test different case.';
 $string['typeonlinejudge'] = 'Online Judge';

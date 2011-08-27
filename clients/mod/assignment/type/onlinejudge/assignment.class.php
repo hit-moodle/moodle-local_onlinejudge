@@ -546,7 +546,7 @@ class assignment_onlinejudge extends assignment_upload {
         $table->data[] = array($item_name, $item);
 
         // Details
-        $item_name = get_string('details','assignment_onlinejudge').':';
+        $item_name = get_string('details', 'local_onlinejudge').':';
         $item = get_string('notavailable');
         if ($onlinejudge_result->status == ONLINEJUDGE_STATUS_COMPILATION_ERROR) {
             $item = nl2br(end($onlinejudge_result->testcases)->compileroutput);
@@ -558,7 +558,7 @@ class assignment_onlinejudge extends assignment_upload {
                     $line = get_string('case', 'assignment_onlinejudge', $i).' '.get_string('status'.$case->status, 'local_onlinejudge');
 
                     // details icon link
-                    $url = new moodle_url('/local/onlinejudge/details.php', array('task' => $case->id));
+                    $url = new moodle_url('/local/onlinejudge/details.php', array('task' => $case->id, 'course' => $this->course->id));
                     $attributes = array('href'=>$url, 'title'=>get_string('more'));
                     $attributes['id'] = $OUTPUT->add_action_handler(new popup_action('click', $url));
                     $icon = $OUTPUT->pix_icon('docs', get_string('more'));
