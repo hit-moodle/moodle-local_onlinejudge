@@ -759,8 +759,17 @@ class assignment_onlinejudge extends assignment_upload {
             $oj->output = $test->output;
             $oj->var1 = $oj->ideoneuser;
             $oj->var2 = $oj->ideonepass;
-            $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, 'assignment_onlinejudge', $oj);
-            $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid, 'latest' => 1));
+
+            // Submit task. Use transaction to avoid task is been judged before inserting into assignment_oj_submissions
+            try {
+                $transaction = $DB->start_delegated_transaction();
+                $taskid = onlinejudge_submit_task($this->cm->id, $submission->userid, $oj->language, $files, 'assignment_onlinejudge', $oj);
+                $DB->insert_record('assignment_oj_submissions', array('submission' => $submission->id, 'testcase' => $test->id, 'task' => $taskid, 'latest' => 1));
+                $transaction->allow_commit();
+            } catch (Exception $e) {
+                //TODO: reconnect db ?
+                $transaction->rollback($e); // rethrows exception
+            }
         }
     }
 
