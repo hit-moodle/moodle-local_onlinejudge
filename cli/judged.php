@@ -146,14 +146,16 @@ verbose('Judge daemon exits.');
 /**
  * Return one unjudged task and set it status as JUDGING
  *
- * @return an unjudged task or false
+ * @return an unjudged task or null;
  */
 function get_one_unjudged_task() {
     global $CFG, $DB;
 
-    $transaction = $DB->start_delegated_transaction();
+    $task = null;
 
     try {
+        $transaction = $DB->start_delegated_transaction();
+
         $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', '*', 0, 1);
 
         if (!empty($tasks)) {
@@ -167,7 +169,7 @@ function get_one_unjudged_task() {
         $transaction->rollback($e); // rethrows exception
     }
 
-    return isset($task) ? $task : false;
+    return $task;
 }
 
 // Judge all unjudged tasks
