@@ -122,7 +122,9 @@ while (!$forcestop and !$upgraded) {
     try {
         judge_all_unjudged();
     } catch (Exception $e) {
-        cli_problem('Caught exception: '.$e->getMessage());
+        $info = get_exception_info($e);
+        $errmsg = "Judged exception handler: ".$info->message.' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
+        cli_problem($errmsg);
     }
 
     if ($options['once']) {
