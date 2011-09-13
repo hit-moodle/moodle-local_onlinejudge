@@ -131,8 +131,8 @@ class judge_base{
         $task->stderr = mb_convert_encoding($task->stderr, 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
 
     	//format
-        $task->output = strtr(trim($task->output), array("\r\n" => "\n", "\n\r" => "\n"));
-        $task->stdout = strtr(trim($task->stdout), array("\r\n" => "\n", "\n\r" => "\n"));
+        $task->output = strtr($task->output, array("\r\n" => "\n", "\n\r" => "\n"));
+        $task->stdout = strtr($task->stdout, array("\r\n" => "\n", "\n\r" => "\n"));
 
         if (strcmp($task->output, $task->stdout) == 0)
             return ONLINEJUDGE_STATUS_ACCEPTED;
