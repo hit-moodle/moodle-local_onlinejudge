@@ -134,6 +134,10 @@ class judge_base{
         $task->output = strtr($task->output, array("\r\n" => "\n", "\n\r" => "\n"));
         $task->stdout = strtr($task->stdout, array("\r\n" => "\n", "\n\r" => "\n"));
 
+        // trim tailing return chars which are meaning less
+        $task->output = rtrim($task->output, "\n");
+        $task->stdout = rtrim($task->stdout, "\n");
+
         if (strcmp($task->output, $task->stdout) == 0)
             return ONLINEJUDGE_STATUS_ACCEPTED;
         else {
