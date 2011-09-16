@@ -1,5 +1,8 @@
 <?php
 
+// Threshhold to prevent further rejudge-all requests
+define('PREVENTION_THRESHHOLD', 500);
+
 require_once(dirname(__FILE__).'/../../../../config.php');
 require_once("$CFG->dirroot/mod/assignment/lib.php");
 require_once("$CFG->dirroot/mod/assignment/type/onlinejudge/assignment.class.php");
@@ -42,9 +45,15 @@ require_capability('mod/assignment:grade', get_context_instance(CONTEXT_MODULE, 
 
 $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
 
-if ( $confirm == 1 && confirm_sesskey()){
+$pending = $DB->count_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING));
+if ($pending > PREVENTION_THRESHHOLD) {
+    // Prevent rejudge all requests if judged is busy
+    $assignmentinstance->view_header();
+    echo $OUTPUT->heading(get_string('rejudgeall', 'assignment_onlinejudge'));
+    echo $OUTPUT->box(get_string('rejudgelater', 'assignment_onlinejudge'));
+} else if ( $confirm == 1 && confirm_sesskey()){
     $assignmentinstance->rejudge_all();
-	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
+    redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
 } else {
     $optionsno = array ('id'=>$id);
     $optionsyes = array ('id'=>$id, 'confirm'=>1, 'sesskey'=>sesskey());

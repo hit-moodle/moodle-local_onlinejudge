@@ -82,6 +82,7 @@ $string['readytojudge'] = '已准备好接受评测';
 $string['rejudgeall'] = '全部重新评测';
 $string['rejudgeallnotice'] = '重新评测所有作业可能会消耗较长时间。您确信要继续吗？';
 $string['rejudgefailed'] = '无法提交重新评测请求。';
+$string['rejudgelater'] = '后台评测进程现在非常繁忙。请稍后再试。';
 $string['rejudgesuccess'] = '重新评测请求已经成功提交。';
 $string['requestjudge'] = '请求评测';
 $string['statistics'] = '统计';
