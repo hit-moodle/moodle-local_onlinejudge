@@ -121,14 +121,27 @@ class judge_base{
     }
 
     /**
+     * If string is not encoded in UTF-8, convert it into utf-8 charset
+     */
+    protected function convert_to_utf8($string) {
+        $localwincharset = get_string('localewincharset', 'langconfig');
+        if ($localwincharset != '' and !mb_check_encoding($string, 'UTF-8')) {
+            $textlib = textlib_get_instance();
+            return $textlib->convert($string, $localwincharset);
+        } else {
+            return $string;
+        }
+    }
+
+    /**
      * Compare the stdout of program and the output of testcase
      */
     protected function diff() {
         $task = & $this->task;
 
         // convert students' output into UTF-8 charset
-        $task->stdout = mb_convert_encoding($task->stdout, 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
-        $task->stderr = mb_convert_encoding($task->stderr, 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
+        $task->stdout = $this->convert_to_utf8($task->stdout);
+        $task->stderr = $this->convert_to_utf8($task->stderr);
 
     	//format
         $task->output = strtr($task->output, array("\r\n" => "\n", "\n\r" => "\n"));
