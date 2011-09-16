@@ -112,7 +112,7 @@ if (!$ajax) {
 }
 
 function format_compileroutput($string) {
-    return nl2br($string);
+    return '<pre>'.htmlentities($string).'</pre>';
 }
 
 function format_cpuusage($string) {
