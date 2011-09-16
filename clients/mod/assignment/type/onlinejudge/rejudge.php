@@ -53,7 +53,7 @@ if ($pending > PREVENTION_THRESHHOLD) {
     echo $OUTPUT->box(get_string('rejudgelater', 'assignment_onlinejudge'));
 } else if ( $confirm == 1 && confirm_sesskey()){
     $assignmentinstance->rejudge_all();
-    redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
+    redirect($CFG->wwwroot.'/mod/assignment/submissions.php?id='.$id, get_string('rejudgeallrequestsent', 'assignment_onlinejudge'), 10);
 } else {
     $optionsno = array ('id'=>$id);
     $optionsyes = array ('id'=>$id, 'confirm'=>1, 'sesskey'=>sesskey());

@@ -80,6 +80,7 @@ Presentation error means the data outputted by the program is correct, but the s
 $string['readytojudge'] = 'Ready to be judged';
 $string['rejudgeall'] = 'Rejudge all';
 $string['rejudgeallnotice'] = 'Rejudging all submissions may take a long time. Do you want to continue?';
+$string['rejudgeallrequestsent'] = 'The requests of rejudging all submissions have been sent.';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';
 $string['rejudgelater'] = 'The judge daemon is very busy. Please retry later.';
 $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
