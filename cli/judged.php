@@ -115,17 +115,9 @@ if ($CFG->ostype != 'WINDOWS' and function_exists('pcntl_signal')) {
 
 // Run forever until being killed or the plugin was upgraded
 $forcestop = false;
-$upgraded = false;
 $plugin_version = get_config('local_onlinejudge', 'version');
-while (!$forcestop and !$upgraded) {
-
-    try {
-        judge_all_unjudged();
-    } catch (Exception $e) {
-        $info = get_exception_info($e);
-        $errmsg = "Judged exception handler: ".$info->message.' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
-        cli_problem($errmsg);
-    }
+while (!$forcestop) {
+    judge_all_unjudged();
 
     if ($options['once']) {
         break;
@@ -135,9 +127,9 @@ while (!$forcestop and !$upgraded) {
     // TODO: definable by admin
     sleep(5);
 
-    $upgraded = $plugin_version < get_config('local_onlinejudge', 'version');
-    if ($upgraded) {
+    if ($plugin_version < get_config('local_onlinejudge', 'version')) {
         verbose('Plugin was upgraded.');
+        break;
     }
 }
 
@@ -153,9 +145,8 @@ function get_one_unjudged_task() {
 
     $task = null;
 
+    $transaction = $DB->start_delegated_transaction();
     try {
-        $transaction = $DB->start_delegated_transaction();
-
         $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', '*', 0, 1);
 
         if (!empty($tasks)) {
@@ -165,7 +156,6 @@ function get_one_unjudged_task() {
 
         $transaction->allow_commit();
     } catch (Exception $e) {
-        //TODO: reconnect db ?
         $transaction->rollback($e); // rethrows exception
     }
 
@@ -177,8 +167,15 @@ function judge_all_unjudged() {
     while ($task = get_one_unjudged_task()) {
         verbose(cli_heading('TASK: '.$task->id, true));
         verbose('Judging...');
-        $task = onlinejudge_judge($task);
-        verbose("Successfully judged: $task->status");
+        try {
+            $task = onlinejudge_judge($task);
+            verbose("Successfully judged: $task->status");
+        } catch (Exception $e) {
+            $info = get_exception_info($e);
+            $errmsg = "Judged inner level exception handler: ".$info->message.' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
+            cli_problem($errmsg);
+            // Continue to get next unjudged task
+        }
     }
 }
 
