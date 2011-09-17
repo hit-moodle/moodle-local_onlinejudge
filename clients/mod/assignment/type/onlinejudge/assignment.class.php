@@ -833,7 +833,9 @@ function onlinejudge_task_judged($task) {
         FROM {assignment_submissions} s LEFT JOIN {assignment_oj_submissions} o
         ON s.id = o.submission
         WHERE o.task = ?';
-    $submission = $DB->get_record_sql($sql, array($task->id), MUST_EXIST);
+    if (!$submission = $DB->get_record_sql($sql, array($task->id))) {
+        return false;
+    }
 
     $cm = get_coursemodule_from_instance('assignment', $submission->assignment);
     $ass = new assignment_onlinejudge($cm->id, NULL, $cm);
