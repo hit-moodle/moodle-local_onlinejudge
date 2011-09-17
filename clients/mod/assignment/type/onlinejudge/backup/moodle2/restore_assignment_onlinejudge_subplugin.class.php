@@ -42,11 +42,11 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
         $paths = array();
 
         $elename = $this->get_namefor('onlinejudge');
-        $elepath = $this->get_pathfor('/onlinejudge'); // because we used get_recommended_name() in backup this works
+        $elepath = $this->get_pathfor('/onlinejudges/onlinejudge'); // because we used get_recommended_name() in backup this works
         $paths[] = new restore_path_element($elename, $elepath);
 
         $elename = $this->get_namefor('testcase');
-        $elepath = $this->get_pathfor('/testcase'); // because we used get_recommended_name() in backup this works
+        $elepath = $this->get_pathfor('/testcases/testcase'); // because we used get_recommended_name() in backup this works
         $paths[] = new restore_path_element($elename, $elepath);
 
         return $paths; // And we return the interesting paths
@@ -59,12 +59,12 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
 
         $paths = array();
 
-        $elename = $this->get_namefor('task');
-        $elepath = $this->get_pathfor('/task'); // because we used get_recommended_name() in backup this works
+        $elename = $this->get_namefor('onlinejudge_submission');
+        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission'); // because we used get_recommended_name() in backup this works
         $paths[] = new restore_path_element($elename, $elepath);
 
-        $elename = $this->get_namefor('onlinejudge_submission');
-        $elepath = $this->get_pathfor('/onlinejudge_submission'); // because we used get_recommended_name() in backup this works
+        $elename = $this->get_namefor('task');
+        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission/tasks/task'); // because we used get_recommended_name() in backup this works
         $paths[] = new restore_path_element($elename, $elepath);
 
         return $paths; // And we return the interesting paths
@@ -116,7 +116,10 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
         $data->userid = $this->get_mappingid('user', $data->userid);
 
         $newitemid = $DB->insert_record('onlinejudge_tasks', $data);
-        $this->set_mapping($this->get_namefor('task'), $oldid, $newitemid);
+
+        // Since process_assignment_onlinejudge_onlinejudge_submission() is called before this function,
+        // we must update assignment_oj_submissions table's task by this way
+        $DB->set_field('assignment_oj_submissions', 'task', $newitemid, array('task' => $oldid, 'submission' => $this->get_new_parentid('assignment_submission')));
     }
 
     /**
@@ -128,7 +131,6 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
         $data = (object)$data;
 
         $data->testcase = $this->get_mappingid($this->get_namefor('testcase'), $data->testcase);
-        $data->task = $this->get_mappingid($this->get_namefor('task'), $data->task);
         $data->submission = $this->get_mappingid('assignment_submission', $data->submission);
 
         $DB->insert_record('assignment_oj_submissions', $data);
