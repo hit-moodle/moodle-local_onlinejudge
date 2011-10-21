@@ -147,7 +147,7 @@ function get_one_unjudged_task() {
 
     $transaction = $DB->start_delegated_transaction();
     try {
-        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '', '*', 0, 1);
+        $tasks = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), 'submittime ASC', '*', 0, 1);
 
         if (!empty($tasks)) {
             $task = array_pop($tasks);

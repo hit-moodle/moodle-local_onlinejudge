@@ -68,6 +68,20 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011092200, 'local', 'onlinejudge');
     }
 
+    if ($oldversion < 2011102100) {
+
+        // Define index submittime (not unique) to be added to onlinejudge_tasks
+        $table = new xmldb_table('onlinejudge_tasks');
+        $index = new xmldb_index('submittime', XMLDB_INDEX_NOTUNIQUE, array('submittime'));
+
+        // Conditionally launch add index submittime
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011102100, 'local', 'onlinejudge');
+    }
 
     echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');
 

@@ -30,8 +30,8 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->version  = 2011100100;   // The (date) version of this plugin
+$plugin->version  = 2011102100;   // The (date) version of this plugin
 $plugin->requires = 2010122900;   // Requires this Moodle version
 
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = "2.0beta1 (20111001)"; // User-friendly version number
+$plugin->release   = "2.0beta1 (20111021)"; // User-friendly version number

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge/db" VERSION="20110922" COMMENT="XMLDB file for Moodle local/onlinejudge"
+<XMLDB PATH="local/onlinejudge/db" VERSION="20111021" COMMENT="XMLDB file for Moodle local/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -39,7 +39,8 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="status" UNIQUE="false" FIELDS="status" NEXT="judgetime"/>
-        <INDEX NAME="judgetime" UNIQUE="false" FIELDS="judgetime" PREVIOUS="status"/>
+        <INDEX NAME="judgetime" UNIQUE="false" FIELDS="judgetime" PREVIOUS="status" NEXT="submittime"/>
+        <INDEX NAME="submittime" UNIQUE="false" FIELDS="submittime" PREVIOUS="judgetime"/>
       </INDEXES>
     </TABLE>
   </TABLES>
