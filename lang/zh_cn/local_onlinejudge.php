@@ -72,9 +72,9 @@ $string['judgedcrashnotify'] = '后台评测进程崩溃通知';
 $string['judgedcrashnotify_help'] = '软件缺陷和升级都会导致后台进程崩溃或退出。如果发生这种情况，谁将收到通知？这个人应该有权限访问服务器的shell，并且能启动后台进程。';
 $string['judgednotifybody'] = '在{$a->count}个待测任务中，最早的任务已经在队列中等待了{$a->period}了。
 
-可能是后台评测进程崩溃或退出。
+可能是后台评测进程崩溃或退出。您必须马上重新启动它！
 
-您必须马上重新启动它！';
+还有一种可能是任务队列里有太多任务了。您可以考虑多运行几个后台评测进程。';
 $string['judgednotifysubject'] = '有{$a->count}个待测任务已经等待得太久';
 $string['judgestatus'] = '在线评测已经评测了<strong>{$a->judged}</strong>个任务。现在等待队列中还有<strong>{$a->pending}</strong>个任务。';
 $string['langc_sandbox'] = 'C (本地运行)';

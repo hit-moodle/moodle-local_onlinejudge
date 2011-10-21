@@ -72,9 +72,9 @@ $string['judgedcrashnotify'] = 'Judge daemon crashed notification';
 $string['judgedcrashnotify_help'] = 'Judge daemon may be crashed or quit due to software bugs or upgrading. If so, who will receive the notification? It should be a person who can access the shell of the server and launch the judge daemon.';
 $string['judgednotifybody'] = 'Among the {$a->count} pending tasks, the oldest task has been in the waiting queue for {$a->period}.
 
-It is possible that the judge daemon of online judge was crashed or quitted.
+It is possible that the judge daemon of online judge was crashed or quitted. You must launch it as soon as possible!
 
-You must launch it as soon as possible!';
+Or, it is possible that there are too much tasks in the queue and you should consider to run multiply judge daemons.';
 $string['judgednotifysubject'] = '{$a->count} pending tasks have been waiting too long';
 $string['judgestatus'] = 'Online Judge has judged <strong>{$a->judged}</strong> tasks and there are <strong>{$a->pending}</strong> tasks in the waiting queue.';
 $string['langc_sandbox'] = 'C (run locally)';
