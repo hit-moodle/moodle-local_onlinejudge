@@ -93,7 +93,7 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
 
         // Changing type of field input on table onlinejudge_tasks to binary
         $table = new xmldb_table('onlinejudge_tasks');
-        $field = new xmldb_field('input', XMLDB_TYPE_BINARY, 'big', null, null, null, null, 'input');
+        $field = new xmldb_field('input', XMLDB_TYPE_BINARY, 'big', null, null, null, null, 'cpulimit');
         // Launch change of type for field input
         $dbman->change_field_type($table, $field);
 
