@@ -83,6 +83,19 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011102100, 'local', 'onlinejudge');
     }
 
+    if ($oldversion < 2011102400) {
+
+        // Changing type of field output on table onlinejudge_tasks to binary
+        $table = new xmldb_table('onlinejudge_tasks');
+        $field = new xmldb_field('output', XMLDB_TYPE_BINARY, 'big', null, null, null, null, 'input');
+
+        // Launch change of type for field output
+        $dbman->change_field_type($table, $field);
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2011102400, 'local', 'onlinejudge');
+    }
+
     echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');
 
     return true;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge/db" VERSION="20111021" COMMENT="XMLDB file for Moodle local/onlinejudge"
+<XMLDB PATH="local/onlinejudge/db" VERSION="20111024" COMMENT="XMLDB file for Moodle local/onlinejudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -13,7 +13,7 @@
         <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="language" NEXT="cpulimit"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
         <FIELD NAME="input" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
-        <FIELD NAME="output" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="compileonly"/>
+        <FIELD NAME="output" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="compileonly"/>
         <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="output" NEXT="component"/>
         <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Who submitted this task" PREVIOUS="compileonly" NEXT="status"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="component" NEXT="stdout"/>

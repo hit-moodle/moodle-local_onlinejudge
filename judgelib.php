@@ -125,7 +125,7 @@ class judge_base{
      */
     protected function convert_to_utf8($string) {
         $localwincharset = get_string('localewincharset', 'langconfig');
-        if ($localwincharset != '' and !mb_check_encoding($string, 'UTF-8')) {
+        if (!empty($localwincharset) and !mb_check_encoding($string, 'UTF-8') and mb_check_encoding($string, $localwincharset)) {
             $textlib = textlib_get_instance();
             return $textlib->convert($string, $localwincharset);
         } else {
@@ -139,9 +139,10 @@ class judge_base{
     protected function diff() {
         $task = & $this->task;
 
-        // convert students' output into UTF-8 charset
+        // convert data into UTF-8 charset if possible
         $task->stdout = $this->convert_to_utf8($task->stdout);
         $task->stderr = $this->convert_to_utf8($task->stderr);
+        $task->output = $this->convert_to_utf8($task->output);
 
     	//format
         $task->output = strtr($task->output, array("\r\n" => "\n", "\n\r" => "\n"));
