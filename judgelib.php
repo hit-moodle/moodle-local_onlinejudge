@@ -157,14 +157,14 @@ class judge_base{
         else {
             $tokens = array();
             $tok = strtok($task->output, " \n\r\t");
-            while ($tok) {
+            while ($tok !== false) {
                 $tokens[] = $tok;
                 $tok = strtok(" \n\r\t");
             }
 
             $tok = strtok($task->stdout, " \n\r\t");
             foreach ($tokens as $anstok) {
-                if (!$tok || $tok !== $anstok)
+                if ($tok === false || $tok !== $anstok)
                     return ONLINEJUDGE_STATUS_WRONG_ANSWER;
                 $tok = strtok(" \n\r\t");
             }
