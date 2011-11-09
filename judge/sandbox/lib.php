@@ -39,10 +39,10 @@ define('SANDBOX_SAND', $CFG->dirroot.'/local/onlinejudge/judge/sandbox/sand/sand
 
 class judge_sandbox extends judge_base {
     protected static $supported_languages = array(
-        'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCES% -lm',
-        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCES% -lm',
-        'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCES% -lm',
-        'cpp_warn2err' => 'g++ -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCES% -lm'
+        'c' => 'gcc -m32 -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCES% -lm',
+        'c_warn2err' => 'gcc -m32 -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCES% -lm',
+        'cpp' => 'g++ -m32 -D_MOODLE_ONLINE_JUDGE_ -Wall -static -o %DEST% %SOURCES% -lm',
+        'cpp_warn2err' => 'g++ -m32 -D_MOODLE_ONLINE_JUDGE_ -Wall -Werror -static -o %DEST% %SOURCES% -lm'
     );
 
     static function get_languages() {
