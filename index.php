@@ -34,8 +34,6 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
-require_login(SITEID);
-
 $context = get_system_context();
 
 $PAGE->set_context($context);
