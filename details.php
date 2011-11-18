@@ -51,6 +51,9 @@ $PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
 $PAGE->set_pagelayout('popup');
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('details', 'local_onlinejudge'));
+$PAGE->set_heading(get_string('details', 'local_onlinejudge'));
+$PAGE->set_course($COURSE);
+$PAGE->navbar->add(get_string('details', 'local_onlinejudge'));
 
 if ($ajax) {
     @header('Content-Type: text/plain; charset=utf-8');
