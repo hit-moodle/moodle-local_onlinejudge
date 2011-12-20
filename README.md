@@ -1,4 +1,4 @@
-**THIS PLUGIN IS IN BETA VERSION AND NOT RECOMMENDED TO USE IN PRODUCTION SITES**
+**This plugin is in BETA version and NOT recommended to use in production sites**
 
 Introduction
 ============
@@ -73,9 +73,9 @@ In Linux
 1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove it.
 2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH/local/`
-4. * run `MOODLE_PATH/local/onlinejudge/cli/install_assignment_type`. *
+4. **run `MOODLE_PATH/local/onlinejudge/cli/install_assignment_type`.**
 5. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
-6. * In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`, to launch the judge daemon.*
+6. **In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`, to launch the judge daemon.**
 7. If you would like to use sandbox judge engine, then `cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make`
 
 In Windows
@@ -84,9 +84,9 @@ In Windows
 1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove it.
 2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH\local\`
-4. * Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assignment_type.bat`. *
+4. **Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assignment_type.bat`.**
 5. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
-6. * In command prompt, `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the judge daemon. *
+6. **In command prompt, `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the judge daemon.**
 
 Usage
 =====
@@ -107,6 +107,10 @@ Links
 Home:
 
 * <https://github.com/hit-moodle/moodle-local_onlinejudge>
+
+FAQ:
+
+* <https://github.com/hit-moodle/moodle-local_onlinejudge/wiki>
 
 Bug reports, feature requests, help wanted and other issues:
 
