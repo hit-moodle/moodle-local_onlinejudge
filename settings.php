@@ -35,7 +35,7 @@ if ($hassiteconfig) { // needs this condition or there is error on login page
 
     $temp->add(new admin_setting_configtext('local_onlinejudge/maxmemlimit', get_string('maxmemlimit', 'local_onlinejudge'), get_string('maxmemlimit_help', 'local_onlinejudge'), 64, PARAM_INT));
     $temp->add(new admin_setting_configtext('local_onlinejudge/maxcpulimit', get_string('maxcpulimit', 'local_onlinejudge'), get_string('maxcpulimit_help', 'local_onlinejudge'), 10, PARAM_INT));
-    $temp->add(new admin_setting_configtext('local_onlinejudge/ideonedelay', get_string('ideonedelay', 'local_onlinejudge'), get_string('ideonedelay_help', 'local_onlinejudge'), 5, PARAM_INT));
+    $temp->add(new admin_setting_configtext('local_onlinejudge/ideonedelay', get_string('ideonedelay', 'local_onlinejudge'), get_string('ideonedelay_help', 'local_onlinejudge'), 10, PARAM_INT));
 
     $choices = onlinejudge_get_languages();
     $temp->add(new admin_setting_configselect('local_onlinejudge/defaultlanguage', get_string('defaultlanguage', 'local_onlinejudge'), get_string('defaultlanguage_help', 'local_onlinejudge'), '', $choices));

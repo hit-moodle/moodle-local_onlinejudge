@@ -170,6 +170,8 @@ class judge_ideone extends judge_base
          *     )
          */
         $webid = $client->createSubmission($user, $pass, $source, $language, $input, true, true);
+        $delay = get_config('local_onlinejudge', 'ideonedelay');
+        sleep($delay);  // ideone reject bulk access
 
         if ($webid['error'] == 'OK') {
             $link = $webid['link'];
@@ -178,10 +180,9 @@ class judge_ideone extends judge_base
         }
 
         // Get ideone results
-        $delay = get_config('local_onlinejudge', 'ideonedelay');
         while (1) {
-            sleep($delay);
             $status = $client->getSubmissionStatus($user, $pass, $link);
+            sleep($delay);  // ideone reject bulk access. Always add delay between accesses
             if($status['status'] == 0) {
                 break;
             }
