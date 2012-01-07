@@ -43,7 +43,7 @@ $string['defaultlanguage_help'] = '新建在线评测作业的缺省语言。';
 $string['details'] = '详细信息';
 $string['ideoneautherror'] = '用户名或密码错误';
 $string['ideonedelay'] = '发往ideone.com的访问请求之间的时间间隔（秒）';
-$string['ideonedelay_help'] = '向ideone.com发送评测请求后，不可能立即得到结果。在查询结果之前，我们应该等待多久？建议设为5秒或稍高。';
+$string['ideonedelay_help'] = '向ideone.com发送评测请求和查询结果之间如何间隔太短，会被拒绝访问。这个间隔应该多大？';
 $string['ideoneerror'] = 'Ideone返回错误：{$a}';
 $string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Moodle在线评测</a>使用了<a href="http://sphere-research.com">Sphere Research Labs</a>提供的<a href="http://ideone.com">Ideone API</a> &copy;';
 $string['ideoneresultlink'] = '在<a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>查看更多信息。';
