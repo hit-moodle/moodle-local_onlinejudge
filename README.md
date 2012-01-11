@@ -17,7 +17,7 @@ It contains three modules:
 
 Now, this plugin includes two judge engines:
 
-1. *sandbox* compiles and executes C/C++ programs in a protected environment of the server. Supports Linux 32/64-bit only.
+1. *sandbox* compiles and executes C/C++ programs locally in a protected environment. Supports Linux 32/64-bit only.
 2. *ideone* posts all data to ideone.com which compiles and executes programs remotely. Supports 40+ languaes, such as C/C++, Java, Python, C#, JavaScript, Perl, PHP. Works in both Windows and Linux.
 
 Now, this plugin includes one client:
