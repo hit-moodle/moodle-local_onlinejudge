@@ -98,7 +98,7 @@ $string['sandboxerror'] = 'Sandbox error occurs: {$a}';
 $string['settingsform'] = 'Online Judge Settings';
 $string['settingsupdated'] = 'Settings updated.';
 $string['status0'] = 'Pending...';
-$string['status1'] = '<font color=green>Accepted</font>';
+$string['status1'] = 'Accepted';
 $string['status2'] = 'Abnormal Termination';
 $string['status3'] = 'Compilation Error';
 $string['status4'] = 'Compilation Ok';

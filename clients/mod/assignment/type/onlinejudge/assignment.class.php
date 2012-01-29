@@ -338,7 +338,9 @@ class assignment_onlinejudge extends assignment_upload {
 
         // replace draft status with onlinejudge status
         $pattern = '/(<div class="box files">).*(<div )/';
-        $replacement = '$1<strong>'.get_string('status'.$onlinejudge_result->status, 'local_onlinejudge').'</strong>$2';
+        $statusstyle = $onlinejudge_result->status == ONLINEJUDGE_STATUS_ACCEPTED ? 'notifysuccess' : 'notifyproblem';
+        $statustext = html_writer::tag('span', get_string('status'.$onlinejudge_result->status, 'local_onlinejudge'), array('class' => $statusstyle));
+        $replacement = '$1'.$statustext.'$2';
         $output = preg_replace($pattern, $replacement, $output, 1);
 
         // TODO: Syntax Highlight source code link
@@ -529,7 +531,8 @@ class assignment_onlinejudge extends assignment_upload {
         $item_name = get_string('status', 'assignment_onlinejudge').$OUTPUT->help_icon('status', 'assignment_onlinejudge').':';
         $item = get_string('notavailable');
         if (isset($onlinejudge_result->status)) {
-            $item = get_string('status'.$onlinejudge_result->status, 'local_onlinejudge');
+            $itemstyle = $onlinejudge_result->status == ONLINEJUDGE_STATUS_ACCEPTED ? 'notifysuccess' : 'notifyproblem';
+            $item = html_writer::tag('span', get_string('status'.$onlinejudge_result->status, 'local_onlinejudge'), array('class' => $itemstyle));
             // Show forcejudge button in submissions.php page only
             if (strstr($PAGE->url, '/mod/assignment/submissions.php') and has_capability('mod/assignment:grade', $this->context)) {
                 $item .= '<input type="submit" name="forcejudge" value="'.get_string('forcejudge', 'assignment_onlinejudge').'" />';
