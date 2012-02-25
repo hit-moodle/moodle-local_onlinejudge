@@ -1,0 +1,26 @@
+#!/bin/sh
+
+PIDID=`pgrep -f "judged.php"`
+RUN_CMD='sudo -u www-data php judged.php'
+
+# Restart
+if ! [ -z $1 ]; then
+    if [ $1 = "restart" ]; then
+        if ! [ -z {PIDID} ]; then
+            echo "Restarting judged.php..."
+            kill ${PIDID}
+            ${RUN_CMD} >/dev/null 2>&1
+            exit 0
+        else
+            echo "judged.php PID not found"
+        fi
+    fi
+fi
+
+
+if ! [ -z ${PIDID} ]; then
+    echo "judged.php is already running (pid $PIDID)"
+else
+    echo "judged.php is not running, starting it..."
+    ${RUN_CMD} >/dev/null 2>&1
+fi
