@@ -848,7 +848,9 @@ function onlinejudge_task_judged($task) {
         ON s.testcase = t.id
         WHERE s.submission = ? AND s.latest = 1
         ORDER BY t.sortorder ASC';
-    $onlinejudges = $DB->get_records_sql($sql, array($submission->id));
+    if (!$onlinejudges = $DB->get_records_sql($sql, array($submission->id))) {
+        return false;
+    }
 
     // update grade after the last task is judged
     if ($task->id == end($onlinejudges)->task) {
