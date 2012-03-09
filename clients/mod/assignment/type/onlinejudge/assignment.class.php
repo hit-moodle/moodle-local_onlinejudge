@@ -846,34 +846,30 @@ function onlinejudge_task_judged($task) {
     $sql = 'SELECT s.*, t.subgrade
         FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
         ON s.testcase = t.id
-        WHERE s.submission = ? AND s.latest = 1
-        ORDER BY t.sortorder ASC';
+        WHERE s.submission = ? AND s.latest = 1';
     if (!$onlinejudges = $DB->get_records_sql($sql, array($submission->id))) {
         return false;
     }
 
-    // update grade after the last task is judged
-    if ($task->id == end($onlinejudges)->task) {
-        $finalgrade = 0;
-        foreach ($onlinejudges as $oj) {
-            if ($task = onlinejudge_get_task($oj->task)) {
-                $task->grade = $ass->grade_marker($task->status, $oj->subgrade);
-                if ($task->grade == -1) { // Not all testcases are judged, or judge engines internal error
-                    // In the case of internal error, keep old grade is reasonable
-                    // since most of ie is caused by system
-                    return false;
-                }
-                $finalgrade += $task->grade;
+    $finalgrade = 0;
+    foreach ($onlinejudges as $oj) {
+        if ($task = onlinejudge_get_task($oj->task)) {
+            $task->grade = $ass->grade_marker($task->status, $oj->subgrade);
+            if ($task->grade == -1) { // Not all testcases are judged, or judge engines internal error
+                // In the case of internal error, keep old grade is reasonable
+                // since most of ie is caused by system
+                return true;
             }
+            $finalgrade += $task->grade;
         }
-
-        $submission->grade = $finalgrade;
-        $submission->timemarked = time();
-        $submission->mailed = 1; // do not notify student by mail
-        $submission->teacher = get_admin()->id;
-        $DB->update_record('assignment_submissions', $submission);
-        $ass->update_grade($submission);
     }
+
+    $submission->grade = $finalgrade;
+    $submission->timemarked = time();
+    $submission->mailed = 1; // do not notify student by mail
+    $submission->teacher = get_admin()->id;
+    $DB->update_record('assignment_submissions', $submission);
+    $ass->update_grade($submission);
 
     return true;
 }
