@@ -856,12 +856,12 @@ function onlinejudge_task_judged($task) {
         foreach ($onlinejudges as $oj) {
             if ($task = onlinejudge_get_task($oj->task)) {
                 $task->grade = $ass->grade_marker($task->status, $oj->subgrade);
-                if ($task->grade != -1 && $finalgrade != -1) {
-                    $finalgrade += $task->grade;
-                } else {
-                    // Never count grade again
-                    $finalgrade = -1;
+                if ($task->grade == -1) { // Not all testcases are judged, or judge engines internal error
+                    // In the case of internal error, keep old grade is reasonable
+                    // since most of ie is caused by system
+                    return false;
                 }
+                $finalgrade += $task->grade;
             }
         }
 
