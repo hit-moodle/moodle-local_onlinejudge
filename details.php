@@ -45,9 +45,6 @@ if (empty($task)) {
     print_error('invalidtaskid', 'local_onlinejudge', '', $taskid);
 }
 
-$task[0]="asldkf;adsjf;l";
-$task[1]="a;sdkf;jadksjfl;j";
-
 $context = get_context_instance(CONTEXT_MODULE, $task->cmid);
 
 $PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
