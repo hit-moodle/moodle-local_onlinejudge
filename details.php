@@ -45,6 +45,9 @@ if (empty($task)) {
     print_error('invalidtaskid', 'local_onlinejudge', '', $taskid);
 }
 
+$task[0]="asldkf;adsjf;l";
+$task[1]="a;sdkf;jadksjfl;j";
+
 $context = get_context_instance(CONTEXT_MODULE, $task->cmid);
 
 $PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
@@ -134,3 +137,48 @@ function format_stderr($string) {
     return format_compileroutput($string);
 }
 
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<style type="text/css">
+			ins {color:green;background:#dfd;text-decoration:none}
+			del {color:red;background:#fdd;text-decoration:none}
+			.pane {margin:0;padding:0;border:0;width:100%;min-height:30em;overflow:auto;font:12px monospace}
+			.diff {color:gray}
+		</style>
+	</head>
+	<body>
+		<div>
+			<?php
+				include 'finediff.php';
+
+				$granularity = 3;
+
+				$from_text = $task[0];
+				$to_text = $task[1];
+				$diff = '';
+				$granularityStacks = array(
+					FineDiff::$paragraphGranularity,
+					FineDiff::$sentenceGranularity,
+					FineDiff::$wordGranularity,
+					FineDiff::$characterGranularity
+				);
+
+				$from_len = strlen($from_text);
+				$to_len = strlen($to_text);
+				$diff = new FineDiff($from_text, $to_text, FineDiff::$characterGranularity);
+				$edits = $diff->getOps();
+				$rendered_diff = $diff->renderDiffToHTML();
+				$diff_len = strlen($diff->getOpcodes());
+			?>
+			<div class="pane diff" style="white-space:pre-line">
+					(diff len: <?php echo $diff_len; ?> chars)
+					<?php echo $rendered_diff; ?>
+			</div>
+		</div>
+</body>
+</html>
+
+<?php
