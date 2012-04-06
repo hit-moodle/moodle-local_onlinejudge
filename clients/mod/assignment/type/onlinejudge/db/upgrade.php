@@ -283,6 +283,19 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011081100, 'assignment', 'onlinejudge');
     }
 
+    if ($oldversion < 2012040600) {
+        // Convert all CR+LF to LF in not usefile testcases
+        $rs = $DB->get_records('assignment_oj_testcases', array('usefile' => 0), '', 'id, input, output');
+        foreach ($rs as $r) {
+            $r->input = strtr($r->input, array("\r\n" => "\n", "\n\r" => "\n"));
+            $r->output = strtr($r->output, array("\r\n" => "\n", "\n\r" => "\n"));
+            $DB->update_record('assignment_oj_testcases', $r, true);
+        }
+
+        // onlinejudge savepoint reached
+        upgrade_plugin_savepoint(true, 2012040600, 'assignment', 'onlinejudge');
+    }
+
     return true;
 }
 

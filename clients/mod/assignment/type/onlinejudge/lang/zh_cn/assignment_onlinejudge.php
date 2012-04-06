@@ -57,9 +57,13 @@ $string['ideonepass_help'] = '这不是ideone网站的密码，而是ideone <em>
 $string['ideonepass2'] = '再次输入API密码';
 $string['ideonepassmismatch'] = '两个密码不匹配';
 $string['input'] = '输入';
-$string['input_help'] = '输入数据会被送入被测程序的标准输入。';
+$string['input_help'] = '输入数据会被送入被测程序的标准输入。
+
+注意：所有Windows风格的换行符（ CR+LF 或 \r\n ）会被转换为Unix风格（LF 或 \n）';
 $string['inputfile'] = '输入文件';
-$string['inputfile_help'] = '此文件中的数据会被送入被测程序的标准输入。如果此文件不可读，这条测试用例会被忽略。';
+$string['inputfile_help'] = '此文件中的数据会被送入被测程序的标准输入。
+
+如果此文件不可读，这条测试用例会被忽略。';
 $string['judgetime'] = '评测时间';
 $string['langc_warn2err'] = 'C (警告视为错误)';
 $string['langcpp_warn2err'] = 'C++ (警告视为错误)';
@@ -70,9 +74,13 @@ $string['maxmemusage'] = '最大内存用量';
 $string['memlimit'] = '内存最多可用';
 $string['notestcases'] = '未设置测试用例';
 $string['output'] = '输出';
-$string['output_help'] = '输出数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。';
+$string['output_help'] = '输出数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。
+
+注意：所有Windows风格的换行符（ CR+LF 或 \r\n ）会被转换为Unix风格（LF 或 \n）';
 $string['outputfile'] = '输出文件';
-$string['outputfile_help'] = '此文件中的数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。如果此文件不可读，这条测试用例会被忽略。';
+$string['outputfile_help'] = '此文件中的数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。
+
+如果此文件不可读，这条测试用例会被忽略。';
 $string['pluginname'] = '在线评测';
 $string['ratiope'] = '格式错误得分比例';
 $string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例

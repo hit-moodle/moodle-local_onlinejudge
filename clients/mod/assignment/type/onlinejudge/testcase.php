@@ -93,12 +93,14 @@ if ($testform->is_cancelled()){
 
         if (isset($fromform->usefile[$i])) {
             $testcase->usefile = true;
-			$testcase->inputfile = $fromform->inputfile[$i];
-			$testcase->outputfile = $fromform->outputfile[$i];
+            // Keep file as is
+            $testcase->inputfile = $fromform->inputfile[$i];
+            $testcase->outputfile = $fromform->outputfile[$i];
         } else {
             $testcase->usefile = false;
-			$testcase->input = $fromform->input[$i];
-			$testcase->output = $fromform->output[$i];
+            // Translate textbox inputs to Unix text format
+            $testcase->input = crlf2lf($fromform->input[$i]);
+            $testcase->output = crlf2lf($fromform->output[$i]);
         }
 
         $testcase->feedback = $fromform->feedback[$i];
@@ -162,5 +164,10 @@ function emptycase(&$form, $i) {
         return empty($form->inputfile[$i]) && empty($form->outputfile[$i]);
     else
         return empty($form->input[$i]) && empty($form->output[$i]);
+}
+
+/* Translate CR+LF (\r\n) to LF (\n) */
+function crlf2lf(&$text) {
+    return strtr($text, array("\r\n" => "\n", "\n\r" => "\n"));
 }
 

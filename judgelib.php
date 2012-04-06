@@ -144,13 +144,9 @@ class judge_base{
         $task->stderr = $this->convert_to_utf8($task->stderr);
         $task->output = $this->convert_to_utf8($task->output);
 
-    	//format
-        $task->output = strtr($task->output, array("\r\n" => "\n", "\n\r" => "\n"));
-        $task->stdout = strtr($task->stdout, array("\r\n" => "\n", "\n\r" => "\n"));
-
         // trim tailing return chars which are meaning less
-        $task->output = rtrim($task->output, "\n");
-        $task->stdout = rtrim($task->stdout, "\n");
+        $task->output = rtrim($task->output, "\r\n");
+        $task->stdout = rtrim($task->stdout, "\r\n");
 
         if (strcmp($task->output, $task->stdout) == 0)
             return ONLINEJUDGE_STATUS_ACCEPTED;

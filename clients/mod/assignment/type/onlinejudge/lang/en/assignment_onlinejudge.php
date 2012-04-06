@@ -57,9 +57,13 @@ $string['ideonepass_help'] = 'It is NOT the ideone password but the ideone <em>A
 $string['ideonepass2'] = 'Retype API password';
 $string['ideonepassmismatch'] = 'The two passwords are mismatch';
 $string['input'] = 'Input';
-$string['input_help'] = 'The input data will be sent to the stdin of submitted programs.';
+$string['input_help'] = 'The input data will be sent to the stdin of submitted programs.
+
+NOTE: Windows flavor new line characters (CR + LF or \r\n) will be converted to Unix flavor (LF or \n).';
 $string['inputfile'] = 'Input file';
-$string['inputfile_help'] = 'The data in the file will be sent to the stdin of submitted programs. If the file is missing, the testcase will be skipped.';
+$string['inputfile_help'] = 'The data in the file will be sent to the stdin of submitted programs.
+
+If the file is missing, the testcase will be skipped.';
 $string['judgetime'] = 'Judge time';
 $string['managetestcases'] = 'Manage testcases';
 $string['maxcpuusage'] = 'Maximum CPU usage';
@@ -69,9 +73,13 @@ $string['memlimit'] = 'Maximum memory usage';
 $string['notestcases'] = 'No defined testcases';
 $string['onlinejudgeinfo'] = 'Online Judge Information';
 $string['output'] = 'Output';
-$string['output_help'] = 'The output data will be compared with submissions\' stdout to judge correctness.';
+$string['output_help'] = 'The output data will be compared with submissions\' stdout to judge correctness.
+
+NOTE: Windows flavor new line characters (CR + LF or \r\n) will be converted to Unix flavor (LF or \n).';
 $string['outputfile'] = 'Output file';
-$string['outputfile_help'] = 'The data in the file will be compared submissions\' stdout to judge correctness. If the file is missing, the testcase will be skipped.';
+$string['outputfile_help'] = 'The data in the file will be compared with submissions\' stdout to judge correctness.
+
+If the file is missing, the testcase will be skipped.';
 $string['pluginname'] = 'Online Judge';
 $string['ratiope'] = 'Ratio for presentation error';
 $string['ratiope_help'] = 'Grade for presentation error is equal to testcase\'s max grade times this ratio.
