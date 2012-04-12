@@ -60,7 +60,7 @@ class judge_sandbox extends judge_base {
     	global $CFG;
 
         $search = array('%SOURCES%', '%DEST%');
-        $replace = array('"'.implode('" "', $files).'"', '"'.$this->get_temp_dir().'/a.out"');
+        $replace = array('"'.implode('" "', $files).'"', '"'.onlinejudge_get_temp_dir().'/a.out"');
         // construct compiler command
         $command = str_replace($search, $replace, self::$supported_languages[$this->language]);
 
@@ -69,7 +69,7 @@ class judge_sandbox extends judge_base {
         $return = 0;
         exec($command.' 2>&1', $output, $return);
 
-        $this->task->compileroutput = str_replace($this->get_temp_dir().'/', '', implode("\n", $output));
+        $this->task->compileroutput = str_replace(onlinejudge_get_temp_dir().'/', '', implode("\n", $output));
         if ($return != 0) {
             // TODO: if the command can not be executed, it should be internal error
             $this->task->status = ONLINEJUDGE_STATUS_COMPILATION_ERROR;

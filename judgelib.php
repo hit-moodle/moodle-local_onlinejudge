@@ -73,12 +73,6 @@ class judge_base{
         $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
     }
 
-    function __destruct() {
-        if (!debugging('', DEBUG_DEVELOPER)) {
-            remove_dir($this->get_temp_dir());
-        }
-    }
-
     /**
      * Return an array of programming languages supported by this judge
      *
@@ -180,7 +174,7 @@ class judge_base{
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
         foreach ($files as $file) {
-            $path = $this->get_temp_dir().$file->get_filepath();
+            $path = onlinejudge_get_temp_dir().$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             if (!check_dir_exists($path)) {
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
@@ -190,17 +184,6 @@ class judge_base{
         }
 
         return $dstfiles;
-    }
-
-    protected function get_temp_dir() {
-        global $CFG;
-
-        $tmpdir = "$CFG->dataroot/temp/onlinejudge/{$this->task->id}";
-        if (!check_dir_exists($tmpdir)) {
-            throw new moodle_exception('errorcreatingdirectory', '', '', $tmpdir);
-        }
-
-        return $tmpdir;
     }
 
     /**
@@ -436,5 +419,27 @@ function onlinejudge_delete_coursemodule($cmid) {
     // Mark them as deleted only and keep the statistics.
     // Delete them really in cron
     return $DB->set_field('onlinejudge_tasks', 'deleted', 1, array('cmid' => $cmid));
+}
+
+function onlinejudge_get_temp_dir() {
+    global $CFG;
+
+    // Use static variable to suppress getmypid() calls
+    // The same process use the same temp dir so that
+    // it is possable to reuse some temp files
+    static $tmpdir = '';
+    if (empty($tmpdir)) {
+        $tmpdir = $CFG->dataroot.'/temp/onlinejudge/'.getmypid();
+    }
+
+    if (!check_dir_exists($tmpdir)) {
+        throw new moodle_exception('errorcreatingdirectory', '', '', $tmpdir);
+    }
+
+    return $tmpdir;
+}
+
+function onlinejudge_clean_temp_dir() {
+    remove_dir(onlinejudge_get_temp_dir());
 }
 

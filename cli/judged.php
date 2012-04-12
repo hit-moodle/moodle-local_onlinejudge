@@ -133,6 +133,8 @@ while (!$forcestop) {
     }
 }
 
+verbose('Clean temp files.');
+onlinejudge_clean_temp_dir();
 verbose('Judge daemon exits.');
 
 /**
