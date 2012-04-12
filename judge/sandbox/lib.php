@@ -86,16 +86,40 @@ class judge_sandbox extends judge_base {
      * @return updated task
      */
     function judge() {
+        static $binfile = '';
+        static $last_compilation_status = -1;
 
-        $files = $this->create_temp_files();
-
-        $binfile = $this->compile($files);
+        if (!$this->last_task_is_simlar()) {
+            $files = $this->create_temp_files();
+            $binfile = $this->compile($files);
+            $last_compilation_status = $this->task->status;
+        } else { // reuse results of last compilation
+            $this->task->status = $last_compilation_status;
+        }
 
         if ($this->task->status == ONLINEJUDGE_STATUS_COMPILATION_OK && !$this->task->compileonly) {
             $this->run_in_sandbox($binfile);
         }
 
         return $this->task;
+    }
+
+    /**
+     * Whether the last task is using the same program with current task
+     */
+    protected function last_task_is_simlar() {
+        static $last_contenthashs = array();
+        $new_contenthashs = array();
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
+        foreach ($files as $file) {
+            $new_contenthashs[] = $file->get_contenthash();
+        }
+
+        $result = $last_contenthashs == $new_contenthashs;
+        $last_contenthashs = $new_contenthashs;
+        return $result;
     }
 
     protected function run_in_sandbox($binfile) {
