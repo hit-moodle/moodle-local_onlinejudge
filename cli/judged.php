@@ -134,7 +134,7 @@ while (!$forcestop) {
 }
 
 verbose('Clean temp files.');
-onlinejudge_clean_temp_dir();
+onlinejudge_clean_temp_dir(false);  // Clean full tree of temp dir
 verbose('Judge daemon exits.');
 
 /**

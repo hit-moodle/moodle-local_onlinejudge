@@ -439,7 +439,7 @@ function onlinejudge_get_temp_dir() {
     return $tmpdir;
 }
 
-function onlinejudge_clean_temp_dir() {
-    remove_dir(onlinejudge_get_temp_dir());
+function onlinejudge_clean_temp_dir($content_only=true) {
+    remove_dir(onlinejudge_get_temp_dir(), $content_only);
 }
 

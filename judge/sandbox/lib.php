@@ -90,6 +90,7 @@ class judge_sandbox extends judge_base {
         static $last_compilation_status = -1;
 
         if (!$this->last_task_is_simlar()) {
+            onlinejudge_clean_temp_dir();
             $files = $this->create_temp_files();
             $binfile = $this->compile($files);
             $last_compilation_status = $this->task->status;
