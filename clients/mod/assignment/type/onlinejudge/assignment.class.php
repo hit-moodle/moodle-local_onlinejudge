@@ -552,7 +552,7 @@ class assignment_onlinejudge extends assignment_upload {
         $item_name = get_string('details', 'local_onlinejudge').':';
         $item = get_string('notavailable');
         if ($onlinejudge_result->status == ONLINEJUDGE_STATUS_COMPILATION_ERROR) {
-            $item = htmlspecialchars(end($onlinejudge_result->testcases)->compileroutput);
+            $item = htmlspecialchars(reset($onlinejudge_result->testcases)->compileroutput);
         } else if (!empty($onlinejudge_result->testcases)) {
             $i = 1;
             $lines = array();
