@@ -88,14 +88,17 @@ class judge_sandbox extends judge_base {
     function judge() {
         static $binfile = '';
         static $last_compilation_status = -1;
+        static $last_compileroutput = '';
 
         if (!$this->last_task_is_simlar()) {
             onlinejudge_clean_temp_dir();
             $files = $this->create_temp_files();
             $binfile = $this->compile($files);
             $last_compilation_status = $this->task->status;
+            $last_compileroutput = $this->task->compileroutput;
         } else { // reuse results of last compilation
             $this->task->status = $last_compilation_status;
+            $this->task->compileroutput = $last_compileroutput;
         }
 
         if ($this->task->status == ONLINEJUDGE_STATUS_COMPILATION_OK && !$this->task->compileonly) {
