@@ -36,6 +36,7 @@
  */
 
 define('CLI_SCRIPT', true);
+define('LOCK_FILE', '/temp/onlinejudge/lock');
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -114,6 +115,7 @@ if ($CFG->ostype != 'WINDOWS' and function_exists('pcntl_signal')) {
 }
 
 // Run forever until being killed or the plugin was upgraded
+$LOCK = fopen($CFG->dataroot . LOCK_FILE, 'w');
 $forcestop = false;
 $plugin_version = get_config('local_onlinejudge', 'version');
 while (!$forcestop) {
@@ -136,6 +138,7 @@ while (!$forcestop) {
 verbose('Clean temp files.');
 onlinejudge_clean_temp_dir(false);  // Clean full tree of temp dir
 verbose('Judge daemon exits.');
+fclose($LOCK);
 
 /**
  * Return one unjudged task and set it status as JUDGING
@@ -143,19 +146,15 @@ verbose('Judge daemon exits.');
  * @return an unjudged task or null;
  */
 function get_one_unjudged_task() {
-    global $CFG, $DB;
+    global $CFG, $DB, $LOCK;
 
     $task = null;
 
-    $transaction = $DB->start_delegated_transaction();
-    try {
-        if ($task = $DB->get_record('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '*', IGNORE_MULTIPLE)) {
-            $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE_STATUS_JUDGING, array('id' => $task->id));
-        }
-        $transaction->allow_commit();
-    } catch (Exception $e) {
-        $transaction->rollback($e); // rethrows exception
+    flock($LOCK, LOCK_EX); // try locking, but ignore if not available (eg. on NFS and FAT)
+    if ($task = $DB->get_record('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '*', IGNORE_MULTIPLE)) {
+        $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE_STATUS_JUDGING, array('id' => $task->id));
     }
+    flock($LOCK, LOCK_UN);
 
     return $task;
 }
