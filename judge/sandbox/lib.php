@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__)."/../../../../config.php");
 require_once($CFG->dirroot."/local/onlinejudge/judgelib.php");
 
-define('SANDBOX_SAND', $CFG->dirroot.'/local/onlinejudge/judge/sandbox/sand/sand');
+define('SANDBOX_SAND', escapeshellcmd($CFG->dirroot.'/local/onlinejudge/judge/sandbox/sand/sand'));
 
 class judge_sandbox extends judge_base {
     protected static $supported_languages = array(
@@ -146,7 +146,7 @@ class judge_sandbox extends judge_base {
             throw new onlinejudge_exception('cannotrunsand');
         }
 
-        $sand .= ' -l cpu='.(($this->task->cpulimit)*1000).' -l memory='.$this->task->memlimit.' -l disk=512000 "'.$binfile.'"';
+        $sand .= ' -l cpu='.escapeshellarg(($this->task->cpulimit)*1000).' -l memory='.escapeshellarg($this->task->memlimit).' -l disk=512000 '.escapeshellarg($binfile);
 
         // run it in sandbox!
         $descriptorspec = array(
