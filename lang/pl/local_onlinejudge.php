@@ -34,7 +34,6 @@
  */
 
 $string['about'] = 'O';
-$string['aboutcontent'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Online Judge</a> is developped by <a href="http://www.hit.edu.cn">Harbin Institute of Technology</a>, and licensed by <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.';
 $string['badvalue'] = 'Zła wartość';
 $string['cannotrunsand'] = 'Nie można uruchomić sprawdzaczki';
 $string['compileroutput'] = 'Wyjście kompilatora';
@@ -46,7 +45,6 @@ $string['ideoneautherror'] = 'Zła nazwa użytkownika lub hasło';
 $string['ideonedelay'] = 'Opóźnienie pomiędzy zgłoszeniami do ideone.com (w sekundach)';
 $string['ideonedelay_help'] = 'Jeśli opóźnienie pomiędzy zgloszeniami jest zbyt małe, ideone może odżucić zgloszenie.';
 $string['ideoneerror'] = 'Ideone zwrócił błąd: {$a}';
-$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['ideoneresultlink'] = 'Zobacz szczegóły na <a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>.';
 $string['ideoneuserrequired'] = 'Wymagane jeśli zaznaczono ideone.com';
 $string['info'] = 'Informacje';
@@ -69,13 +67,6 @@ $string['infoteacher'] = 'Ważne informacje';
 $string['invalidlanguage'] = 'Złe ID języka: {$a}';
 $string['invalidjudgeclass'] = 'Invalid judge class: {$a}';
 $string['invalidtaskid'] = 'Złe id zadania: {$a}';
-$string['judgedcrashnotify'] = 'Judge daemon crashed notification';
-$string['judgedcrashnotify_help'] = 'Judge daemon may be crashed or quit due to software bugs or upgrading. If so, who will receive the notification? It should be a person who can access the shell of the server and launch the judge daemon.';
-$string['judgednotifybody'] = 'Among the {$a->count} pending tasks, the oldest task has been in the waiting queue for {$a->period}.
-
-It is possible that the judge daemon of online judge was crashed or quitted. You must launch it as soon as possible!
-
-Or, it is possible that there are too much tasks in the queue and you should consider to run multiply judge daemons.';
 $string['judgednotifysubject'] = '{$a->count} oczekujących zadań, oczekuje zbyt dług';
 $string['judgestatus'] = 'Online Judge ocenił <strong>{$a->judged}</strong> zadań i teraz jest <strong>{$a->pending}</strong> zadan oczekujących.';
 $string['langc_sandbox'] = 'C (wykonaj lokalnie)';
@@ -87,19 +78,13 @@ $string['maxcpulimit_help'] = 'How long can a program been judged keep running.'
 $string['maxmemlimit'] = 'Maksymalne użycie pamięci (MB)';
 $string['maxmemlimit_help'] = 'How many memory can a program been judged use.';
 $string['memusage'] = 'Uzycie pamięci';
-$string['messageprovider:judgedcrashed'] = 'Online judge daemon crashed notification';
 $string['mystat'] = 'Moje statystyki';
 $string['notesensitive'] = '* Pokazuj tylko nauczycielą';
 $string['onefileonlyideone'] = 'Ideone.com does not support multi-files';
 $string['onlinejudge:viewjudgestatus'] = 'Pokaż status sędziego';
-$string['onlinejudge:viewmystat'] = 'View self statistics';
-$string['onlinejudge:viewsensitive'] = 'View sensitive details';
-$string['pluginname'] = 'Online Judge';
-$string['sandboxerror'] = 'Sandbox error occurs: {$a}';
-$string['settingsform'] = 'Online Judge Settings';
 $string['settingsupdated'] = 'Zaktualizowano ustawienia.';
 $string['status0'] = 'Czekaj...';
-$string['status1'] = '<font color=red>Zaakceptowano</font>';
+$string['status1'] = 'Zaakceptowano';
 $string['status2'] = 'Abnormal Termination';
 $string['status3'] = 'Błąd kompilacji';
 $string['status4'] = 'Compilation Ok';
@@ -110,11 +95,5 @@ $string['status9'] = 'Błąd wykonania';
 $string['status8'] = 'Niedozwolone funkcje';
 $string['status10'] = 'Przekroczono limit czasu';
 $string['status11'] = 'Zła odpowiedź';
-$string['status21'] = 'Internal Error';
 $string['status22'] = 'Ocenianie...';
-$string['status23'] = 'Multi-status';
-$string['status255'] = 'Unsubmitted';
-$string['stderr'] = 'Standard error output';
-$string['stdout'] = 'Standard output';
-$string['upgradenotify'] = 'Do NOT forget to execute cli/install_assignment_type and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
 
