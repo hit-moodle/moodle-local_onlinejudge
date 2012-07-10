@@ -65,7 +65,7 @@ Installation / Upgrading
 ========================
 
 *MOODLE_PATH means the root path of your moodle installation.*
-*Do NOT forget this bold step during upgrading.*
+*Do NOT ignore the bold steps during upgrading.*
 
 In Linux
 --------
