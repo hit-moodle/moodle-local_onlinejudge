@@ -96,6 +96,8 @@ Online Judge Assignment Type
 
 After installation, there will be a new assignment type called *Online Judge* appears in the *"Add an activity..."* drop down list. Simply click it and follow the inline help.
 
+In settings block, there are links to testcase management and rejudge all.
+
 Judge Daemon
 ------------
 
