@@ -432,6 +432,7 @@ class assignment_onlinejudge extends assignment_upload {
             $formdata = file_postupdate_standard_filemanager($formdata, 'files', $options, $this->context, 'mod_assignment', 'submission', $submission->id);
             $updates = new stdClass();
             $updates->id = $submission->id;
+            $updates->numfiles = count($fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id, 'sortorder', false));
             $updates->timemodified = time();
             $DB->update_record('assignment_submissions', $updates);
             add_to_log($this->course->id, 'assignment', 'upload',
@@ -441,7 +442,7 @@ class assignment_onlinejudge extends assignment_upload {
                 $this->email_teachers($submission);
             }
 
-            $this->request_judge($submission);
+            $this->request_judge($submission);  // Added by onlinejudge
 
             // send files to event system
             $files = $fs->get_area_files($this->context->id, 'mod_assignment', 'submission', $submission->id);
