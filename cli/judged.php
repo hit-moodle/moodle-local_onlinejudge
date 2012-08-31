@@ -115,7 +115,16 @@ if ($CFG->ostype != 'WINDOWS' and function_exists('pcntl_signal')) {
 }
 
 // Run forever until being killed or the plugin was upgraded
-$LOCK = fopen($CFG->dataroot . LOCK_FILE, 'w');
+$lockfile = $CFG->dataroot . LOCK_FILE;
+if (!check_dir_exists(dirname($lockfile))) {
+    throw new moodle_exception('errorcreatingdirectory', '', '', $lockfile);
+}
+$LOCK = fopen($lockfile, 'w');
+if (!$LOCK) {
+    mtrace('Can not create'.$CFG->dataroot.LOCK_FILE);
+    die;
+}
+
 $forcestop = false;
 $plugin_version = get_config('local_onlinejudge', 'version');
 while (!$forcestop) {
