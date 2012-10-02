@@ -41,8 +41,8 @@ In Linux
 
 * Moodle 2.0 or above
 * php-cli
-* make, gcc and g++ (optional but recommended)
-* pcntl and posix extension in php-cli (optional but recommended)
+* (optional but recommended) make, gcc and g++. For 64-bit system, libc 32-bit development libraries, e.g. libc6-dev-i386, glibc-devel.i386, are required.
+* (optional but recommended) pcntl and posix extension for php-cli
 
 In Windows
 ----------
@@ -65,7 +65,7 @@ Installation / Upgrading
 ========================
 
 *MOODLE_PATH means the root path of your moodle installation.*
-*Do NOT forget this bold step during upgrading.*
+*Do NOT ignore the bold steps during upgrading.*
 
 In Linux
 --------
@@ -95,6 +95,8 @@ Online Judge Assignment Type
 ----------------------------
 
 After installation, there will be a new assignment type called *Online Judge* appears in the *"Add an activity..."* drop down list. Simply click it and follow the inline help.
+
+In settings block, there are links to testcase management and rejudge all.
 
 Judge Daemon
 ------------
