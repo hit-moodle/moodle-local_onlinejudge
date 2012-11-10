@@ -67,6 +67,14 @@ Installation / Upgrading
 *MOODLE_PATH means the root path of your moodle installation.*
 *Do NOT ignore the bold steps during upgrading.*
 
+**For clean installation of Moodle 2.3 or 2.4 (rather than an upgraded site):**
+
+You need to enable the 2.2 assignment type in administration under:
+
+```
+ Site admin > Plugins > Activity modules > Manage activities
+```
+
 In Linux
 --------
 
