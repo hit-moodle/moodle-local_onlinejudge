@@ -3,6 +3,7 @@
 int main(void)
 {
     int *p = malloc(1024*1024*1024);
+    memset(p,0,sizeof(1024*1024*1024));
     free(p);
 
     return 0;
