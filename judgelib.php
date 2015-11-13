@@ -158,11 +158,8 @@ class judge_base{
                     return ONLINEJUDGE_STATUS_WRONG_ANSWER;
                 $tok = strtok(" \n\r\t");
             }
-            while ($tok !== false) {
-                if ( !empty(trim($tok)) ) {
-                    return ONLINEJUDGE_STATUS_WRONG_ANSWER;
-                }
-                $tok = strtok(" \n\r\t");
+            if ($tok !== false) {
+                return ONLINEJUDGE_STATUS_WRONG_ANSWER;
             }
             return ONLINEJUDGE_STATUS_PRESENTATION_ERROR;
         }
