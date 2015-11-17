@@ -139,6 +139,10 @@ class judge_ideone extends judge_base
             break;
         }
 
+        if (!mb_detect_encoding($source, "UTF-8", true)) {
+            $source = utf8_encode($source);
+        } 
+
         $status_ideone = array(
             0   => ONLINEJUDGE_STATUS_PENDING,
             11  => ONLINEJUDGE_STATUS_COMPILATION_ERROR,
