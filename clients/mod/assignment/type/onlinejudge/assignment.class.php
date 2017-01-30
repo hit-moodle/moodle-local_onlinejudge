@@ -271,6 +271,34 @@ class assignment_onlinejudge extends assignment_upload {
     }
 
     /**
+     * Counts all complete (real) assignment submissions by enrolled students
+     * This is necessary because advanced file uploads needs to check that the data2 field is equal to "submitted" to determine
+     * if a submission is complete and the onlinejudge doesn't.
+     *
+     * @param  int $groupid (optional) If nonzero then count is restricted to this group
+     * @return int          The number of submissions
+     */
+    function count_real_submissions($groupid=0) {
+        global $CFG;
+        global $DB;
+
+        // Grab the context assocated with our course module
+        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+
+        // Get ids of users enrolled in the given course.
+        list($enroledsql, $params) = get_enrolled_sql($context, 'mod/assignment:view', $groupid);
+        $params['assignmentid'] = $this->cm->instance;
+
+        // Get ids of users enrolled in the given course.
+        return $DB->count_records_sql("SELECT COUNT('x')
+                                         FROM {assignment_submissions} s
+                                    LEFT JOIN {assignment} a ON a.id = s.assignment
+                                   INNER JOIN ($enroledsql) u ON u.id = s.userid
+                                        WHERE s.assignment = :assignmentid AND
+                                              s.timemodified > 0", $params);
+    }
+
+    /**
      * Get testcases data of current assignment.
      *
      * @return An array of testcases objects. All testcase files are read into memory
