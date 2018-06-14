@@ -14,8 +14,21 @@
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
         <FIELD NAME="input" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
         <FIELD NAME="output" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="compileonly"/>
-        <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="output" NEXT="component"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Who submitted this task" PREVIOUS="compileonly" NEXT="status"/>
+          <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
+                 PREVIOUS="output" NEXT="compile_lm_option"/>
+          <!--The following compile options are newly added. Attributes will take the following naming convention compile_[optionname]_option-->
+          <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                 COMMENT="Compiler Parameter [Link the math library]" PREVIOUS="compileonly"
+                 NEXT="compile_warnings_option"/>
+          <FIELD NAME="compile_warnings_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                 COMMENT="Compilation Parameter [Enables all compiler's warning messages]" PREVIOUS="compile_lm_option"
+                 NEXT="compile_static_option"/>
+          <FIELD NAME="compile_static_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                 COMMENT="Compilation Parameter [Allow only static libraries and not shared libraries]"
+                 PREVIOUS="compile_warnings_option"/>
+          <!-- ///////////////////////////////////////////////////////////////////////////////////-->
+          <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
+                 COMMENT="Who submitted this task" PREVIOUS="compile_static_option" NEXT="status"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="component" NEXT="stdout"/>
         <FIELD NAME="stdout" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="status" NEXT="stderr"/>
         <FIELD NAME="stderr" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout" NEXT="compileroutput"/>

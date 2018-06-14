@@ -38,6 +38,6 @@ function xmldb_local_onlinejudge_uninstall() {
     unset_config('ideonedelay', 'local_onlinejudge');
 
     $fs = get_file_storage();
-    return $fs->delete_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge');
+    return $fs->delete_area_files(context_system::instance()->id, 'local_onlinejudge');
 }
 

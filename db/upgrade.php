@@ -101,6 +101,17 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011102401, 'local', 'onlinejudge');
     }
 
+    if ($oldversion < 2018061400) {
+        $table = new xmldb_table('onlinejudge_tasks');
+        $field = new xmldb_field('compile_lm_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_warnings_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_static_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        upgrade_plugin_savepoint(true, 2018061400, 'local', 'onlinejudge');
+    }
+
     echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');
 
     return true;
