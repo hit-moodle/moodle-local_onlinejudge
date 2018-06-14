@@ -30,8 +30,9 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->version  = 2012051800;   // The (date) version of this plugin
-$plugin->requires = 2010122900;   // Requires this Moodle version
+$plugin->component = 'local_onlinejudge'; // Declare the type and name of this plugin.
+$plugin->version = 2018061400;   // The (date) version of this plugin
+$plugin->requires = 2017111300;   // Requires this Moodle version
 
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = "2.0 beta4"; // User-friendly version number
+$plugin->release = "3.0 beta4"; // User-friendly version number
