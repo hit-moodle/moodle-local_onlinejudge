@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Move all files in $SRCPATH to $DSTPATH
+
+SCRIPTPATH=`dirname $0`
+SRCPATH="$SCRIPTPATH/../clients/mod/assign/feedback/onlinejudge/"
+DSTPATH="$SCRIPTPATH/../../../mod/assign/feedback/onlinejudge"
+
+if [ -e $DSTPATH ]; then
+    rm -rf $DSTPATH
+fi
+
+mv $SRCPATH $DSTPATH

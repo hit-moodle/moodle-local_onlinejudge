@@ -134,9 +134,8 @@ while (!$forcestop) {
         break;
     }
 
-    //Check interval is 5 seconds
-    // TODO: definable by admin
-    sleep(5);
+    // Check interval is definable by admin (5 seconds default)
+    sleep(get_config('local_onlinejudge', 'judgecheckinterval'));
 
     if ($plugin_version < get_config('local_onlinejudge', 'version')) {
         verbose('Plugin was upgraded.');
@@ -155,6 +154,7 @@ fclose($LOCK);
  * @return an unjudged task or null;
  */
 function get_one_unjudged_task() {
+
     global $CFG, $DB, $LOCK;
 
     $task = null;
@@ -203,4 +203,3 @@ function verbose($msg) {
         mtrace(rtrim($msg));
     }
 }
-
