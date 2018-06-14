@@ -33,7 +33,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
+function xmldb_assignfeedback_onlinejudge_upgrade($oldversion = 0)
+{
 
     global $CFG, $THEME, $DB;
 
@@ -294,6 +295,155 @@ function xmldb_assignment_onlinejudge_upgrade($oldversion=0) {
 
         // onlinejudge savepoint reached
         upgrade_plugin_savepoint(true, 2012040600, 'assignment', 'onlinejudge');
+    }
+
+    if ($oldversion < 2018061400) {
+        $table = new xmldb_table('assignment_oj');
+        $field = new xmldb_field('compile_lm_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_warnings_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_static_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+
+        $field = new xmldb_field('ideoneuser');
+        $dbman->rename_field($table, $field, 'clientid');
+        $field = new xmldb_field('ideonepass');
+        $dbman->rename_field($table, $field, 'accesstoken');
+        $ideone_langs = array(
+            7 => 'Ada (gnat-4.3.2, ideone.com)',
+            13 => 'Assembler (nasm-2.07, ideone.com)',
+            45 => 'Assembler (gcc-4.3.4, ideone.com)',
+            104 => 'AWK (gawk) (gawk-3.1.6, ideone.com)',
+            105 => 'AWK (mawk) (mawk-1.3.3, ideone.com)',
+            28 => 'Bash (bash 4.0.35, ideone.com)',
+            110 => 'bc (bc-1.06.95, ideone.com)',
+            12 => 'Brainf**k (bff-1.0.3.1, ideone.com)',
+            11 => 'C (gcc-4.3.4, ideone.com)',
+            27 => 'C# (mono-2.8, ideone.com)',
+            1 => 'C++ (gcc-4.3.4, ideone.com)',
+            44 => 'C++0x (gcc-4.5.1, ideone.com)',
+            34 => 'C99 strict (gcc-4.3.4, ideone.com)',
+            14 => 'CLIPS (clips 6.24, ideone.com)',
+            111 => 'Clojure (clojure 1.1.0, ideone.com)',
+            118 => 'COBOL (open-cobol-1.0, ideone.com)',
+            106 => 'COBOL 85 (tinycobol-0.65.9, ideone.com)',
+            32 => 'Common Lisp (clisp) (clisp 2.47, ideone.com)',
+            102 => 'D (dmd) (dmd-2.042, ideone.com)',
+            36 => 'Erlang (erl-5.7.3, ideone.com)',
+            124 => 'F# (fsharp-2.0.0, ideone.com)',
+            123 => 'Factor (factor-0.93, ideone.com)',
+            125 => 'Falcon (falcon-0.9.6.6, ideone.com)',
+            107 => 'Forth (gforth-0.7.0, ideone.com)',
+            5 => 'Fortran (gfortran-4.3.4, ideone.com)',
+            114 => 'Go (gc-2010-07-14, ideone.com)',
+            121 => 'Groovy (groovy-1.7, ideone.com)',
+            21 => 'Haskell (ghc-6.8.2, ideone.com)',
+            16 => 'Icon (iconc 9.4.3, ideone.com)',
+            9 => 'Intercal (c-intercal 28.0-r1, ideone.com)',
+            10 => 'Java (sun-jdk-1.6.0.17, ideone.com)',
+            35 => 'JavaScript (rhino) (rhino-1.6.5, ideone.com)',
+            112 => 'JavaScript (spidermonkey) (spidermonkey-1.7, ideone.com)',
+            26 => 'Lua (luac 5.1.4, ideone.com)',
+            30 => 'Nemerle (ncc 0.9.3, ideone.com)',
+            25 => 'Nice (nicec 0.9.6, ideone.com)',
+            122 => 'Nimrod (nimrod-0.8.8, ideone.com)',
+            43 => 'Objective-C (gcc-4.5.1, ideone.com)',
+            8 => 'Ocaml (ocamlopt 3.10.2, ideone.com)',
+            119 => 'Oz (mozart-1.4.0, ideone.com)',
+            22 => 'Pascal (fpc) (fpc 2.2.0, ideone.com)',
+            2 => 'Pascal (gpc) (gpc 20070904, ideone.com)',
+            3 => 'Perl (perl 5.12.1, ideone.com)',
+            54 => 'Perl 6 (rakudo-2010.08, ideone.com)',
+            29 => 'PHP (php 5.2.11, ideone.com)',
+            19 => 'Pike (pike 7.6.86, ideone.com)',
+            108 => 'Prolog (gnu) (gprolog-1.3.1, ideone.com)',
+            15 => 'Prolog (swi) (swipl 5.6.64, ideone.com)',
+            4 => 'Python (python 2.6.4, ideone.com)',
+            116 => 'Python 3 (python-3.1.2, ideone.com)',
+            117 => 'R (R-2.11.1, ideone.com)',
+            17 => 'Ruby (ruby-1.9.2, ideone.com)',
+            39 => 'Scala (scala-2.8.0.final, ideone.com)',
+            33 => 'Scheme (guile) (guile 1.8.5, ideone.com)',
+            23 => 'Smalltalk (gst 3.1, ideone.com)',
+            40 => 'SQL (sqlite3-3.7.3, ideone.com)',
+            38 => 'Tcl (tclsh 8.5.7, ideone.com)',
+            62 => 'Text (text 6.10, ideone.com)',
+            115 => 'Unlambda (unlambda-2.0.0, ideone.com)',
+            101 => 'Visual Basic .NET (mono-2.4.2.3, ideone.com)',
+            6 => 'Whitespace (wspace 0.3, ideone.com)',
+        );
+
+        $sphere_engine_langs = array(
+            7 => 'Ada (gnat-5.1.1, sphere-engine.com)',
+            13 => 'Assembler (nasm-2.11.05, sphere-engine.com)',
+            45 => 'Assembler (gcc-4.9.3, sphere-engine.com)',
+            104 => 'AWK (gawk) (fawk-4.1.1, sphere-engine.com)',
+            105 => 'AWK (mawk) (mawk-1.3.3, sphere-engine.com)',
+            28 => 'Bash (bash 4.3.33, sphere-engine.com)',
+            110 => 'bc (bc-1.06.95, sphere-engine.com)',
+            12 => 'Brainf**k (bff-1.0.6, sphere-engine.com)',
+            11 => 'C (gcc-5.1.1, sphere-engine.com)',
+            27 => 'C# (mono-4.0.2, sphere-engine.com)',
+            1 => 'C++ (gcc-5.1.1, sphere-engine.com)',
+            44 => 'C++0x (gcc-5.1.1, sphere-engine.com)',
+            34 => 'C99 strict (gcc-5.1.1, sphere-engine.com)',
+            14 => 'CLIPS (clips 6.24, sphere-engine.com)',
+            111 => 'Clojure (clojure 1.7.0, sphere-engine.com)',
+            118 => 'COBOL (open-cobol-1.1.0, sphere-engine.com)',
+            106 => 'COBOL 85 (tinycobol-0.65.9, sphere-engine.com)',
+            32 => 'Common Lisp (clisp) (clisp 2.49, sphere-engine.com)',
+            102 => 'D (dmd) (dmd-2.072.2, sphere-engine.com)',
+            36 => 'Erlang (erl-5.7.3, sphere-engine.com)',
+            124 => 'F# (fsharp-1.3, sphere-engine.com)',
+            107 => 'Forth (gforth-0.7.2, sphere-engine.com)',
+            5 => 'Fortran (gfortran-5.1.1, sphere-engine.com)',
+            114 => 'Go (gc-1.4, sphere-engine.com)',
+            121 => 'Groovy (groovy-2.4, sphere-engine.com)',
+            21 => 'Haskell (ghc-7.8, sphere-engine.com)',
+            16 => 'Icon (iconc 9.4.3, sphere-engine.com)',
+            9 => 'Intercal (c-intercal 28.0-r1, sphere-engine.com)',
+            10 => 'Java (jdk 8u51, sphere-engine.com)',
+            55 => 'Java7 (sun-jdk-1.7.0_10, sphere-engine.com)',
+            35 => 'JavaScript (rhino) (rhino-1.7.7, sphere-engine.com)',
+            112 => 'JavaScript (spidermonkey) (24.2.0, sphere-engine.com)',
+            26 => 'Lua (luac 7.2, sphere-engine.com)',
+            30 => 'Nemerle (ncc 1.2.0, sphere-engine.com)',
+            25 => 'Nice (nicec 0.9.13, sphere-engine.com)',
+            43 => 'Objective-C (gcc-5.1.1, sphere-engine.com)',
+            8 => 'Ocaml (ocamlopt 4.01.0, sphere-engine.com)',
+            22 => 'Pascal (fpc) (fpc 2.6.4+dfsg-6, sphere-engine.com)',
+            2 => 'Pascal (gpc) (gpc 20070904, sphere-engine.com)',
+            3 => 'Perl (perl6 2014.07,, sphere-engine.com)',
+            54 => 'Perl 6 (rakudo-2010.08, sphere-engine.com)',
+            29 => 'PHP (PHP 5.6.11-1, sphere-engine.com)',
+            19 => 'Pike (pike v7.8, sphere-engine.com)',
+            108 => 'Prolog (gnu) (prolog 1.4.5, sphere-engine.com)',
+            15 => 'Prolog (swi) (swi 7.2, sphere-engine.com)',
+            4 => 'Python (python 2.7.10, sphere-engine.com)',
+            116 => 'Python 3 (python 3.4.3+, sphere-engine.com)',
+            117 => 'R (R-3.2.2, sphere-engine.com)',
+            17 => 'Ruby (ruby-2.1.5, sphere-engine.com)',
+            39 => 'Scala (scala-2.11.7.final, sphere-engine.com)',
+            33 => 'Scheme (guile) (guile 2.0.11, sphere-engine.com)',
+            23 => 'Smalltalk (gst 3.2.4, sphere-engine.com)',
+            40 => 'SQL (sqlite3-3.8.7, sphere-engine.com)',
+            38 => 'Tcl (tclsh 8.6, sphere-engine.com)',
+            6 => 'Whitespace (wspace 0.3, sphere-engine.com)',
+        );
+
+        foreach ($ideone_langs as $id => $title) {
+            $records = $DB->get_records('assignment_oj', array('language' => $id . '_ideone'));
+            if (!empty($records)) {
+                foreach ($records as $record) {
+                    if (!is_null($sphere_engine_langs[$id])) {
+                        $record->language = $id . '_sphere_engine';
+                        $DB->update_record('assignment_oj', $record);
+                    }
+                }
+            }
+        }
+        upgrade_plugin_savepoint(true, 2018061400, 'assignfeedback', 'onlinejudge');
     }
 
     return true;
