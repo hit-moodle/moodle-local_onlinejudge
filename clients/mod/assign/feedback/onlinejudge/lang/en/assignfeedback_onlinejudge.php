@@ -31,7 +31,8 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+$string['testcasemanagement'] = 'Test Case Management';
+$string['testcasesrequired'] = 'Please consider adding 1 or more testcase(s)';
 $string['addtestcases'] = 'Add {$a} more testcase(s)';
 $string['assignmentlangs'] = 'Programming language';
 $string['badtestcasefile'] = 'This file does not exist or can not be read';
@@ -47,15 +48,16 @@ $string['denytoreadfile'] = 'You have not the permission to read this file.';
 $string['download'] = 'Download ';
 $string['duejudge'] = 'Judge after due date';
 $string['feedback'] = 'Feedback for Wrong Answer';
-$string['feedback_help'] = 'The message would be showen to the students who did not pass the testcase. It is helpful if you want to give some hints or instructions.';
+$string['feedback_help'] = 'The message would be shown to the students who did not pass the testcase. It is helpful if you want to give some hints or instructions.';
 $string['filereaderror'] = 'Can not read this file';
 $string['forcejudge'] = 'Force judge';
-$string['ideoneuser'] = 'Ideone username';
-$string['ideoneuser_help'] = 'If you choose a language which is run in ideone.com, you must provide a <a href="http://ideone.com">ideone.com</a> username.';
-$string['ideonepass'] = 'Ideone API password';
-$string['ideonepass_help'] = 'It is NOT the ideone password but the ideone <em>API</em> password. Change API password at <a href="https://ideone.com/account/">https://ideone.com/account/</a>.';
-$string['ideonepass2'] = 'Retype API password';
-$string['ideonepassmismatch'] = 'The two passwords are mismatch';
+$string['forcejudgerequestsent'] = 'The request of force judging submission of user <b>{$a}</b> is sent.';
+$string['clientid'] = 'Sphere-Engine Client ID';
+$string['clientid_help'] = 'If you choose a language which is run in sphere-engine.com, you must provide a <a href="https://sphere-engine.com">sphere-engine.com</a> client id.';
+$string['accesstoken'] = 'Sphere-Engine Access Token';
+$string['accesstoken_help'] = 'It is NOT the Sphere-Engine access token but the Sphere-Engine <em>API</em> access token. Change access-token at <a href="https://sphere-engine.com/account/">https://sphere-engine.com/account/</a>.';
+$string['accesstoken2'] = 'Retype access token';
+$string['accesstokenmismatch'] = 'The two access tokens are mismatch';
 $string['input'] = 'Input';
 $string['input_help'] = 'The input data will be sent to the stdin of submitted programs.
 
@@ -89,6 +91,7 @@ $string['readytojudge'] = 'Ready to be judged';
 $string['rejudgeall'] = 'Rejudge all';
 $string['rejudgeallnotice'] = 'Rejudging all submissions may take a long time. Do you want to continue?';
 $string['rejudgeallrequestsent'] = 'The requests of rejudging all submissions have been sent.';
+$string['rejudgeallrequestfailed'] = 'No submission(s) made to this assignment to rejudge.';
 $string['rejudgefailed'] = 'Can not submitted rejudge request.';
 $string['rejudgelater'] = 'The judge daemon is very busy. Please retry later.';
 $string['rejudgesuccess'] = 'Rejudge request has been submitted successfully.';
@@ -103,7 +106,7 @@ $string['status_help'] = 'Status indicates the results given by the online judge
 * Compilation Error - The compiler does not believe the code is correct. Grade is 0.
 * Compilation OK - If the assignment is set as <em>compile only</em>, and your code pass the compilation, then this status is returned. No grade.
 * Internal Error - The internal system is misconfigured or the judge does not work. Only administrator can solve this problem. No grade.
-* Memory-Limit Exceed - Your program has used up the maximum memory allowed. Grade is 0.
+* Memory-Limit Exceed - Your program has used up the maximum memory alloed. Grade is 0.
 * Multi-Status - There are more than one test case and the judge results of each test case are not unique. Check <em>information</em> for details. Grade is sum of all grades got from each passed test case.
 * Output-Limit Exceed - Your program has outputted too much. Check whether there is any infinite loop which keep outputting. Grade is 0.
 * Pending - Your program is waiting in the judge queue. Be patient please. However, if you have been waiting for a long time, perhaps there is something wrong with the online judge. No grade.
@@ -124,4 +127,17 @@ $string['testcases_help'] = 'Each testcase will be applied to the submissions an
 $string['typeonlinejudge'] = 'Online Judge';
 $string['usefile'] = 'Testcase from files';
 $string['waitingforjudge'] = 'Waiting for judge';
+$string['enabled'] = 'Online Judge';
+$string['enabled_help'] = 'Allowing submissions to be programmatically judged.';
+$string['user_help_heading'] = 'User Help';
+$string['user_help'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Source Control URL</a><hr>';
 
+$string['compile_warnings_option'] = 'Allow Warnings';
+$string['compile_lm_option'] = 'Link Math Library?';
+$string['compile_static_option'] = 'Link Static Libraries Only';
+
+$string['compile_warnings_option_help'] = 'if select yes, compiler warning messages will be allowed to be shown.';
+$string['compile_lm_option_help'] = 'if select yes, math library will be linked while judging submissions.';
+$string['compile_static_option_help'] = 'if select yes, only static libraries will be linked.';
+$string['source_code'] = 'Source code';
+// TODO: Add translations to other languages.
