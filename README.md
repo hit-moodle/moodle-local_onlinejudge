@@ -130,12 +130,12 @@ Links
 
 Home:
 
-* <https://github.com/andrewnagyeb/moodle-local_onlinejudge>
+* <https://github.com/hit-moodle/moodle-local_onlinejudge>
 
 FAQ:
 
-* <https://github.com/andrewnagyeb/moodle-local_onlinejudge/wiki>
+* <https://github.com/hit-moodle/moodle-local_onlinejudge/wiki>
 
 Bug reports, feature requests, help wanted and other issues:
 
-* <https://github.com/andrewnagyeb/moodle-local_onlinejudge/issues>
+* <https://github.com/hit-moodle/moodle-local_onlinejudge/issues>
