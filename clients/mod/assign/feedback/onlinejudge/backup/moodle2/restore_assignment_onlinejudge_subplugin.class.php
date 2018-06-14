@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4                         //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4.                   //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 // This file is part of Moodle - http://moodle.org/
 //
@@ -32,7 +43,8 @@
  * but it's a good example of subplugins supported at different
  * elements (assignment and submission)
  */
-class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
+class restore_assignfeedback_onlinejudge_subplugin extends restore_subplugin
+{
 
     /**
      * Returns the paths to be handled by the subplugin at assignment level
@@ -73,13 +85,14 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
     /**
      * This method processes the onlinejudge element inside one onlinejudge assignment (see onlinejudge subplugin backup)
      */
-    public function process_assignment_onlinejudge_onlinejudge($data) {
+    public function process_assignfeedback_onlinejudge_assign($data)
+    {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->assignment = $this->get_new_parentid('assignment');
+        $data->assignment = $this->get_new_parentid('assign');
 
         $newitemid = $DB->insert_record('assignment_oj', $data);
         $this->set_mapping($this->get_namefor('onlinejudge'), $oldid, $newitemid);
@@ -99,8 +112,8 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
         $newitemid = $DB->insert_record('assignment_oj_testcases', $data);
         $this->set_mapping($this->get_namefor('testcase'), $oldid, $newitemid, true);
 
-        $this->add_related_files('mod_assignment', 'onlinejudge_input', $this->get_namefor('testcase'), null, $oldid);
-        $this->add_related_files('mod_assignment', 'onlinejudge_output', $this->get_namefor('testcase'), null, $oldid);
+        $this->add_related_files('assign', 'onlinejudge_input', $this->get_namefor('testcase'), null, $oldid);
+        $this->add_related_files('assign', 'onlinejudge_output', $this->get_namefor('testcase'), null, $oldid);
     }
 
     /**
@@ -125,7 +138,8 @@ class restore_assignment_onlinejudge_subplugin extends restore_subplugin {
     /**
      * This method processes the onlinejudge_submission element inside one onlinejudge assignment (see onlinejudge subplugin backup)
      */
-    public function process_assignment_onlinejudge_onlinejudge_submission($data) {
+    public function process_assignfeedback_onlinejudge_onlinejudge_submission($data)
+    {
         global $DB;
 
         $data = (object)$data;

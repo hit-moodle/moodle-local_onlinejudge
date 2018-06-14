@@ -1,5 +1,6 @@
 <?php
 
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,7 +28,8 @@
  * backup subplugin class that provides the necessary information
  * needed to backup one assignment->onlinejudge subplugin.
  */
-class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
+class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
+{
 
     /**
      * Returns the subplugin information to attach at assignment element
@@ -85,8 +87,8 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
         $onlinejudge->set_source_table('assignment_oj', array('assignment' => backup::VAR_PARENTID));
         $testcase->set_source_table('assignment_oj_testcases', array('assignment' => backup::VAR_PARENTID));
 
-        $testcase->annotate_files('mod_assignment', 'onlinejudge_input', 'id');
-        $testcase->annotate_files('mod_assignment', 'onlinejudge_output', 'id');
+        $testcase->annotate_files('assign', 'onlinejudge_input', 'id');
+        $testcase->annotate_files('assign', 'onlinejudge_output', 'id');
 
         return $subplugin; // And we return the root subplugin element
     }
@@ -109,9 +111,8 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
             'task',
             array('id'),
             array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output',
-                  'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput',
-                  'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime',
-                  'var1', 'var2', 'var3', 'var4', 'deleted'
+                'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput',
+                'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'deleted'
             )
         );
 
@@ -129,4 +130,3 @@ class backup_assignment_onlinejudge_subplugin extends backup_subplugin {
         return $subplugin; // And we return the root subplugin element
     }
 }
-
