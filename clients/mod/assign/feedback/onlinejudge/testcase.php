@@ -1,4 +1,5 @@
 <?php
+
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
@@ -31,56 +32,62 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__).'/../../../../config.php');
-require_once("$CFG->dirroot/mod/assignment/lib.php");
+/**
+ * @developer Mina Mofreh
+ * @co-developer Andrew Nagyeb
+ */
+
+require_once(dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->dirroot . "/mod/assign/lib.php");
 require_once('testcase_form.php');
+require_once($CFG->dirroot . "/mod/assign/locallib.php");
 
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID
-$a  = optional_param('a', 0, PARAM_INT);   // Assignment ID
+$a = optional_param('a', 0, PARAM_INT);   // Assignment ID
 
-$url = new moodle_url('/mod/assignment/type/onlinejudge/testcase.php');
+$url = new moodle_url('/mod/assign/feedback/onlinejudge/testcase.php');
+
+global $DB, $PAGE, $OUTPUT;
 if ($id) {
-    if (! $cm = get_coursemodule_from_id('assignment', $id)) {
+    if (!$cm = get_coursemodule_from_id('assign', $id)) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $assignment = $DB->get_record("assignment", array("id"=>$cm->instance))) {
-        print_error('invalidid', 'assignment');
+    if (!$assignment = $DB->get_record("assign", array("id" => $cm->instance))) {
+        print_error('invalidid', 'assign');
     }
 
-    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
-        print_error('coursemisconf', 'assignment');
+    if (!$course = $DB->get_record("course", array("id" => $assignment->course))) {
+        print_error('coursemisconf', 'assign');
     }
     $url->param('id', $id);
 } else {
-    if (!$assignment = $DB->get_record("assignment", array("id"=>$a))) {
-        print_error('invalidid', 'assignment');
+    if (!$assignment = $DB->get_record("assign", array("id" => $a))) {
+        print_error('invalidid', 'assign');
     }
-    if (! $course = $DB->get_record("course", array("id"=>$assignment->course))) {
-        print_error('coursemisconf', 'assignment');
+    if (!$course = $DB->get_record("course", array("id" => $assignment->course))) {
+        print_error('coursemisconf', 'assign');
     }
-    if (! $cm = get_coursemodule_from_instance("assignment", $assignment->id, $course->id)) {
+    if (!$cm = get_coursemodule_from_instance("assign", $assignment->id, $course->id)) {
         print_error('invalidcoursemodule');
     }
     $url->param('a', $a);
 }
-
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
-global $context;
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
-require_capability('mod/assignment:grade', $context);
+$context = context_module::instance($cm->id);
+require_capability('mod/assign:grade', $context);
 
 $testform = new testcase_form($DB->count_records('assignment_oj_testcases', array('assignment' => $assignment->id)));
 
-if ($testform->is_cancelled()){
+if ($testform->is_cancelled()) {
 
-	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
+    redirect($CFG->wwwroot . '/mod/assign/view.php?id=' . $id);
 
-} else if ($fromform = $testform->get_data()){
+} else if ($fromform = $testform->get_data()) {
 
-	for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
+    for ($i = 0; $i < $fromform->boundary_repeats; $i++) {
         if (emptycase($fromform, $i)) {
             if ($fromform->caseid[$i] != -1) {
                 $DB->delete_records('assignment_oj_testcases', array('id' => $fromform->caseid[$i]));
@@ -90,7 +97,7 @@ if ($testform->is_cancelled()){
             }
             continue;
         }
-
+        $testcase = new \stdClass;
         if (isset($fromform->usefile[$i])) {
             $testcase->usefile = true;
             // Keep file as is
@@ -116,20 +123,18 @@ if ($testform->is_cancelled()){
         }
 
         if ($testcase->usefile) {
-            file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assignment', 'onlinejudge_input', $testcase->id);
-            file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assignment', 'onlinejudge_output', $testcase->id);
+            file_save_draft_area_files($testcase->inputfile, $context->id, 'mod_assign', 'onlinejudge_input', $testcase->id);
+            file_save_draft_area_files($testcase->outputfile, $context->id, 'mod_assign', 'onlinejudge_output', $testcase->id);
         }
 
         unset($testcase);
-	}
+    }
 
-	redirect($CFG->wwwroot.'/mod/assignment/view.php?id='.$id);
+    redirect($CFG->wwwroot . '/mod/assign/view.php?id=' . $id);
 
 } else {
 
-    $assignmentinstance = new assignment_onlinejudge($cm->id, $assignment, $cm, $course);
-    $assignmentinstance->view_header();
-
+    echo $OUTPUT->header();
     $testcases = $DB->get_records('assignment_oj_testcases', array('assignment' => $assignment->id), 'sortorder ASC');
 
     $toform = array();
@@ -143,20 +148,21 @@ if ($testform->is_cancelled()){
             $toform["usefile[$i]"] = $tstValue->usefile;
             $toform["caseid[$i]"] = $tstValue->id;
 
-            file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_input', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
-            file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assignment', 'onlinejudge_output', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
+            file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_input', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
+            file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_output', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
 
             $i++;
         }
     }
 
-	$testform->set_data($toform);
-	$testform->display();
+    $testform->set_data($toform);
+    $testform->display();
+    echo $OUTPUT->footer();
 
-	$assignmentinstance->view_footer();
 }
 
-function emptycase(&$form, $i) {
+function emptycase(&$form, $i)
+{
     if ($form->subgrade[$i] != 0.0)
         return false;
 
@@ -167,7 +173,7 @@ function emptycase(&$form, $i) {
 }
 
 /* Translate CR+LF (\r\n) to LF (\n) */
-function crlf2lf(&$text) {
+function crlf2lf(&$text)
+{
     return strtr($text, array("\r\n" => "\n", "\n\r" => "\n"));
 }
-
