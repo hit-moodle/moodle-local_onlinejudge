@@ -32,8 +32,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__).'/../../config.php');
-require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
 require_login(SITEID, false);
 
@@ -45,9 +45,9 @@ if (empty($task)) {
     print_error('invalidtaskid', 'local_onlinejudge', '', $taskid);
 }
 
-$context = get_context_instance(CONTEXT_MODULE, $task->cmid);
+$context = context_module::instance($task->cmid);
 
-$PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
+$PAGE->set_url('/mod/assign/feedeback/onlinejudge/details.php');
 $PAGE->set_pagelayout('popup');
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('details', 'local_onlinejudge'));
@@ -81,18 +81,18 @@ foreach ($task as $key => $content) {
         continue;
     }
 
-    $titlecell   = new html_table_cell();
+    $titlecell = new html_table_cell();
     $contentcell = new html_table_cell();
 
     $titlecell->text = get_string($key, 'local_onlinejudge');
     if (in_array($key, $sensitive_fields)) {
         $titlecell->text .= '*';
     }
-
-    if (empty($content)) {
+    // empty is not used as it treats '0' as empty.
+    if (!isset($content) and is_null($content)) {
         $content = get_string('notavailable');
     } else {
-        $formatter = 'format_'.$key;
+        $formatter = 'format_' . $key;
         if (function_exists($formatter)) {
             $content = $formatter($content);
         }
@@ -114,23 +114,27 @@ if (!$ajax) {
     echo $OUTPUT->footer();
 }
 
-function format_compileroutput($string) {
-    return '<pre>'.htmlspecialchars($string).'</pre>';
+function format_compileroutput($string)
+{
+    return '<pre>' . htmlspecialchars($string) . '</pre>';
 }
 
-function format_cpuusage($string) {
-    return $string.' '.get_string('sec');
+function format_cpuusage($string)
+{
+    return $string . ' ' . get_string('sec');
 }
 
-function format_memusage($string) {
+function format_memusage($string)
+{
     return display_size($string);
 }
 
-function format_stdout($string) {
+function format_stdout($string)
+{
     return format_compileroutput($string);
 }
 
-function format_stderr($string) {
+function format_stderr($string)
+{
     return format_compileroutput($string);
 }
-
