@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title><?php echo $file ?></title>
+    <title><?php echo $file->get_filename() ?></title>
     <script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
 	<script type="text/javascript" src="syntaxhighlighter/scripts/shBrushAS3.js"></script>
 	<script type="text/javascript" src="syntaxhighlighter/scripts/shBrushAppleScript.js"></script>
@@ -30,17 +30,11 @@
 	<script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
 	<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shCoreDefault.css"/>
 	<script type="text/javascript">
-		SyntaxHighlighter.all();
+        SyntaxHighlighter.all();
 	</script>
 </head>
 
 <body>
-
-        <a href="<?php echo $ffurl?>"> <?php echo get_string('download', 'assignment_onlinejudge') . $file ?> </a>
-        <pre name="code" class="brush: <?php echo $lang ?>"><?php echo $code ?></pre>
-        <div align="center">
-            <?php close_window_button(); ?>
-        </div>
-
+<?php echo $item;?>
 </body>
 </html>
