@@ -33,34 +33,35 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-define("ONLINEJUDGE_STATUS_PENDING",               0 );
+define("ONLINEJUDGE_STATUS_PENDING", 0);
 
-define("ONLINEJUDGE_STATUS_ACCEPTED",              1 );
-define("ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION",  2 );
-define("ONLINEJUDGE_STATUS_COMPILATION_ERROR",     3 );
-define("ONLINEJUDGE_STATUS_COMPILATION_OK",        4 );
-define("ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED",   5 );
-define("ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED",   6 );
-define("ONLINEJUDGE_STATUS_PRESENTATION_ERROR",    7 );
-define("ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS",  8 );
-define("ONLINEJUDGE_STATUS_RUNTIME_ERROR",         9 );
-define("ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED",     10);
-define("ONLINEJUDGE_STATUS_WRONG_ANSWER",          11);
+define("ONLINEJUDGE_STATUS_ACCEPTED", 1);
+define("ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION", 2);
+define("ONLINEJUDGE_STATUS_COMPILATION_ERROR", 3);
+define("ONLINEJUDGE_STATUS_COMPILATION_OK", 4);
+define("ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED", 5);
+define("ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED", 6);
+define("ONLINEJUDGE_STATUS_PRESENTATION_ERROR", 7);
+define("ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS", 8);
+define("ONLINEJUDGE_STATUS_RUNTIME_ERROR", 9);
+define("ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED", 10);
+define("ONLINEJUDGE_STATUS_WRONG_ANSWER", 11);
 
-define("ONLINEJUDGE_STATUS_INTERNAL_ERROR",        21);
-define("ONLINEJUDGE_STATUS_JUDGING",               22);
-define("ONLINEJUDGE_STATUS_MULTI_STATUS",          23);
+define("ONLINEJUDGE_STATUS_INTERNAL_ERROR", 21);
+define("ONLINEJUDGE_STATUS_JUDGING", 22);
+define("ONLINEJUDGE_STATUS_MULTI_STATUS", 23);
 
-define("ONLINEJUDGE_STATUS_UNSUBMITTED",          255);
+define("ONLINEJUDGE_STATUS_UNSUBMITTED", 255);
 
-require_once(dirname(__FILE__).'/exceptions.php');
+require_once(dirname(__FILE__) . '/exceptions.php');
 
 $judge_plugins = get_list_of_plugins('local/onlinejudge/judge');
 foreach ($judge_plugins as $dir) {
     require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
 }
 
-class judge_base{
+class judge_base
+{
 
     // object of the task
     protected $task;
@@ -68,7 +69,8 @@ class judge_base{
     // language id without judge id
     protected $language;
 
-    function __construct($task) {
+    function __construct($task)
+    {
         $this->task = $task;
         $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
     }
@@ -79,7 +81,8 @@ class judge_base{
      * The array key must be the language's ID, such as c_sandbox, python_ideone.
      * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
      */
-    static function get_languages() {
+    static function get_languages()
+    {
         return array();
     }
 
@@ -89,12 +92,12 @@ class judge_base{
      * @param object options
      * @return throw exceptions on error
      */
-    static function parse_options($options, & $task) {
+    static function parse_options($options, & $task)
+    {
         $options = (array)$options;
-
         // only common options are parsed here.
         // special options should be parsed by childclass
-        foreach ($options as $key=>$value) {
+        foreach ($options as $key => $value) {
             if ($key == 'memlimit' and $value > 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit')) {
                 $value = 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit');
             }
@@ -108,20 +111,21 @@ class judge_base{
     /**
      * Judge the current task
      *
-     * @return updated task or false
+     * @return bool [updated task or false]
      */
-    function judge() {
+    function judge()
+    {
         return false;
     }
 
     /**
      * If string is not encoded in UTF-8, convert it into utf-8 charset
      */
-    protected function convert_to_utf8($string) {
+    protected function convert_to_utf8($string)
+    {
         $localwincharset = get_string('localewincharset', 'langconfig');
         if (!empty($localwincharset) and !mb_check_encoding($string, 'UTF-8') and mb_check_encoding($string, $localwincharset)) {
-            $textlib = textlib_get_instance();
-            return $textlib->convert($string, $localwincharset);
+            return core_text::convert($string, $localwincharset);
         } else {
             return $string;
         }
@@ -130,8 +134,9 @@ class judge_base{
     /**
      * Compare the stdout of program and the output of testcase
      */
-    protected function diff() {
-        $task = & $this->task;
+    protected function diff()
+    {
+        $task = &$this->task;
 
         // convert data into UTF-8 charset if possible
         $task->stdout = $this->convert_to_utf8($task->stdout);
@@ -170,14 +175,20 @@ class judge_base{
      *
      * @return array of the full path of saved files
      */
-    protected function create_temp_files() {
+    protected function create_temp_files()
+    {
         $dstfiles = array();
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
+        $files = $fs->get_area_files(
+            context_system::instance()->id,
+            'local_onlinejudge',
+            'tasks', $this->task->id,
+            'sortorder',
+            false);
         foreach ($files as $file) {
-            $path = onlinejudge_get_temp_dir().$file->get_filepath();
-            $fullpath = $path.$file->get_filename();
+            $path = onlinejudge_get_temp_dir() . $file->get_filepath();
+            $fullpath = $path . $file->get_filename();
             if (!check_dir_exists($path)) {
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
@@ -194,7 +205,8 @@ class judge_base{
      * @param string $language ID of the language
      * @return compiler information or null
      */
-    static function get_compiler_info($language) {
+    static function get_compiler_info($language)
+    {
         return array();
     }
 
@@ -203,7 +215,8 @@ class judge_base{
      *
      * @return true for yes, false for no
      */
-    static function is_available() {
+    static function is_available()
+    {
         return false;
     }
 }
@@ -214,7 +227,8 @@ class judge_base{
  * The array key must be the language's ID, such as c_sandbox, python_ideone.
  * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
  */
-function onlinejudge_get_languages() {
+function onlinejudge_get_languages()
+{
     $langs = array();
     $judgeclasses = onlinejudge_get_judge_classes();
     foreach ($judgeclasses as $judgeclass) {
@@ -222,7 +236,6 @@ function onlinejudge_get_languages() {
     }
 
     asort($langs);
-    //print_r($langs);
     return $langs;
 }
 
@@ -230,9 +243,10 @@ function onlinejudge_get_languages() {
  * Return the human-readable name of specified language
  *
  * @param string $language ID of the language
- * @return name
+ * @return string [name]
  */
-function onlinejudge_get_language_name($language) {
+function onlinejudge_get_language_name($language)
+{
     $langs = onlinejudge_get_languages();
     return $langs[$language];
 }
@@ -241,12 +255,13 @@ function onlinejudge_get_language_name($language) {
  * Return the infomation of the compiler of specified language
  *
  * @param string $language ID of the language
- * @return compiler information or null
+ * @return null|string [compiler information]
  */
-function onlinejudge_get_compiler_info($language) {
+function onlinejudge_get_compiler_info($language)
+{
     $judgeclasses = onlinejudge_get_judge_classes();
-    $judgeclass = 'judge_'.onlinejudge_judge_name($language);
-    return $judgeclass::get_compiler_info($language);
+    $judgeclass = 'judge_' . onlinejudge_judge_name($language);
+    return $judgeclass != 'judge_' ? $judgeclass::get_compiler_info($language) : false;
 }
 
 /**
@@ -256,24 +271,27 @@ function onlinejudge_get_compiler_info($language) {
  * @param int $userid ID of user
  * @param string $language ID of the language
  * @param array $files array of stored_file of source code or array of filename => filecontent
+ * @param $component
  * @param object $options include input, output and etc.
- * @return id of the task or throw exception
+ * @return bool|int [id of the task]
+ * @throws onlinejudge_exception
  */
-function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options) {
+function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options)
+{
     global $DB;
 
+    $task = new \stdClass;
     $task->cmid = $cmid;
     $task->userid = $userid;
     $task->status = ONLINEJUDGE_STATUS_PENDING;
     $task->submittime = time();
-
     if (!array_key_exists($language, onlinejudge_get_languages())) {
         throw new onlinejudge_exception('invalidlanguage', $language);
     }
     $task->language = $language;
     $task->component = $component;
 
-    $judgeclass = 'judge_'.onlinejudge_judge_name($language);
+    $judgeclass = 'judge_' . onlinejudge_judge_name($language);
     $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         throw new onlinejudge_exception('invalidjudgeclass', $judgeclass);
@@ -284,7 +302,8 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
     $task->id = $DB->insert_record('onlinejudge_tasks', $task);
 
     $fs = get_file_storage();
-    $file_record->contextid = get_context_instance(CONTEXT_SYSTEM)->id;
+    $file_record = new \stdClass;
+    $file_record->contextid = context_system::instance()->id;
     $file_record->component = 'local_onlinejudge';
     $file_record->filearea = 'tasks';
     $file_record->itemid = $task->id;
@@ -294,9 +313,9 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
         } else {
             $file_record->filepath = dirname($key);
             if (strpos($file_record->filepath, '/') !== 0) {
-                $file_record->filepath = '/'.$file_record->filepath;
+                $file_record->filepath = '/' . $file_record->filepath;
             }
-            if (strrpos($file_record->filepath, '/') !== strlen($file_record->filepath)-1) {
+            if (strrpos($file_record->filepath, '/') !== strlen($file_record->filepath) - 1) {
                 $file_record->filepath .= '/';
             }
             $file_record->filename = basename($key);
@@ -311,10 +330,19 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
  * Judge specified task
  *
  * @param $taskorid object of task or task id
- * @return updated task
+ * @return stdClass task updated
+ * @throws Exception
+ * @throws onlinejudge_exception
  */
-function onlinejudge_judge($taskorid) {
-    global $CFG, $DB;
+
+function onlinejudge_judge($taskorid)
+{
+    global $DB;
+    require_once(dirname(__FILE__) .
+        DIRECTORY_SEPARATOR . 'classes' .
+        DIRECTORY_SEPARATOR . 'event' .
+        DIRECTORY_SEPARATOR .
+        'onlinejudge_task_judged.php');
 
     if (is_object($taskorid)) {
         $task = $taskorid;
@@ -324,7 +352,7 @@ function onlinejudge_judge($taskorid) {
 
     $task->judgetime = time();
 
-    $judgeclass = 'judge_'.onlinejudge_judge_name($task->language);
+    $judgeclass = 'judge_' . onlinejudge_judge_name($task->language);
     $judgeclasses = onlinejudge_get_judge_classes();
     if (!in_array($judgeclass, $judgeclasses)) {
         $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
@@ -341,13 +369,18 @@ function onlinejudge_judge($taskorid) {
         $task->status = ONLINEJUDGE_STATUS_INTERNAL_ERROR;
         $task->infostudent = $e->getMessage();
         $DB->update_record('onlinejudge_tasks', $task);
-        events_trigger('onlinejudge_task_judged', $task);
+        $context = context_module::instance($task->cmid);
+        $event = \mod_onlinejudge\event\onlinejudge_task_judged::create(array('context' => $context, 'objectid' => $task->id));
+        $event->add_record_snapshot('onlinejudge_tasks', $task);
+        $event->trigger();
         throw $e;
     }
 
     $DB->update_record('onlinejudge_tasks', $task);
-    events_trigger('onlinejudge_task_judged', $task);
-
+    $context = context_module::instance($task->cmid);
+    $event = \mod_onlinejudge\event\onlinejudge_task_judged::create(array('context' => $context, 'objectid' => $task->id));
+    $event->add_record_snapshot('onlinejudge_tasks', $task);
+    $event->trigger();
     return $task;
 }
 
@@ -357,7 +390,8 @@ function onlinejudge_judge($taskorid) {
  * @param int $taskid
  * @return object of task or null if unavailable
  */
-function onlinejudge_get_task($taskid) {
+function onlinejudge_get_task($taskid)
+{
     global $DB;
 
     return $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
@@ -367,9 +401,10 @@ function onlinejudge_get_task($taskid) {
  * Return the overall status of a list of tasks
  *
  * @param array $tasks
- * @return Overall status
+ * @return int status
  */
-function onlinejudge_get_overall_status($tasks) {
+function onlinejudge_get_overall_status($tasks)
+{
 
     $status = ONLINEJUDGE_STATUS_UNSUBMITTED;
     foreach ($tasks as $task) {
@@ -387,14 +422,15 @@ function onlinejudge_get_overall_status($tasks) {
     return $status;
 }
 
-function onlinejudge_get_judge_classes() {
+function onlinejudge_get_judge_classes()
+{
     global $CFG;
 
     static $judgeclasses = array();
 
     if (empty($judgeclasses)) {
         if ($plugins = get_list_of_plugins('local/onlinejudge/judge')) {
-            foreach ($plugins as $plugin=>$dir) {
+            foreach ($plugins as $plugin => $dir) {
                 $judgeclasses[] = "judge_$dir";
             }
         }
@@ -406,8 +442,9 @@ function onlinejudge_get_judge_classes() {
 /**
  * Parse judge engine name from language
  */
-function onlinejudge_judge_name($language) {
-    return  substr($language, strrpos($language, '_')+1);
+function onlinejudge_judge_name($language)
+{
+    return substr($language, strpos($language, '_') + 1);
 }
 
 /**
@@ -415,7 +452,8 @@ function onlinejudge_judge_name($language) {
  *
  * @param int $cmid
  */
-function onlinejudge_delete_coursemodule($cmid) {
+function onlinejudge_delete_coursemodule($cmid)
+{
     global $DB;
 
     // Mark them as deleted only and keep the statistics.
@@ -423,7 +461,8 @@ function onlinejudge_delete_coursemodule($cmid) {
     return $DB->set_field('onlinejudge_tasks', 'deleted', 1, array('cmid' => $cmid));
 }
 
-function onlinejudge_get_temp_dir() {
+function onlinejudge_get_temp_dir()
+{
     global $CFG;
 
     // Use static variable to suppress getmypid() calls
@@ -431,7 +470,7 @@ function onlinejudge_get_temp_dir() {
     // it is possable to reuse some temp files
     static $tmpdir = '';
     if (empty($tmpdir)) {
-        $tmpdir = $CFG->dataroot.'/temp/onlinejudge/'.getmypid();
+        $tmpdir = $CFG->dataroot . '/temp/onlinejudge/' . getmypid();
     }
 
     if (!check_dir_exists($tmpdir)) {
@@ -441,7 +480,7 @@ function onlinejudge_get_temp_dir() {
     return $tmpdir;
 }
 
-function onlinejudge_clean_temp_dir($content_only=true) {
+function onlinejudge_clean_temp_dir($content_only = true)
+{
     remove_dir(onlinejudge_get_temp_dir(), $content_only);
 }
-
