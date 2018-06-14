@@ -8,7 +8,7 @@ YUI.add('moodle-assignment_onlinejudge-details', function(Y) {
 
     var DETAILS = function() {
         DETAILS.superclass.constructor.apply(this, arguments);
-    }
+    };
 
     Y.extend(DETAILS, Y.Base, {
         initializer : function(config) {
