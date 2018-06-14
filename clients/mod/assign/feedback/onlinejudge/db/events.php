@@ -33,10 +33,22 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array(
-    'onlinejudge_task_judged' => array (
-        'handlerfile'      => '/mod/assignment/type/onlinejudge/assignment.class.php',
-        'handlerfunction'  => 'onlinejudge_task_judged',
-        'schedule'         => 'instant'
-    )
+$observers = array(
+
+    array(
+        'eventname' => 'assignsubmission_file\event\submission_created',
+        'callback' => 'invoke_judge',
+        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
+    ),
+    array(
+        'eventname' => 'assignsubmission_file\event\submission_updated',
+        'callback' => 'invoke_judge',
+        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
+    ),
+
+    array(
+        'eventname' => 'mod_onlinejudge\event\onlinejudge_task_judged',
+        'callback' => 'onlinejudge_task_judged',
+        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
+    ),
 );
