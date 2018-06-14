@@ -34,7 +34,8 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
     /**
      * Returns the subplugin information to attach at assignment element
      */
-    protected function define_assignment_subplugin_structure() {
+    protected function define_assignment_subplugin_structure()
+    {
 
         /**
          * Any activity sublugins is always rooted by one backup_subplugin_element()
@@ -96,7 +97,8 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
     /**
      * Returns the subplugin information to attach at submission element
      */
-    protected function define_submission_subplugin_structure() {
+    protected function define_submission_subplugin_structure()
+    {
 
         // remember this has not XML representation
         $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
@@ -112,7 +114,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
             array('id'),
             array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output',
                 'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput',
-                'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'deleted'
+                'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'
             )
         );
 
