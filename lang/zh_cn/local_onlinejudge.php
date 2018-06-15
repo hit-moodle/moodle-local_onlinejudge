@@ -112,6 +112,4 @@ $string['status255'] = '未提交评测请求';
 $string['stderr'] = '标准错误输出';
 $string['stdout'] = '标准输出';
 $string['upgradenotify'] = '不要忘记运行cli/install_assignment_type和cli/judged.php。详见<a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>。';
-$string['event_onlinejudge_task_judged'] = "Event Online Judge Task Judged";
-$string['event_onlinejudge_task_description'] = "The event is concerned with firing the 'onlinejudge_task_judged' located in MOODLE_PATH/mod/assign/feedback/onlinejudge/lib.php.";
-// TODO: add translations to other languages.
+// TODO: Fix/Add (existing/missing) translations.

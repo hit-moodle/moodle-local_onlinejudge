@@ -93,4 +93,4 @@ $string['status8'] = 'Niedozwolone funkcje';
 $string['status10'] = 'Przekroczono limit czasu';
 $string['status11'] = 'Zła odpowiedź';
 $string['status22'] = 'Ocenianie...';
-
+// TODO: Fix/Add (existing/missing) translations.

@@ -56,7 +56,6 @@ $string['seautherror'] = 'Nome de usuario errado ou senha errada';
 $string['sedelay'] = 'Atraso entre pedidos de ideone.com (segundo)';
 $string['sedelay_help'] = 'Depois de enviar um pedido a Analise ideone.com, nao podemos obter o resultado imediatamente.�Quanto tempo devemos esperar antes de consultar o resultado?�5 segundos ou entao um pouco mais.';
 $string['seerror'] = 'Ideone retornou um erro: {$a}';
-$string['selogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Analise Online de Fontes para Moodle</a> uses <a href="https://sphere-engine.com/">Sphere Engine Compilers API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
 $string['seresultlink'] = 'Veja detalhes em <a href="https://{$a->end_point}.compilers.sphere-engine.com/api/v4/submissions/{$a->submission_id}?access_token={$a->access_token}">https://{$a->end_point}.compilers.sphere-engine.com/api/v4/submissions/{$a->submission_id}?access_token={$a->access_token}</a>.';
 $string['seclientidrequired'] = 'Necessario se o Analisador ideone.com for selecionado';
 $string['info'] = 'Informacao';
@@ -113,6 +112,4 @@ $string['status255'] = 'Nao-Submetido';
 $string['stderr'] = 'Saida de erro padrao';
 $string['stdout'] = 'Saida padrao';
 $string['upgradenotify'] = 'Nao se esqueca de executar cli/install_assignment_type and cli/judged.php. Detalhes em <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
-$string['event_onlinejudge_task_judged'] = "Event Online Judge Task Judged";
-$string['event_onlinejudge_task_description'] = "The event is concerned with firing the 'onlinejudge_task_judged' located in MOODLE_PATH/mod/assign/feedback/onlinejudge/lib.php.";
-// TODO: add translations to other languages.
+// TODO: Fix/Add (existing/missing) translations.

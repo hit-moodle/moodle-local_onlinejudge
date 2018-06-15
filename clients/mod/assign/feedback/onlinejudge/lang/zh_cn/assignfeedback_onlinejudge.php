@@ -148,15 +148,4 @@ $string['testcases_help'] = '每个测试用例都会被单独评测。例如，
 $string['typeonlinejudge'] = '在线评测';
 $string['usefile'] = '测试用例来自文件';
 $string['waitingforjudge'] = '等待评测结果';
-$string['enabled_help'] = 'Allowing submissions to be programmatically judged';
-$string['user_help_heading'] = 'User Help';
-$string['user_help'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Source Control URL</a><hr>';
-
-$string['compile_warnings_option'] = 'Allow Warnings';
-$string['compile_lm_option'] = 'Link Math Library?';
-$string['compile_static_option'] = 'Link Static Libraries Only';
-
-$string['compile_warnings_option_help'] = 'if select yes, compiler warning messages will be allowed to be shown.';
-$string['compile_lm_option_help'] = 'if select yes, math library will be linked while judging submissions.';
-$string['compile_static_option_help'] = 'if select yes, only static libraries will be linked.';
-// TODO: Fix/Add translations to this language
+// TODO: Fix/Add (existing/missing) translations.
