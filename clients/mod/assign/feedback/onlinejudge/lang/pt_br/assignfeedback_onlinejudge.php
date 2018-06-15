@@ -36,119 +36,97 @@
 
 /**
  * Strings for Online Judge Assignment Type
- *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @translate Paulo Alexandre
  */
-$string['testcasemanagement'] = '测试用例管理';
-$string['addtestcases'] = '增加 {$a} 组测试用例';
-$string['assignmentlangs'] = '编程语言';
-$string['badtestcasefile'] = '此文件不存在，或不可读';
-$string['cannotruncompiler'] = '无法执行编译器脚本';
-$string['case'] = '用例{$a}:';
-$string['compileonly'] = '只编译';
-$string['compileonly_help'] = '如选择是，提交的作业将只被编译，不被运行和测试。教师必须手工评分。';
-$string['compiler'] = '编译器';
-$string['configmaxcpu'] = '缺省的CPU使用时间上限，对全站所有作业有效（每个作业可在此范围内自行设定）';
-$string['configmaxmem'] = '缺省的最大内存使用量，对全站所有作业有效（每个作业可在此范围内自行设定）';
-$string['cpulimit'] = 'CPU使用时间上限';
-$string['denytoreadfile'] = '您没有访问此文件的权限。';
-$string['download'] = '下载 ';
-$string['duejudge'] = '到截止时间后才评测';
-$string['feedback'] = '给错误答案的反馈';
-$string['feedback_help'] = '没能通过测试的学生会看到这条信息。可以通过它给学生一些提示或指导，很方便。';
-$string['filereaderror'] = '此文件不可读';
-$string['forcejudge'] = '强制评测';
-$string['ideoneuser'] = 'Ideone用户名';
-$string['ideoneuser_help'] = '如果您选择了一个在ideone.com运行的语言，那么您就必须提供一个<a href="http://ideone.com">ideone.com</a>用户名。';
-$string['ideonepass'] = 'Ideone API密码';
-$string['ideonepass_help'] = '这不是ideone网站的密码，而是ideone <em>API</em>密码。在<a href="https://ideone.com/account/">https://ideone.com/account/</a>修改API密码。';
-$string['ideonepass2'] = '再次输入API密码';
-$string['ideonepassmismatch'] = '两个密码不匹配';
-$string['input'] = '输入';
-$string['input_help'] = '输入数据会被送入被测程序的标准输入。
+$string['testcasemanagement'] = 'Gerenciamento de Casos de Teste';
+$string['addtestcases'] = 'Adicionar {$a} mais casos de teste(s)';
+$string['assignmentlangs'] = 'A linguagem de programacao';
+$string['badtestcasefile'] = 'Este arquivo nao existe ou nao pode ser lido ';
+$string['cannotruncompiler'] = 'Nao foi possivel executar o script de compilador';
+$string['case'] = 'Caso {$a}:';
+$string['compileonly'] = 'Apenas compilar';
+$string['compileonly_help'] = 'Selecionando sim, as submissoes serao compiladas, mas nao ser�o executadas.�Os professores deverao executar manualmente.';
+$string['compiler'] = 'Compilador';
+$string['configmaxcpu'] = 'Taxa de utilizacao maxima de cpu para todas as atividades analisadas (sujeito a outras configuracoes locais)';
+$string['configmaxmem'] = 'Quantidade maxima de uso de memoria para todas as atividades analisadas (sujeito a outras configuracoes locais)';
+$string['cpulimit'] = 'Tempo maximo de processamento';
+$string['denytoreadfile'] = 'Voce nao tem permissao para ler este arquivo.';
+$string['download'] = 'Download';
+$string['duejudge'] = 'analises pendentes';
+$string['feedback'] = 'Feedback para a resposta errada';
+$string['feedback_help'] = 'A mensagem de ajuda para os alunos que nao passaram nos casos de teste.�E o que eles podem fazer para melhora os resultados, alguma dica ou instrucao.';
+$string['filereaderror'] = 'Nao foi possivel ler este arquivo';
+$string['forcejudge'] = 'Forcar a analise';
+$string['forcejudgerequestsent'] = 'The request of force judging submission of user <b>{$a}</b> is sent.';
+$string['clientid'] = 'Nome de usuario do Ideone';
+$string['clientid_help'] = 'Se voc� escolher um idioma que e executado em ideone.com, voc� deve fornecer um <a href="http://ideone.com">ideone.com</a> username.';
+$string['accesstoken'] = 'Senha do Ideone';
+$string['accesstoken_help'] = 'Nao e a senha ideone mas o ideone <em>API</em> senha.�Alterar a senha API em <a href="https://ideone.com/account/">https://ideone.com/account/</a>.';
+$string['accesstoken2'] = 'Redigite a senha da API Ideone';
+$string['accesstokenmismatch'] = 'As senhas nao conferem';
+$string['input'] = 'Entrada';
+$string['input_help'] = 'Os dados de entrada serao enviados para o stdin dos programas apresentados.';
+$string['inputfile'] = 'Arquivo de entrada';
+$string['inputfile_help'] = 'Os dados no arquivo serao enviados para o stdin dos programas apresentados.�Se o arquivo estiver faltando, os casos de teste serao ignorados.';
+$string['judgetime'] = 'Tempo de analise';
+$string['managetestcases'] = 'Gerenciar os casos de teste';
+$string['maxcpuusage'] = 'Uso da maximo de CPU';
+$string['maximumfilesize'] = 'Tamanho maximo de arquivo fonte';
+$string['maxmemusage'] = 'Uso de maximo de memoria';
+$string['memlimit'] = 'Limite de memoria maxima';
+$string['notestcases'] = 'Sem casos de teste definidos';
+$string['onlinejudgeinfo'] = 'Informacoes do Analisador Online';
+$string['output'] = 'Saida';
+$string['output_help'] = 'A saida do programa sera comparada com os arquivos de entrada para a correta analise.';
+$string['outputfile'] = 'Arquivo de saida';
+$string['outputfile_help'] = 'Os dados no arquivo de saida serao comparados com as saidas das submissoes para a correta analise.�Se nao houver nenhum arquivo, os casos de testes serao ignorados.';
+$string['pluginname'] = 'Analisador Online';
+$string['ratiope'] = 'Nota para uma apresentacao errada';
+$string['ratiope_help'] = 'Nota de erro da apresentacao e igual aos casos de teste.
 
-注意：所有Windows风格的换行符（ CR+LF 或 \r\n ）会被转换为Unix风格（LF 或 \n）';
-$string['inputfile'] = '输入文件';
-$string['inputfile_help'] = '此文件中的数据会被送入被测程序的标准输入。
-
-如果此文件不可读，这条测试用例会被忽略。';
-$string['judgetime'] = '评测时间';
-$string['langc_warn2err'] = 'C (警告视为错误)';
-$string['langcpp_warn2err'] = 'C++ (警告视为错误)';
-$string['managetestcases'] = '管理测试用例';
-$string['maxcpuusage'] = '最长CPU运行时间';
-$string['maximumfilesize'] = '源文件最大长度';
-$string['maxmemusage'] = '最大内存用量';
-$string['memlimit'] = '内存最多可用';
-$string['notestcases'] = '未设置测试用例';
-$string['output'] = '输出';
-$string['output_help'] = '输出数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。
-
-注意：所有Windows风格的换行符（ CR+LF 或 \r\n ）会被转换为Unix风格（LF 或 \n）';
-$string['outputfile'] = '输出文件';
-$string['outputfile_help'] = '此文件中的数据会和被测程序向标准输出的输出相比较，以检验程序的正确性。
-
-如果此文件不可读，这条测试用例会被忽略。';
-$string['pluginname'] = '在线评测';
-$string['ratiope'] = '格式错误得分比例';
-$string['ratiope_help'] = '格式错误获得的分数等于用例最高分乘以这个比例
-
-格式错误是指程序输出的数据都是正确的，但数据之间的分隔符存在错误。它通常是由多余的空格或者换行符导致的。如果严格要求，可以把比例设为0%，那么格式错误就得不到任何分数。如果不介意这些琐碎的问题，可以把比例设为100%，那么格式错误就相当于正确。';
-$string['readytojudge'] = '已准备好接受评测';
-$string['rejudgeall'] = '全部重新评测';
-$string['rejudgeallnotice'] = '重新评测所有作业可能会消耗较长时间。您确信要继续吗？';
-$string['rejudgeallrequestsent'] = '重新评测全部作业的请求已发送。';
-$string['rejudgefailed'] = '无法提交重新评测请求。';
-$string['rejudgelater'] = '后台评测进程现在非常繁忙。请稍后再试。';
-$string['rejudgesuccess'] = '重新评测请求已经成功提交。';
-$string['requestjudge'] = '请求评测';
-$string['statistics'] = '统计';
-$string['status'] = '状态';
-$string['status_help'] = '状态是自动评测的结果。不同状态的含义如下：
-
-* Accepted - 通过评测。获得所有用例所设满分的总和
-* 编译错误 - 程序不能通过编译。得0分
-* 编译通过 - 只有作业被设置为只编译不评测时，才会出现这种状态。不评分
-* 错误答案 - 程序输出与标准答案不匹配。得0分
-* 等待评测 - 您的程序正在队列中等待被评测，请稍候。如果这种状态持续的时间很长，则可能是系统内部出现问题。不评分
-* 多种状态 - 当有多组测试用例，且各组用例测试的结果不完全相同时，会得到这种状态。“信息”中会给出每组用例单独的评测结果。得分为所有用例得分的和
-* 非正常结束 - 程序退出时没有返回0。得0分
-* 格式错误 - 输出的关键数据都对，但与标准答案相比，缺少或多余一些分隔符（空格、回车、制表符等）。可能是0到满分之间的任何值，由教师的设置决定。
-* 内部错误 - 系统内部配置不当，或评测程序失效导致的错误。只有系统管理员才能解决这个问题。不评分
-* 内存超限 - 每次作业都会设置一个允许程序使用内存的最大值。如果实际使用的内存超出这个值，就会得到这个状态。得0分
-* 受限函数 - 程序中调用了一些不应该调用的系统功能。得0分
-* 数据输出超限 - 程序输出了过多的数据，超出了系统限制。通常是程序发生了死循环，且在循环体内不断输出数据导致的。得0分
-* 运行超时 - 每次作业都会设置一个允许程序在CPU中运行的最长时间。如果实际使用的时间超出这个值，就会得到这个状态。得0分
-* 运行时错误 - 程序执行了非法操作。一般是试图访问不可访问的内存，或试图执行无权执行的指令。得0分';
-$string['statusat'] = '非正常结束';
-$string['statusce'] = '编译错误';
-$string['statuscompileok'] = '编译通过';
-$string['statusie'] = '内部错误';
-$string['statusmle'] = '内存超限';
-$string['statusmultiple'] = '多个状态';
-$string['statusole'] = '数据输出超限';
-$string['statuspe'] = '格式错误';
-$string['statuspending'] = '等待评测...';
-$string['statusre'] = '运行时错误';
-$string['statusrf'] = '受限函数';
-$string['statustle'] = '运行超时';
-$string['statuswa'] = '错误答案';
-$string['subgrade'] = '成绩';
-$string['subgrade_help'] = '通过此测试用例能获得百分之几的分数。
-
-如果作业最高分设为50，此测试用例的成绩设为20%，那么通过测试的学生可以获得10分，没能通过测试的学生只能获得0分。最终成绩是所有测试用例得分的总和。如果该和超过了作业的最高分，那么将以最高分做为最终成绩。
-
-所有测试用例成绩的总和<em>并非</em>必须为100%。这样，把总和设成低于100%，可以留一些分数给人工评分；把总和设成高于100%，那么没通过所有的测试用例也有可能获得满分。';
-$string['successrate'] = '成功率';
-$string['testcases'] = '测试用例';
-$string['testcases_help'] = '每个测试用例都会被单独评测。例如，有3个测试用例，那么被测程序会被运行三次，每次处理不同的用例。';
-$string['typeonlinejudge'] = '在线评测';
-$string['usefile'] = '测试用例来自文件';
-$string['waitingforjudge'] = '等待评测结果';
-$string['enabled'] = '在线评测';
+Apresenta��o de erro significa que os dados retornados pelo programa est�o corretos, mas os seperadores entre cada token de dados s�o incompativeis com casos de teste. Geralmente e causado por espa�os em branco ou quebras de linha. Se voc� quiser ser rigoroso, configura-lo para 0% um erro de apresenta��o sera no valor zero. Se voc� o formato da resposta nao e t�o trivial, configure-o para 100% e um erro de apresenta��o sera aceito.';
+$string['readytojudge'] = 'Pronto para ser analisado';
+$string['rejudgeall'] = 'Analisar todos';
+$string['rejudgeallnotice'] = 'Analisar todas as submissoes pode levar um longo tempo.�Deseja continuar?';
+$string['rejudgefailed'] = 'Nao foi possivel analisar seu pedido';
+$string['rejudgesuccess'] = 'O pedido de analise foi enviado com sucesso';
+$string['requestjudge'] = 'Requisitar analise';
+$string['runtimeout'] = 'Tempo maximo de saida';
+$string['statistics'] = 'Estatisticas';
+$string['status'] = 'Status';
+$string['status_help'] = 'Status indica os resultados obtidos pelo Analisador Online.�Os significados estao a seguir:
+		
+* Termino anormal - O seu programa n�o retornou 0 depois de sair. Nota 0.
+* Aceito - Passou. A Nota e a soma de todas as notas de todos os casos de teste disponivel.
+* Erro de Compila��o - O compilador n�o acredita que o c�digo esteja correto. Nota 0.
+* Compila��o OK - Se a atribui��o foi definido como compilar <em>somente</em>, entao seu codigo foi aprovado na compilacao, esse status e retornado. Nenhum Nota.
+* Erro interno - O sistema foi configurado incorretamente ou o Analisador n�o esta funcionando. Somente o administrador pode resolver este problema. Nenhum Nota.
+* Limite Maximo de Memoria Excedido - Seu programa utilizou o maximo de mem�ria permitido. Nota 0.
+* Mais de um Status - Ha mais de um caso de teste e os resultados do Analisador de cada caso de teste sao diferentes. Verifique <em>informacoes</em> para mais detalhes. A nota e a soma de todos as notas de cada caso de teste aprovado.
+* Limite de saida excedido - Seu programa tem gerou uma saida muito grande. Verifique se existe algum loop infinito que gere essa saida. Nota 0.
+* Pendente - O seu programa esta esperando na fila de analise. Aguarde por favor. No entanto, se voc� esta esperando por um muito tempo, talvez ha algo errado com o Analisador online. Nenhum Nota.
+* Erro de Apresenta��o - Todos os tokens em sua saida est�o corretos. Mas os separadores (por exemplo, espa�os em branco, quebra de linha, tabulacoes) s�o diferentes da resposta padr�o. A nota pode ser de 0 a 100%. Depende da defini��o de atribuicao.
+* Fun��es Restritas - Seu programa tem chamado algumas fun��es internas do sistema. Nota 0.
+* Erro de Acesso a memoria (Acess Violation) - Seu programa executou uma opera��o ilegal. Talvez tenha sido uma falha na tentativa de acesso � mem�ria ou uma isntrucao sem logica. Nota 0.
+* Tempo de execucao excedido - Seu programa utilizou o tempo maximo permitido de CPU. Nota 0.
+* Resposta Errada - A saida do seu programa n�o coincide com a resposta padrao. Nota 0.';
+$string['subgrade'] = 'Notas';
+$string['subgrade_help'] = 'Total de pontos dos os alunos depois de passar nos casos de teste.
+		
+Se as tarefas teem nota maxima e 50, e os Casos de Teste teem a nota definida para 20%, os estudantes que passaram no teste vaao ganhar 10 pontos e quem nao conseguiu passar ira fica com nota zero. A nota final e a soma de todos os pontos obtido a partir de cada DE CASOS Teste. Se a soma for maior do que a atribuicao, a nota maxima sera usado como a nota final.
+		
+A soma de todas as categorias de casos de teste <em>nao</em> e necessario para ser 100%. Portanto, voc� pode deixar alguns pontos para a classifica��o manual, se a soma for inferior a 100%. E tambem, voc� pode fazer a soma seja superior a 100% para que nem todos os casos de teste sejam obrigados a passar.';
+$string['successrate'] = 'A taxa de acertos';
+$string['testcases'] = 'Casos de Teste ';
+$string['testcases_help'] = 'Cada casos de teste sera aplicado aos argumentos e julgados separadamente.�Por exemplo,�se ha tr�s casos de teste, uma submissao sera executado tr�s vezes para testar caso diferente.';
+$string['typeonlinejudge'] = 'Analisador OnLine';
+$string['usefile'] = 'Utilizar arquivos para casos de teste';
+$string['waitingforjudge'] = 'Aguardando pelo Analisador';
+$string['enabled'] = 'Analisador Online';
 $string['enabled_help'] = 'Allowing submissions to be programmatically judged';
 $string['user_help_heading'] = 'User Help';
 $string['user_help'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Source Control URL</a><hr>';
@@ -160,4 +138,4 @@ $string['compile_static_option'] = 'Link Static Libraries Only';
 $string['compile_warnings_option_help'] = 'if select yes, compiler warning messages will be allowed to be shown.';
 $string['compile_lm_option_help'] = 'if select yes, math library will be linked while judging submissions.';
 $string['compile_static_option_help'] = 'if select yes, only static libraries will be linked.';
-// TODO: Add translations to this language.
+// TODO: Fix translations to this language
