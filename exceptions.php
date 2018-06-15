@@ -36,7 +36,7 @@
 
 /**
  * Online judge related exceptions
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -45,7 +45,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 class onlinejudge_exception extends moodle_exception {
-    function __construct($errorcode, $a=NULL, $debuginfo = NULL) {
+    function __construct($errorcode, $a = NULL, $debuginfo = NULL) {
         parent::__construct($errorcode, 'local_onlinejudge', '', $a, $debuginfo);
     }
 }

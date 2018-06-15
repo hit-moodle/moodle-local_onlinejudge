@@ -41,7 +41,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) { // needs this condition or there is error on login page
-    require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+    require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
     $temp = new admin_settingpage('onlinejudge', get_string('pluginname', 'local_onlinejudge'));
     $temp->add(new admin_setting_configtext('local_onlinejudge/judgecheckinterval', get_string('judgecheckinterval', 'local_onlinejudge'), get_string('judgecheckinterval_help', 'local_onlinejudge'), 5, PARAM_INT));

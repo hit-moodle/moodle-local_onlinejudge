@@ -49,19 +49,16 @@ require_once('locallib.php');
 require_once($CFG->libdir . '/questionlib.php'); //for get_grade_options()
 
 
-class testcase_form extends moodleform
-{
+class testcase_form extends moodleform {
     var $testcases_number = 5;
     var $testcasecount;
 
-    function __construct($testcasecount)
-    {
+    function __construct($testcasecount) {
         $this->testcasecount = $testcasecount;
         parent::__construct();
     }
 
-    function definition()
-    {
+    function definition() {
         global $CFG, $COURSE, $cm, $id;
 
         $mform = $this->_form; // Don't forget the underscore!

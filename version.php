@@ -46,5 +46,5 @@ $plugin->component = 'local_onlinejudge'; // Declare the type and name of this p
 $plugin->version = 2018061400;   // The (date) version of this plugin
 $plugin->requires = 2017111300;   // Requires this Moodle version
 
-$plugin->maturity  = MATURITY_BETA;
+$plugin->maturity = MATURITY_BETA;
 $plugin->release = "3.0 beta4"; // User-friendly version number

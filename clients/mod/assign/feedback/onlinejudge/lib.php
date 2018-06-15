@@ -45,8 +45,7 @@ require_once($CFG->dirroot . "/mod/assign/locallib.php");
  * @param $assign_id
  * @return int The id of the assignment
  */
-function add_instance(stdClass $assign, $assign_id)
-{
+function add_instance(stdClass $assign, $assign_id) {
     global $DB;
     $returnid = null;
     if ($assign_id) {
@@ -64,8 +63,7 @@ function add_instance(stdClass $assign, $assign_id)
  * @param object $assignment The data from the form
  * @return int The assignment id
  */
-function update_instance($assign, $assignid)
-{
+function update_instance($assign, $assignid) {
     global $DB;
     $returnid = null;
     if ($assignid) {
@@ -89,11 +87,9 @@ function update_instance($assign, $assignid)
  * @param int [assign_grade]
  * @return object
  */
-function get_onlinejudge_result($submission, $assign_grade)
-{
+function get_onlinejudge_result($submission, $assign_grade) {
     global $DB;
-    if (empty($submission))
-        return null;
+    if (empty($submission)) return null;
 
     $sql = 'SELECT s.*, t.feedback, t.subgrade
                 FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
@@ -128,8 +124,7 @@ function get_onlinejudge_result($submission, $assign_grade)
     return $result;
 }
 
-function update_submission($submission, $new_oj = false)
-{
+function update_submission($submission, $new_oj = false) {
     global $DB;
 
     $DB->update_record('assign_submission', $submission);
@@ -150,15 +145,13 @@ function update_submission($submission, $new_oj = false)
  *
  * @return array
  */
-function get_max_memory_usages()
-{
+function get_max_memory_usages() {
 
     // Get max size
     $maxsize = 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit');
     $memusage[$maxsize] = display_size($maxsize);
 
-    $sizelist = array(1048576, 2097152, 4194304, 8388608, 16777216, 33554432,
-        67108864, 134217728, 268435456, 536870912);
+    $sizelist = array(1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912);
 
     foreach ($sizelist as $sizebytes) {
         if ($sizebytes < $maxsize) {
@@ -177,16 +170,13 @@ function get_max_memory_usages()
  *
  * @return array
  */
-function get_max_cpu_times()
-{
+function get_max_cpu_times() {
 
     // Get max size
     $maxtime = get_config('local_onlinejudge', 'maxcpulimit');
     $cputime[$maxtime] = get_string('numseconds', 'moodle', $maxtime);
 
-    $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9,
-        10, 11, 12, 13, 14, 15, 20,
-        25, 30, 40, 50, 60);
+    $timelist = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30, 40, 50, 60);
 
     foreach ($timelist as $timesecs) {
         if ($timesecs < $maxtime) {
@@ -208,32 +198,15 @@ function get_max_cpu_times()
  * @param int [$ratiope]
  * @return int [grade]
  */
-function grade_marker($status, $fraction, $grade, $ratiope)
-{
-    $grades = array(
-        ONLINEJUDGE_STATUS_PENDING => -1,
-        ONLINEJUDGE_STATUS_JUDGING => -1,
-        ONLINEJUDGE_STATUS_INTERNAL_ERROR => -1,
-        ONLINEJUDGE_STATUS_WRONG_ANSWER => 0,
-        ONLINEJUDGE_STATUS_RUNTIME_ERROR => 0,
-        ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED => 0,
-        ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED => 0,
-        ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED => 0,
-        ONLINEJUDGE_STATUS_COMPILATION_ERROR => 0,
-        ONLINEJUDGE_STATUS_COMPILATION_OK => 0,
-        ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS => 0,
-        ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION => 0,
-        ONLINEJUDGE_STATUS_ACCEPTED => $fraction * $grade,
-        ONLINEJUDGE_STATUS_PRESENTATION_ERROR => $fraction * $grade * $ratiope,
-    );
+function grade_marker($status, $fraction, $grade, $ratiope) {
+    $grades = array(ONLINEJUDGE_STATUS_PENDING => -1, ONLINEJUDGE_STATUS_JUDGING => -1, ONLINEJUDGE_STATUS_INTERNAL_ERROR => -1, ONLINEJUDGE_STATUS_WRONG_ANSWER => 0, ONLINEJUDGE_STATUS_RUNTIME_ERROR => 0, ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED => 0, ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED => 0, ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED => 0, ONLINEJUDGE_STATUS_COMPILATION_ERROR => 0, ONLINEJUDGE_STATUS_COMPILATION_OK => 0, ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS => 0, ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION => 0, ONLINEJUDGE_STATUS_ACCEPTED => $fraction * $grade, ONLINEJUDGE_STATUS_PRESENTATION_ERROR => $fraction * $grade * $ratiope,);
     return $grades[$status];
 }
 
 /**
  * Adds specific settings to the settings block
  */
-function extend_settings_navigation($assignmentnode)
-{
+function extend_settings_navigation($assignmentnode) {
     global $PAGE, $DB, $USER, $CFG;
 
     if (has_capability('mod/assignment:grade', $PAGE->cm->context)) {
@@ -254,8 +227,7 @@ function extend_settings_navigation($assignmentnode)
  * Check rejudge_all method in locallib.php for further illustration.
  * @param $event
  */
-function invoke_judge($event)
-{
+function invoke_judge($event) {
     global $DB;
     $submissionid = $event->get_record_snapshot($event->objecttable, $event->objectid)->submission;
     $submission = $DB->get_record('assign_submission', array('id' => $submissionid));
@@ -266,8 +238,7 @@ function invoke_judge($event)
  * Send judge task request to judgelib
  */
 
-function request_judge($submission)
-{
+function request_judge($submission) {
     global $DB;
 
     $oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment), '*', MUST_EXIST);
@@ -275,12 +246,7 @@ function request_judge($submission)
     $fs = get_file_storage();
     $cm = get_coursemodule_from_instance('assign', $submission->assignment);
     $context = context_module::instance($cm->id);
-    $files = $fs->get_area_files($context->id,
-        'assignsubmission_file',
-        ASSIGNSUBMISSION_FILE_FILEAREA,
-        $submission->id,
-        'sortorder, timemodified',
-        false);
+    $files = $fs->get_area_files($context->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $submission->id, 'sortorder, timemodified', false);
     // Mark all old tasks as old
     $DB->set_field('assignment_oj_submissions', 'latest', 0, array('submission' => $submission->id));
     $tests = get_testcases($submission->assignment);
@@ -307,8 +273,7 @@ function request_judge($submission)
  *
  * @return array of testcases objects. All testcase files are read into memory
  */
-function get_testcases($assign_id)
-{
+function get_testcases($assign_id) {
     global $CFG, $DB;
 
     $records = $DB->get_records('assignment_oj_testcases', array('assignment' => $assign_id), 'sortorder ASC');
@@ -343,8 +308,7 @@ function get_testcases($assign_id)
  * @return bool
  */
 
-function onlinejudge_task_judged($event)
-{
+function onlinejudge_task_judged($event) {
     $task = $event->get_record_snapshot($event->objecttable, $event->objectid);
     global $DB;
     $sql = 'SELECT s.*

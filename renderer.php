@@ -44,7 +44,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/judgelib.php');
+require_once(dirname(__FILE__) . '/judgelib.php');
 
 /**
  * OJ renderer class

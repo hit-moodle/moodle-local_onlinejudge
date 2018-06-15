@@ -31,8 +31,7 @@ namespace SphereEngine\Api\Mock;
 
 use SphereEngine\Api\ApiClient;
 
-class CompilersApiClient extends ApiClient
-{
+class CompilersApiClient extends ApiClient {
     use ApiClientTrait;
 
     /**
@@ -47,8 +46,7 @@ class CompilersApiClient extends ApiClient
      * @param string $responseType expected response type of the endpoint
      * @return mixed
      */
-    protected function makeHttpCall($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType = null)
-    {
+    protected function makeHttpCall($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType = null) {
         if (!$this->isAccessTokenCorrect()) {
             return $this->getMockData('unauthorizedAccess');
         }
@@ -70,8 +68,7 @@ class CompilersApiClient extends ApiClient
         }
     }
 
-    public function mockTestMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType)
-    {
+    public function mockTestMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType) {
         if ($method == 'GET') {
             return $this->getMockData('compilers/test');
         } else {
@@ -79,8 +76,7 @@ class CompilersApiClient extends ApiClient
         }
     }
 
-    public function mockCompilersMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType)
-    {
+    public function mockCompilersMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType) {
         if ($method == 'GET') {
             return $this->getMockData('compilers/compilers');
         } else {
@@ -88,8 +84,7 @@ class CompilersApiClient extends ApiClient
         }
     }
 
-    public function mockSubmissionsMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType)
-    {
+    public function mockSubmissionsMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType) {
         if ($method == 'GET') {
             $ids = $this->getParam($queryParams, 'ids');
 
@@ -107,8 +102,7 @@ class CompilersApiClient extends ApiClient
         }
     }
 
-    public function mockSubmissionMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType)
-    {
+    public function mockSubmissionMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType) {
         if ($method == 'GET') {
             $submissionId = $this->getParam($urlParams, 'id');
 
@@ -119,8 +113,7 @@ class CompilersApiClient extends ApiClient
         }
     }
 
-    public function mockSubmissionStreamMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType)
-    {
+    public function mockSubmissionStreamMethod($method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType) {
         if ($method == 'GET') {
             $submissionId = $this->getParam($urlParams, 'id');
             $stream = $this->getParam($urlParams, 'stream');

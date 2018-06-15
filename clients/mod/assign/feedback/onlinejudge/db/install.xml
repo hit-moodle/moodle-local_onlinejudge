@@ -1,103 +1,103 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assign/feedback/onlinejudge/db" VERSION="20110814"
+<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/assign/feedback/onlinejudge/db"
+       VERSION="20110814"
        COMMENT="XMLDB file for Moodle mod/assign/feedback/onlinejudge"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
-  <TABLES>
-    <TABLE NAME="assignment_oj" COMMENT="Online Judge settings" NEXT="assignment_oj_submissions">
-      <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
-                 NEXT="assignment"/>
-          <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" PREVIOUS="id" NEXT="language"/>
-          <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"
-                 COMMENT="Assignment programming language" PREVIOUS="assignment" NEXT="memlimit"/>
-          <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576"
-                 SEQUENCE="false" PREVIOUS="language" NEXT="cpulimit"/>
-          <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
-                 SEQUENCE="false" PREVIOUS="memlimit" NEXT="compileonly"/>
-          <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" PREVIOUS="cpulimit" NEXT="ratiope"/>
-          <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0.0"
-                 SEQUENCE="false" DECIMALS="10" COMMENT="How much grade can earn when get a presentation error."
-                 PREVIOUS="compileonly" NEXT="clientid"/>
-          <FIELD NAME="clientid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"
-                 COMMENT="Client ID of sphere-engine.com" PREVIOUS="ratiope" NEXT="accesstoken"/>
-          <FIELD NAME="accesstoken" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"
-                 COMMENT="Access Token of sphere-engine.com" PREVIOUS="clientid" NEXT="compile_lm_option"/>
-          <!--The following compile options are newly added. Attributes will take the following naming convention compile_[optionname]_option-->
-          <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
-                 COMMENT="Compiler Parameter [Link the math library]" PREVIOUS="accesstoken"
-                 NEXT="compile_warnings_option"/>
-          <FIELD NAME="compile_warnings_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
-                 COMMENT="Compilation Parameter [Enables all compiler's warning messages]"
-                 PREVIOUS="compile_lm_option" NEXT="compile_static_option"/>
-          <FIELD NAME="compile_static_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
-                 COMMENT="Compilation Parameter [Allow only static libraries and not shared libraries]"
-                 PREVIOUS="compile_warnings_option"/>
-          <!-- ///////////////////////////////////////////////////////////////////////////////////-->
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
-          <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assignment" REFFIELDS="id"
-               COMMENT="assignment foreign key" PREVIOUS="primary"/>
-      </KEYS>
-    </TABLE>
-      <TABLE NAME="assignment_oj_submissions" COMMENT="Judge information of submissions" PREVIOUS="assignment_oj"
-             NEXT="assignment_oj_testcases">
-      <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
-                 NEXT="submission"/>
-          <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" PREVIOUS="id" NEXT="testcase"/>
-          <FIELD NAME="testcase" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" COMMENT="Testcase ID" PREVIOUS="submission" NEXT="task"/>
-          <FIELD NAME="task" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
-                 COMMENT="Corresponding Online Judge task ID" PREVIOUS="testcase" NEXT="latest"/>
-          <FIELD NAME="latest" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false"
-                 PREVIOUS="task"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
-          <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions"
-               REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="testcase"/>
-          <KEY NAME="testcase" TYPE="foreign" FIELDS="testcase" REFTABLE="assignment_oj_testcases" REFFIELDS="id"
-               PREVIOUS="submission"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="latest" UNIQUE="false" FIELDS="latest"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="assignment_oj_testcases" COMMENT="Testcases" PREVIOUS="assignment_oj_submissions">
-      <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
-                 NEXT="assignment"/>
-          <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" PREVIOUS="id" NEXT="input"/>
-          <FIELD NAME="input" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program input"
-                 PREVIOUS="assignment" NEXT="output"/>
-          <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"
-                 COMMENT="Expected program output" PREVIOUS="input" NEXT="usefile"/>
-          <FIELD NAME="usefile" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
-                 PREVIOUS="output" NEXT="feedback"/>
-          <FIELD NAME="feedback" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="usefile"
-                 NEXT="subgrade"/>
-          <FIELD NAME="subgrade" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" DECIMALS="10"
-                 COMMENT="How many percent of the full grade can be gotten after passing this testcase"
-                 PREVIOUS="feedback" NEXT="sortorder"/>
-          <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                 SEQUENCE="false" PREVIOUS="subgrade"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
-          <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assignment" REFFIELDS="id"
-               COMMENT="assignment foreign key" PREVIOUS="primary"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
-      </INDEXES>
-    </TABLE>
-  </TABLES>
+    <TABLES>
+        <TABLE NAME="assignment_oj" COMMENT="Online Judge settings" NEXT="assignment_oj_submissions">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
+                       NEXT="assignment"/>
+                <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="id" NEXT="language"/>
+                <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Assignment programming language" PREVIOUS="assignment" NEXT="memlimit"/>
+                <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576"
+                       SEQUENCE="false" PREVIOUS="language" NEXT="cpulimit"/>
+                <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
+                       SEQUENCE="false" PREVIOUS="memlimit" NEXT="compileonly"/>
+                <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="cpulimit" NEXT="ratiope"/>
+                <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0.0"
+                       SEQUENCE="false" DECIMALS="10" COMMENT="How much grade can earn when get a presentation error."
+                       PREVIOUS="compileonly" NEXT="clientid"/>
+                <FIELD NAME="clientid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Client ID of sphere-engine.com" PREVIOUS="ratiope" NEXT="accesstoken"/>
+                <FIELD NAME="accesstoken" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Access Token of sphere-engine.com" PREVIOUS="clientid" NEXT="compile_lm_option"/>
+                <!--The following compile options are newly added. Attributes will take the following naming convention compile_[optionname]_option-->
+                <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Compiler Parameter [Link the math library]" PREVIOUS="accesstoken"
+                       NEXT="compile_warnings_option"/>
+                <FIELD NAME="compile_warnings_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Compilation Parameter [Enables all compiler's warning messages]"
+                       PREVIOUS="compile_lm_option" NEXT="compile_static_option"/>
+                <FIELD NAME="compile_static_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Compilation Parameter [Allow only static libraries and not shared libraries]"
+                       PREVIOUS="compile_warnings_option"/>
+                <!-- ///////////////////////////////////////////////////////////////////////////////////-->
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
+                <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assignment" REFFIELDS="id"
+                     COMMENT="assignment foreign key" PREVIOUS="primary"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="assignment_oj_submissions" COMMENT="Judge information of submissions" PREVIOUS="assignment_oj"
+               NEXT="assignment_oj_testcases">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
+                       NEXT="submission"/>
+                <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="id" NEXT="testcase"/>
+                <FIELD NAME="testcase" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" COMMENT="Testcase ID" PREVIOUS="submission" NEXT="task"/>
+                <FIELD NAME="task" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Corresponding Online Judge task ID" PREVIOUS="testcase" NEXT="latest"/>
+                <FIELD NAME="latest" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false"
+                       PREVIOUS="task"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="submission"/>
+                <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assignment_submissions"
+                     REFFIELDS="id" COMMENT="assignment_submissions foreign key" PREVIOUS="primary" NEXT="testcase"/>
+                <KEY NAME="testcase" TYPE="foreign" FIELDS="testcase" REFTABLE="assignment_oj_testcases" REFFIELDS="id"
+                     PREVIOUS="submission"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="latest" UNIQUE="false" FIELDS="latest"/>
+            </INDEXES>
+        </TABLE>
+        <TABLE NAME="assignment_oj_testcases" COMMENT="Testcases" PREVIOUS="assignment_oj_submissions">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"
+                       NEXT="assignment"/>
+                <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="id" NEXT="input"/>
+                <FIELD NAME="input" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Program input"
+                       PREVIOUS="assignment" NEXT="output"/>
+                <FIELD NAME="output" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Expected program output" PREVIOUS="input" NEXT="usefile"/>
+                <FIELD NAME="usefile" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
+                       PREVIOUS="output" NEXT="feedback"/>
+                <FIELD NAME="feedback" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="usefile"
+                       NEXT="subgrade"/>
+                <FIELD NAME="subgrade" TYPE="number" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" DECIMALS="10"
+                       COMMENT="How many percent of the full grade can be gotten after passing this testcase"
+                       PREVIOUS="feedback" NEXT="sortorder"/>
+                <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="subgrade"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assignment"/>
+                <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assignment" REFFIELDS="id"
+                     COMMENT="assignment foreign key" PREVIOUS="primary"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
+            </INDEXES>
+        </TABLE>
+    </TABLES>
 </XMLDB>

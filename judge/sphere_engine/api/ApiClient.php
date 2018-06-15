@@ -36,13 +36,12 @@ use SphereEngine\Api\Model\HttpApiResponse;
 
 require_once('Model/HttpApiResponse.php');
 
-class ApiClient
-{
+class ApiClient {
+    public static $PROTOCOL = "http";
     protected $baseUrl;
     protected $accessToken;
     protected $userAgent;
     protected $extraPost = [];
-    public static $PROTOCOL = "http";
 
     /**
      * Constructor
@@ -50,15 +49,13 @@ class ApiClient
      * @param string $version version of the API
      * @param string $endpoint link to the endpoint
      */
-    function __construct($accessToken, $endpoint)
-    {
+    function __construct($accessToken, $endpoint) {
         $this->accessToken = $accessToken;
         $this->baseUrl = $this->buildBaseUrl($endpoint);
         $this->userAgent = "SphereEngine";
     }
 
-    protected function buildBaseUrl($endpoint)
-    {
+    protected function buildBaseUrl($endpoint) {
         return self::$PROTOCOL . '://' . $endpoint;
     }
 
@@ -75,21 +72,118 @@ class ApiClient
      * @throws \SphereEngine\Api\SphereEngineConnectionException on a non 5xx response
      * @return mixed
      */
-    public function callApi($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType = null)
-    {
+    public function callApi($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams, $responseType = null) {
         $httpResponse = $this->makeHttpCall($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams);
         $response = $this->processResponse($httpResponse, $responseType);
         return $response;
     }
 
     /**
-     * extra POST data only for the next request
-     *
-     * @param array $data
+     * Make the HTTP call
+     * @param string $resourcePath path to method endpoint
+     * @param string $method method to call
+     * @param array $queryParams parameters to be place in query URL
+     * @param array $postData parameters to be placed in POST body
+     * @param array $filesData parameters to be placed in FILES
+     * @param array $headerParams parameters to be place in request header
+     * @param string $responseType expected response type of the endpoint
+     * @return \SphereEngine\Api\Model\HttpApiResponse
      */
-    public function addExtraPost($data)
-    {
-        $this->extraPost = $data;
+    protected function makeHttpCall($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams) {
+        $headers = array();
+
+        // construct the http header
+        $headerParams = array('User-Agent' => 'SphereEngine/ClientPHP');
+
+        foreach ($headerParams as $key => $val) {
+            $headers[] = "$key: $val";
+        }
+
+        // fill url params with proper values
+        if (is_array($urlParams)) {
+            foreach ($urlParams as $param => $value) {
+                $resourcePath = str_replace("{" . $param . "}", $value, $resourcePath);
+            }
+        }
+
+        // create a complete url
+        $client = new Client(['base_uri' => rtrim($this->baseUrl, '/') . '/', 'timeout' => 3.0,]);
+
+        if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
+            throw new \Exception('Method ' . $method . ' is not recognized.');
+        }
+
+        $queryParams['access_token'] = $this->accessToken;
+
+        if (!empty($this->extraPost)) {
+            $postData = array_merge($postData, $this->extraPost);
+            unset($this->extraPost);
+        }
+
+        $error = null;
+
+        $multipart = [];
+        if (!empty($filesData)) {
+            $multipart = array_merge($multipart, $this->createMultipartArray($postData));
+            $multipart = array_merge($multipart, $this->createMultipartArray($filesData, true));
+        }
+
+        try {
+
+            $options = ['query' => $queryParams, 'headers' => $headers, 'verify' => false, 'http_errors' => false,];
+
+            // multipart/form-data or application/x-www-form-urlencoded
+            if (!empty($multipart)) {
+                $options['multipart'] = $multipart;
+            } else {
+                $options['form_params'] = $postData;
+            }
+
+            $response = $client->request($method, ltrim($resourcePath, '/'), $options);
+
+            $response_info = ['http_code' => $response->getStatusCode(), 'content_type' => $response->getHeaderLine('Content-Type'),];
+
+            $http_body = $response->getBody()->getContents();
+
+        } catch (RequestException $e) {
+            $http_body = '';
+            $response_info = ['http_code' => 0, 'content_type' => '',];
+
+            $error = $e->getMessage();
+        }
+
+        return new HttpApiResponse($response_info['http_code'], $response_info['content_type'], $http_body, $error);
+    }
+
+    /**
+     * Create multipart array for multipart guzzle request
+     *
+     * @param array $data post or files data
+     * @param boolean $asFiles
+     * @return array
+     */
+    protected function createMultipartArray($data, $asFiles = false) {
+        $multipart = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $k => $v) {
+                    $part = ['name' => "{$key}[{$k}]", 'contents' => $v,];
+                    if ($asFiles) {
+                        $part['filename'] = $k;
+                    }
+                    $multipart[] = $part;
+                }
+                continue;
+            }
+
+            $part = ['name' => $key, 'contents' => $value,];
+            if ($asFiles) {
+                $part['filename'] = $key;
+            }
+            $multipart[] = $part;
+        }
+
+        return $multipart;
     }
 
     /**
@@ -99,8 +193,7 @@ class ApiClient
      * @throws \SphereEngine\Api\SphereEngineConnectionException on a non 5xx response
      * @return mixed
      */
-    protected function processResponse(HttpApiResponse $response, $responseType)
-    {
+    protected function processResponse(HttpApiResponse $response, $responseType) {
         // curl connection errors (invalid port, connection refused, timeout)
         if ($response->error !== null) {
             throw new SphereEngineConnectionException($response->error, 0);
@@ -139,134 +232,11 @@ class ApiClient
     }
 
     /**
-     * Make the HTTP call
-     * @param string $resourcePath path to method endpoint
-     * @param string $method method to call
-     * @param array $queryParams parameters to be place in query URL
-     * @param array $postData parameters to be placed in POST body
-     * @param array $filesData parameters to be placed in FILES
-     * @param array $headerParams parameters to be place in request header
-     * @param string $responseType expected response type of the endpoint
-     * @return \SphereEngine\Api\Model\HttpApiResponse
-     */
-    protected function makeHttpCall($resourcePath, $method, $urlParams, $queryParams, $postData, $filesData, $headerParams)
-    {
-        $headers = array();
-
-        // construct the http header
-        $headerParams = array(
-            'User-Agent' => 'SphereEngine/ClientPHP'
-        );
-
-        foreach ($headerParams as $key => $val) {
-            $headers[] = "$key: $val";
-        }
-
-        // fill url params with proper values
-        if (is_array($urlParams)) {
-            foreach ($urlParams as $param => $value) {
-                $resourcePath = str_replace("{" . $param . "}", $value, $resourcePath);
-            }
-        }
-
-        // create a complete url
-        $client = new Client([
-            'base_uri' => rtrim($this->baseUrl, '/') . '/',
-            'timeout' => 3.0,
-        ]);
-
-        if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
-            throw new \Exception('Method ' . $method . ' is not recognized.');
-        }
-
-        $queryParams['access_token'] = $this->accessToken;
-
-        if (!empty($this->extraPost)) {
-            $postData = array_merge($postData, $this->extraPost);
-            unset($this->extraPost);
-        }
-
-        $error = null;
-
-        $multipart = [];
-        if (!empty($filesData)) {
-            $multipart = array_merge($multipart, $this->createMultipartArray($postData));
-            $multipart = array_merge($multipart, $this->createMultipartArray($filesData, true));
-        }
-
-        try {
-
-            $options = [
-                'query' => $queryParams,
-                'headers' => $headers,
-                'verify' => false,
-                'http_errors' => false,
-            ];
-
-            // multipart/form-data or application/x-www-form-urlencoded
-            if (!empty($multipart)) {
-                $options['multipart'] = $multipart;
-            } else {
-                $options['form_params'] = $postData;
-            }
-
-            $response = $client->request($method, ltrim($resourcePath, '/'), $options);
-
-            $response_info = [
-                'http_code' => $response->getStatusCode(),
-                'content_type' => $response->getHeaderLine('Content-Type'),
-            ];
-
-            $http_body = $response->getBody()->getContents();
-
-        } catch (RequestException $e) {
-            $http_body = '';
-            $response_info = [
-                'http_code' => 0,
-                'content_type' => '',
-            ];
-
-            $error = $e->getMessage();
-        }
-
-        return new HttpApiResponse($response_info['http_code'], $response_info['content_type'], $http_body, $error);
-    }
-
-    /**
-     * Create multipart array for multipart guzzle request
+     * extra POST data only for the next request
      *
-     * @param array $data post or files data
-     * @param boolean $asFiles
-     * @return array
+     * @param array $data
      */
-    protected function createMultipartArray($data, $asFiles = false)
-    {
-        $multipart = [];
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                foreach ($value as $k => $v) {
-                    $part = [
-                        'name' => "{$key}[{$k}]",
-                        'contents' => $v,
-                    ];
-                    if ($asFiles) {
-                        $part['filename'] = $k;
-                    }
-                    $multipart[] = $part;
-                }
-                continue;
-            }
-
-            $part = [
-                'name' => $key,
-                'contents' => $value,
-            ];
-            if ($asFiles) {
-                $part['filename'] = $key;
-            }
-            $multipart[] = $part;
-        }
-
-        return $multipart;
+    public function addExtraPost($data) {
+        $this->extraPost = $data;
     }
 }

@@ -11,8 +11,25 @@ namespace mod_onlinejudge\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class onlinejudge_task_judged extends \core\event\base
-{
+class onlinejudge_task_judged extends \core\event\base {
+
+    /**
+     * Returns localised general event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_onlinejudge_task_judged', 'local_onlinejudge');
+    }
+
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return get_string('event_onlinejudge_task_judged_description');
+    }
 
     /**
      * Override in subclass.
@@ -27,31 +44,10 @@ class onlinejudge_task_judged extends \core\event\base
      *
      * @return void
      */
-    protected function init()
-    {
+    protected function init() {
         $this->data['objecttable'] = 'onlinejudge_tasks';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
 
-    }
-
-    /**
-     * Returns localised general event name.
-     *
-     * @return string
-     */
-    public static function get_name()
-    {
-        return get_string('event_onlinejudge_task_judged', 'local_onlinejudge');
-    }
-
-    /**
-     * Returns description of what happened.
-     *
-     * @return string
-     */
-    public function get_description()
-    {
-        return get_string('event_onlinejudge_task_judged_description');
     }
 }

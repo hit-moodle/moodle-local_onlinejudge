@@ -11,8 +11,16 @@
 
 namespace SphereEngine\Api;
 
-trait ApiCommonsTrait
-{
+trait ApiCommonsTrait {
+    /**
+     * extra POST data only for the next request
+     *
+     * @param array $data
+     */
+    public function addExtraPost($data) {
+        $this->apiClient->addExtraPost($data);
+    }
+
     /**
      * Create endpoint link
      *
@@ -21,8 +29,7 @@ trait ApiCommonsTrait
      * @param boolean $strictEndpoint strict endpoint (false if you need use another endpoint than sphere-engine.com)
      * @throws \RuntimeException
      */
-    protected function createEndpointLink($module, $endpoint, $strictEndpoint = true)
-    {
+    protected function createEndpointLink($module, $endpoint, $strictEndpoint = true) {
 
         if (strpos($endpoint, '.') === false) {
             if ($strictEndpoint && preg_match('/^[a-z0-9]{8,16}$/', $endpoint) == false) {
@@ -35,16 +42,6 @@ trait ApiCommonsTrait
             }
             return $endpoint . '/api/' . $this->version;
         }
-    }
-
-    /**
-     * extra POST data only for the next request
-     *
-     * @param array $data
-     */
-    public function addExtraPost($data)
-    {
-        $this->apiClient->addExtraPost($data);
     }
 
 }

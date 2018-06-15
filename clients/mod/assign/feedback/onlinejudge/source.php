@@ -76,12 +76,10 @@ if ($id) {
 
 require_login($course->id, false, $cm);
 
-if (!$userid)
-    $userid = $USER->id;
+if (!$userid) $userid = $USER->id;
 
 $context = context_course::instance($cm->course);
-if ($userid != $USER->id and !has_capability('mod/assign:grade', $context))
-    print_error('denytoreadfile', 'assignfeedback_onlinejudge');
+if ($userid != $USER->id and !has_capability('mod/assign:grade', $context)) print_error('denytoreadfile', 'assignfeedback_onlinejudge');
 
 // Load up the required assignment code
 require('locallib.php');
@@ -91,12 +89,7 @@ $assignmentinstance = new assign($context, $cm, $course);
 $filearea = ASSIGNSUBMISSION_FILE_FILEAREA;
 $fs = get_file_storage();
 $context = context_module::instance($cm->id);
-$files = $fs->get_area_files($context->id,
-    'assignsubmission_file',
-    ASSIGNSUBMISSION_FILE_FILEAREA,
-    $submissionid,
-    'sortorder, timemodified',
-    false);
+$files = $fs->get_area_files($context->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $submissionid, 'sortorder, timemodified', false);
 $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $a));
 
 /** checking if after tokenize whether the language is sandbox or sphere-engine

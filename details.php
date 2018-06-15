@@ -87,8 +87,7 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable';
 
 foreach ($task as $key => $content) {
-    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields))
-        or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
+    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields)) or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
         continue;
     }
 
@@ -125,27 +124,22 @@ if (!$ajax) {
     echo $OUTPUT->footer();
 }
 
-function format_compileroutput($string)
-{
+function format_compileroutput($string) {
     return '<pre>' . htmlspecialchars($string) . '</pre>';
 }
 
-function format_cpuusage($string)
-{
+function format_cpuusage($string) {
     return $string . ' ' . get_string('sec');
 }
 
-function format_memusage($string)
-{
+function format_memusage($string) {
     return display_size($string);
 }
 
-function format_stdout($string)
-{
+function format_stdout($string) {
     return format_compileroutput($string);
 }
 
-function format_stderr($string)
-{
+function format_stderr($string) {
     return format_compileroutput($string);
 }

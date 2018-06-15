@@ -43,7 +43,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_local_onlinejudge_upgrade($oldversion=0) {
+function xmldb_local_onlinejudge_upgrade($oldversion = 0) {
     global $CFG, $DB, $OUTPUT;
 
     $dbman = $DB->get_manager();

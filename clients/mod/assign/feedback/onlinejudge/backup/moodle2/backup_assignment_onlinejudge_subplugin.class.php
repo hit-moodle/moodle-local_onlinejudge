@@ -28,14 +28,12 @@
  * backup subplugin class that provides the necessary information
  * needed to backup one assignment->onlinejudge subplugin.
  */
-class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
-{
+class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
 
     /**
      * Returns the subplugin information to attach at assignment element
      */
-    protected function define_assignment_subplugin_structure()
-    {
+    protected function define_assignment_subplugin_structure() {
 
         /**
          * Any activity sublugins is always rooted by one backup_subplugin_element()
@@ -97,8 +95,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
     /**
      * Returns the subplugin information to attach at submission element
      */
-    protected function define_submission_subplugin_structure()
-    {
+    protected function define_submission_subplugin_structure() {
 
         // remember this has not XML representation
         $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
@@ -109,14 +106,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin
         $onlinejudge_submissions = new backup_nested_element('onlinejudge_submissions');
         $onlinejudge_submission = new backup_nested_element('onlinejudge_submission', array('id'), array('submission', 'testcase', 'task', 'latest'));
         $tasks = new backup_nested_element('tasks');
-        $task = new backup_nested_element(
-            'task',
-            array('id'),
-            array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output',
-                'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput',
-                'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'
-            )
-        );
+        $task = new backup_nested_element('task', array('id'), array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output', 'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput', 'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'));
 
         $subplugin->add_child($asssuboff);
         $asssuboff->add_child($onlinejudge_submissions);

@@ -71,8 +71,7 @@ foreach ($judge_plugins as $dir) {
     require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
 }
 
-class judge_base
-{
+class judge_base {
 
     // object of the task
     protected $task;
@@ -80,8 +79,7 @@ class judge_base
     // language id without judge id
     protected $language;
 
-    function __construct($task)
-    {
+    function __construct($task) {
         $this->task = $task;
         $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
     }
@@ -92,8 +90,7 @@ class judge_base
      * The array key must be the language's ID, such as c_sandbox, python_ideone.
      * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
      */
-    static function get_languages()
-    {
+    static function get_languages() {
         return array();
     }
 
@@ -103,8 +100,7 @@ class judge_base
      * @param object options
      * @return throw exceptions on error
      */
-    static function parse_options($options, & $task)
-    {
+    static function parse_options($options, & $task) {
         $options = (array)$options;
         // only common options are parsed here.
         // special options should be parsed by childclass
@@ -120,33 +116,37 @@ class judge_base
     }
 
     /**
-     * Judge the current task
+     * Return the infomation of the compiler of specified language
      *
-     * @return bool [updated task or false]
+     * @param string $language ID of the language
+     * @return compiler information or null
      */
-    function judge()
-    {
+    static function get_compiler_info($language) {
+        return array();
+    }
+
+    /**
+     * Whether the judge is avaliable
+     *
+     * @return true for yes, false for no
+     */
+    static function is_available() {
         return false;
     }
 
     /**
-     * If string is not encoded in UTF-8, convert it into utf-8 charset
+     * Judge the current task
+     *
+     * @return bool [updated task or false]
      */
-    protected function convert_to_utf8($string)
-    {
-        $localwincharset = get_string('localewincharset', 'langconfig');
-        if (!empty($localwincharset) and !mb_check_encoding($string, 'UTF-8') and mb_check_encoding($string, $localwincharset)) {
-            return core_text::convert($string, $localwincharset);
-        } else {
-            return $string;
-        }
+    function judge() {
+        return false;
     }
 
     /**
      * Compare the stdout of program and the output of testcase
      */
-    protected function diff()
-    {
+    protected function diff() {
         $task = &$this->task;
 
         // convert data into UTF-8 charset if possible
@@ -158,9 +158,7 @@ class judge_base
         $task->output = rtrim($task->output, "\r\n");
         $task->stdout = rtrim($task->stdout, "\r\n");
 
-        if (strcmp($task->output, $task->stdout) == 0)
-            return ONLINEJUDGE_STATUS_ACCEPTED;
-        else {
+        if (strcmp($task->output, $task->stdout) == 0) return ONLINEJUDGE_STATUS_ACCEPTED; else {
             $tokens = array();
             $tok = strtok($task->output, " \n\r\t");
             while ($tok !== false) {
@@ -170,8 +168,7 @@ class judge_base
 
             $tok = strtok($task->stdout, " \n\r\t");
             foreach ($tokens as $anstok) {
-                if ($tok === false || $tok !== $anstok)
-                    return ONLINEJUDGE_STATUS_WRONG_ANSWER;
+                if ($tok === false || $tok !== $anstok) return ONLINEJUDGE_STATUS_WRONG_ANSWER;
                 $tok = strtok(" \n\r\t");
             }
             if ($tok !== false) {
@@ -182,21 +179,27 @@ class judge_base
     }
 
     /**
+     * If string is not encoded in UTF-8, convert it into utf-8 charset
+     */
+    protected function convert_to_utf8($string) {
+        $localwincharset = get_string('localewincharset', 'langconfig');
+        if (!empty($localwincharset) and !mb_check_encoding($string, 'UTF-8') and mb_check_encoding($string, $localwincharset)) {
+            return core_text::convert($string, $localwincharset);
+        } else {
+            return $string;
+        }
+    }
+
+    /**
      * Save files of current task to a temp directory
      *
      * @return array of the full path of saved files
      */
-    protected function create_temp_files()
-    {
+    protected function create_temp_files() {
         $dstfiles = array();
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(
-            context_system::instance()->id,
-            'local_onlinejudge',
-            'tasks', $this->task->id,
-            'sortorder',
-            false);
+        $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
         foreach ($files as $file) {
             $path = onlinejudge_get_temp_dir() . $file->get_filepath();
             $fullpath = $path . $file->get_filename();
@@ -209,27 +212,6 @@ class judge_base
 
         return $dstfiles;
     }
-
-    /**
-     * Return the infomation of the compiler of specified language
-     *
-     * @param string $language ID of the language
-     * @return compiler information or null
-     */
-    static function get_compiler_info($language)
-    {
-        return array();
-    }
-
-    /**
-     * Whether the judge is avaliable
-     *
-     * @return true for yes, false for no
-     */
-    static function is_available()
-    {
-        return false;
-    }
 }
 
 /**
@@ -238,8 +220,7 @@ class judge_base
  * The array key must be the language's ID, such as c_sandbox, python_ideone.
  * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
  */
-function onlinejudge_get_languages()
-{
+function onlinejudge_get_languages() {
     $langs = array();
     $judgeclasses = onlinejudge_get_judge_classes();
     foreach ($judgeclasses as $judgeclass) {
@@ -256,8 +237,7 @@ function onlinejudge_get_languages()
  * @param string $language ID of the language
  * @return string [name]
  */
-function onlinejudge_get_language_name($language)
-{
+function onlinejudge_get_language_name($language) {
     $langs = onlinejudge_get_languages();
     return $langs[$language];
 }
@@ -268,8 +248,7 @@ function onlinejudge_get_language_name($language)
  * @param string $language ID of the language
  * @return null|string [compiler information]
  */
-function onlinejudge_get_compiler_info($language)
-{
+function onlinejudge_get_compiler_info($language) {
     $judgeclasses = onlinejudge_get_judge_classes();
     $judgeclass = 'judge_' . onlinejudge_judge_name($language);
     return $judgeclass != 'judge_' ? $judgeclass::get_compiler_info($language) : false;
@@ -287,8 +266,7 @@ function onlinejudge_get_compiler_info($language)
  * @return bool|int [id of the task]
  * @throws onlinejudge_exception
  */
-function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options)
-{
+function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, $options) {
     global $DB;
 
     $task = new \stdClass;
@@ -346,14 +324,9 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
  * @throws onlinejudge_exception
  */
 
-function onlinejudge_judge($taskorid)
-{
+function onlinejudge_judge($taskorid) {
     global $DB;
-    require_once(dirname(__FILE__) .
-        DIRECTORY_SEPARATOR . 'classes' .
-        DIRECTORY_SEPARATOR . 'event' .
-        DIRECTORY_SEPARATOR .
-        'onlinejudge_task_judged.php');
+    require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'event' . DIRECTORY_SEPARATOR . 'onlinejudge_task_judged.php');
 
     if (is_object($taskorid)) {
         $task = $taskorid;
@@ -401,8 +374,7 @@ function onlinejudge_judge($taskorid)
  * @param int $taskid
  * @return object of task or null if unavailable
  */
-function onlinejudge_get_task($taskid)
-{
+function onlinejudge_get_task($taskid) {
     global $DB;
 
     return $DB->get_record('onlinejudge_tasks', array('id' => $taskid));
@@ -414,8 +386,7 @@ function onlinejudge_get_task($taskid)
  * @param array $tasks
  * @return int status
  */
-function onlinejudge_get_overall_status($tasks)
-{
+function onlinejudge_get_overall_status($tasks) {
 
     $status = ONLINEJUDGE_STATUS_UNSUBMITTED;
     foreach ($tasks as $task) {
@@ -433,8 +404,7 @@ function onlinejudge_get_overall_status($tasks)
     return $status;
 }
 
-function onlinejudge_get_judge_classes()
-{
+function onlinejudge_get_judge_classes() {
     global $CFG;
 
     static $judgeclasses = array();
@@ -453,8 +423,7 @@ function onlinejudge_get_judge_classes()
 /**
  * Parse judge engine name from language
  */
-function onlinejudge_judge_name($language)
-{
+function onlinejudge_judge_name($language) {
     return substr($language, strpos($language, '_') + 1);
 }
 
@@ -463,8 +432,7 @@ function onlinejudge_judge_name($language)
  *
  * @param int $cmid
  */
-function onlinejudge_delete_coursemodule($cmid)
-{
+function onlinejudge_delete_coursemodule($cmid) {
     global $DB;
 
     // Mark them as deleted only and keep the statistics.
@@ -472,8 +440,7 @@ function onlinejudge_delete_coursemodule($cmid)
     return $DB->set_field('onlinejudge_tasks', 'deleted', 1, array('cmid' => $cmid));
 }
 
-function onlinejudge_get_temp_dir()
-{
+function onlinejudge_get_temp_dir() {
     global $CFG;
 
     // Use static variable to suppress getmypid() calls
@@ -491,7 +458,6 @@ function onlinejudge_get_temp_dir()
     return $tmpdir;
 }
 
-function onlinejudge_clean_temp_dir($content_only = true)
-{
+function onlinejudge_clean_temp_dir($content_only = true) {
     remove_dir(onlinejudge_get_temp_dir(), $content_only);
 }

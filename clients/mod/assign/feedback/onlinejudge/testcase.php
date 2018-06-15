@@ -172,19 +172,14 @@ if ($testform->is_cancelled()) {
 
 }
 
-function emptycase(&$form, $i)
-{
-    if ($form->subgrade[$i] != 0.0)
-        return false;
+function emptycase(&$form, $i) {
+    if ($form->subgrade[$i] != 0.0) return false;
 
-    if (isset($form->usefile[$i]))
-        return empty($form->inputfile[$i]) && empty($form->outputfile[$i]);
-    else
+    if (isset($form->usefile[$i])) return empty($form->inputfile[$i]) && empty($form->outputfile[$i]); else
         return empty($form->input[$i]) && empty($form->output[$i]);
 }
 
 /* Translate CR+LF (\r\n) to LF (\n) */
-function crlf2lf(&$text)
-{
+function crlf2lf(&$text) {
     return strtr($text, array("\r\n" => "\n", "\n\r" => "\n"));
 }

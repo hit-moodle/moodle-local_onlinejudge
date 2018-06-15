@@ -29,16 +29,14 @@
 
 namespace SphereEngine\Api\Model;
 
-class HttpApiResponse
-{
+class HttpApiResponse {
     public $httpCode;
     public $httpBody;
     public $contentType;
 
     public $error;
 
-    function __construct($httpCode, $contentType, $httpBody, $error)
-    {
+    function __construct($httpCode, $contentType, $httpBody, $error) {
         $this->httpCode = $httpCode;
         $this->contentType = $contentType;
         $this->httpBody = $httpBody;

@@ -43,7 +43,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 $context = get_system_context();
 
@@ -51,7 +51,7 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/onlinejudge/index.php');
 $PAGE->set_title(get_string('pluginname', 'local_onlinejudge'));
-$PAGE->set_heading("$SITE->shortname: ".get_string('pluginname', 'local_onlinejudge'));
+$PAGE->set_heading("$SITE->shortname: " . get_string('pluginname', 'local_onlinejudge'));
 
 $output = $PAGE->get_renderer('local_onlinejudge');
 

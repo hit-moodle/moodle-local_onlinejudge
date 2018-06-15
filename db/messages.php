@@ -43,11 +43,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$messageproviders = array (
+$messageproviders = array(
 
 /// Judge daemon crashed notification
-    'judgedcrashed' => array (
-        'capability'  => 'moodle/site:config'
-    ),
-);
+    'judgedcrashed' => array('capability' => 'moodle/site:config'),);
 

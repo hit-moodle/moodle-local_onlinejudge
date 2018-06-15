@@ -36,7 +36,7 @@
 
 /**
  * Strings for local_onlinejudge
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang

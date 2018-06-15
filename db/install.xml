@@ -1,60 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/onlinejudge/db" VERSION="20111024" COMMENT="XMLDB file for Moodle local/onlinejudge"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="local/onlinejudge/db" VERSION="20111024"
+       COMMENT="XMLDB file for Moodle local/onlinejudge"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
-  <TABLES>
-    <TABLE NAME="onlinejudge_tasks" COMMENT="Details of tasks">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
-        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Related user" PREVIOUS="cmid" NEXT="language"/>
-        <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language" PREVIOUS="userid" NEXT="memlimit"/>
-        <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory" PREVIOUS="language" NEXT="cpulimit"/>
-        <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
-        <FIELD NAME="input" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data" PREVIOUS="cpulimit" NEXT="output"/>
-        <FIELD NAME="output" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data" PREVIOUS="input" NEXT="compileonly"/>
-          <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
-                 PREVIOUS="output" NEXT="compile_lm_option"/>
-          <!--The following compile options are newly added. Attributes will take the following naming convention compile_[optionname]_option-->
-          <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
-                 COMMENT="Compiler Parameter [Link the math library]" PREVIOUS="compileonly"
-                 NEXT="compile_warnings_option"/>
-          <FIELD NAME="compile_warnings_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
-                 COMMENT="Compilation Parameter [Enables all compiler's warning messages]" PREVIOUS="compile_lm_option"
-                 NEXT="compile_static_option"/>
-          <FIELD NAME="compile_static_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
-                 COMMENT="Compilation Parameter [Allow only static libraries and not shared libraries]"
-                 PREVIOUS="compile_warnings_option"/>
-          <!-- ///////////////////////////////////////////////////////////////////////////////////-->
-          <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
-                 COMMENT="Who submitted this task" PREVIOUS="compile_static_option" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="component" NEXT="stdout"/>
-        <FIELD NAME="stdout" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Output of user's program" PREVIOUS="status" NEXT="stderr"/>
-        <FIELD NAME="stderr" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout" NEXT="compileroutput"/>
-        <FIELD NAME="compileroutput" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stderr" NEXT="infoteacher"/>
-        <FIELD NAME="infoteacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="compileroutput" NEXT="infostudent"/>
-        <FIELD NAME="infostudent" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="infoteacher" NEXT="cpuusage"/>
-        <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="infostudent" NEXT="memusage"/>
-        <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cpuusage" NEXT="submittime"/>
-        <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
-        <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="submittime" NEXT="var1"/>
-        <FIELD NAME="var1" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="judgetime" NEXT="var2"/>
-        <FIELD NAME="var2" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var1" NEXT="var3"/>
-        <FIELD NAME="var3" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var2" NEXT="var4"/>
-        <FIELD NAME="var4" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var3" NEXT="deleted"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="var4"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>
-        <KEY NAME="cmid" TYPE="foreign" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="cmid"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="status" UNIQUE="false" FIELDS="status" NEXT="judgetime"/>
-        <INDEX NAME="judgetime" UNIQUE="false" FIELDS="judgetime" PREVIOUS="status" NEXT="submittime"/>
-        <INDEX NAME="submittime" UNIQUE="false" FIELDS="submittime" PREVIOUS="judgetime"/>
-      </INDEXES>
-    </TABLE>
-  </TABLES>
+    <TABLES>
+        <TABLE NAME="onlinejudge_tasks" COMMENT="Details of tasks">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
+                <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       COMMENT="Source coursemodule ID" PREVIOUS="id" NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       COMMENT="Related user" PREVIOUS="cmid" NEXT="language"/>
+                <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Programming language" PREVIOUS="userid" NEXT="memlimit"/>
+                <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1048576"
+                       SEQUENCE="false" COMMENT="max memory" PREVIOUS="language" NEXT="cpulimit"/>
+                <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
+                       SEQUENCE="false" COMMENT="max cpu" PREVIOUS="memlimit" NEXT="input"/>
+                <FIELD NAME="input" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data"
+                       PREVIOUS="cpulimit" NEXT="output"/>
+                <FIELD NAME="output" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="output data"
+                       PREVIOUS="input" NEXT="compileonly"/>
+                <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false"
+                       PREVIOUS="output" NEXT="compile_lm_option"/>
+                <!--The following compile options are newly added. Attributes will take the following naming convention compile_[optionname]_option-->
+                <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                       COMMENT="Compiler Parameter [Link the math library]" PREVIOUS="compileonly"
+                       NEXT="compile_warnings_option"/>
+                <FIELD NAME="compile_warnings_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                       COMMENT="Compilation Parameter [Enables all compiler's warning messages]"
+                       PREVIOUS="compile_lm_option"
+                       NEXT="compile_static_option"/>
+                <FIELD NAME="compile_static_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false"
+                       COMMENT="Compilation Parameter [Allow only static libraries and not shared libraries]"
+                       PREVIOUS="compile_warnings_option"/>
+                <!-- ///////////////////////////////////////////////////////////////////////////////////-->
+                <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Who submitted this task" PREVIOUS="compile_static_option" NEXT="status"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
+                       PREVIOUS="component" NEXT="stdout"/>
+                <FIELD NAME="stdout" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Output of user's program" PREVIOUS="status" NEXT="stderr"/>
+                <FIELD NAME="stderr" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stdout"
+                       NEXT="compileroutput"/>
+                <FIELD NAME="compileroutput" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="stderr"
+                       NEXT="infoteacher"/>
+                <FIELD NAME="infoteacher" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"
+                       PREVIOUS="compileroutput" NEXT="infostudent"/>
+                <FIELD NAME="infostudent" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"
+                       PREVIOUS="infoteacher" NEXT="cpuusage"/>
+                <FIELD NAME="cpuusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="infostudent" NEXT="memusage"/>
+                <FIELD NAME="memusage" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="cpuusage" NEXT="submittime"/>
+                <FIELD NAME="submittime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="memusage" NEXT="judgetime"/>
+                <FIELD NAME="judgetime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="submittime" NEXT="var1"/>
+                <FIELD NAME="var1" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="judgetime"
+                       NEXT="var2"/>
+                <FIELD NAME="var2" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var1"
+                       NEXT="var3"/>
+                <FIELD NAME="var3" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var2"
+                       NEXT="var4"/>
+                <FIELD NAME="var4" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="var3"
+                       NEXT="deleted"/>
+                <FIELD NAME="deleted" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"
+                       PREVIOUS="var4"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>
+                <KEY NAME="cmid" TYPE="foreign" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id"
+                     PREVIOUS="primary" NEXT="userid"/>
+                <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="cmid"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="status" UNIQUE="false" FIELDS="status" NEXT="judgetime"/>
+                <INDEX NAME="judgetime" UNIQUE="false" FIELDS="judgetime" PREVIOUS="status" NEXT="submittime"/>
+                <INDEX NAME="submittime" UNIQUE="false" FIELDS="submittime" PREVIOUS="judgetime"/>
+            </INDEXES>
+        </TABLE>
+    </TABLES>
 </XMLDB>

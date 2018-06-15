@@ -29,8 +29,7 @@
 
 namespace SphereEngine\Api\Mock;
 
-class CompilersClientV4 extends \SphereEngine\Api\CompilersClientV4
-{
+class CompilersClientV4 extends \SphereEngine\Api\CompilersClientV4 {
     /**
      * Constructor
      *
@@ -38,8 +37,7 @@ class CompilersClientV4 extends \SphereEngine\Api\CompilersClientV4
      * @param string $endpoint link to the endpoint
      * @param boolean $strictEndpoint strict endpoint (false if you need use another endpoint than sphere-engine.com)
      */
-    function __construct($accessToken, $endpoint, $strictEndpoint = true)
-    {
+    function __construct($accessToken, $endpoint, $strictEndpoint = true) {
         $this->apiClient = new CompilersApiClientV4($accessToken, $this->createEndpointLink('compilers', $endpoint, $strictEndpoint));
     }
 }

@@ -4,10 +4,8 @@ namespace SphereEngine\Api\Mock;
 
 use SphereEngine\Api\Model\HttpApiResponse;
 
-trait ApiClientTrait
-{
-    private function isAccessTokenCorrect()
-    {
+trait ApiClientTrait {
+    private function isAccessTokenCorrect() {
         return $this->accessToken == "correctAccessToken";
     }
 
@@ -19,8 +17,7 @@ trait ApiClientTrait
      * @throws \Exception if $null_if_not_exists is false and the value doesn't exist
      * @return mixed
      */
-    private function getParam($array, $key, $null_if_not_exists = false)
-    {
+    private function getParam($array, $key, $null_if_not_exists = false) {
         if (isset($array[$key])) {
             return $array[$key];
         } else {
@@ -33,43 +30,13 @@ trait ApiClientTrait
     }
 
     /**
-     * Gets json path to data from json path from routing
-     * @param   string $routingJsonPath path to routing json
-     * @throws \Exception on nonexisting JSON file
-     * @throws \Exception on nonexisting data in JSON
-     * @return string
-     */
-    private function getDataPath($routingJsonPath)
-    {
-        $version = isset($this->version) ? $this->version : '';
-        $mockRoutingJsonFile = './client-commons/mockRouting' . $version . '.json';
-        if (file_exists($mockRoutingJsonFile)) {
-            $mockRouting = json_decode(file_get_contents($mockRoutingJsonFile), true);
-            $pathArray = explode('/', $routingJsonPath);
-
-            foreach ($pathArray as $p) {
-                if (isset($mockRouting[$p])) {
-                    $mockRouting = $mockRouting[$p];
-                } else {
-                    throw new \Exception('There is no ' . $routingJsonPath . ' path in ' . $mockRoutingJsonFile . ' file');
-                }
-            }
-
-            return $mockRouting;
-        } else {
-            throw new \Exception('There is no ' . $mockRoutingJsonFile . ' file. Please pull data from client-commons submodule.');
-        }
-    }
-
-    /**
      * Gets data from JSON mock file.
      * @param   string $routingJsonPath path to routing json
      * @throws \Exception on nonexisting JSON file
      * @throws \Exception on nonexisting data in JSON
      * @return \SphereEngine\Api\Model\HttpApiResponse
      */
-    private function getMockData($routingJsonPath)
-    {
+    private function getMockData($routingJsonPath) {
         $version = isset($this->version) ? $this->version : '';
         $mockDataJsonFile = './client-commons/mockData' . $version . '.json';
         if (file_exists($mockDataJsonFile)) {
@@ -97,6 +64,34 @@ trait ApiClientTrait
             return new HttpApiResponse($httpCode, 'application/json', $httpBody, $connError);
         } else {
             throw new \Exception('There is no ' . $mockDataJsonFile . ' file. Please pull data from client-commons submodule.');
+        }
+    }
+
+    /**
+     * Gets json path to data from json path from routing
+     * @param   string $routingJsonPath path to routing json
+     * @throws \Exception on nonexisting JSON file
+     * @throws \Exception on nonexisting data in JSON
+     * @return string
+     */
+    private function getDataPath($routingJsonPath) {
+        $version = isset($this->version) ? $this->version : '';
+        $mockRoutingJsonFile = './client-commons/mockRouting' . $version . '.json';
+        if (file_exists($mockRoutingJsonFile)) {
+            $mockRouting = json_decode(file_get_contents($mockRoutingJsonFile), true);
+            $pathArray = explode('/', $routingJsonPath);
+
+            foreach ($pathArray as $p) {
+                if (isset($mockRouting[$p])) {
+                    $mockRouting = $mockRouting[$p];
+                } else {
+                    throw new \Exception('There is no ' . $routingJsonPath . ' path in ' . $mockRoutingJsonFile . ' file');
+                }
+            }
+
+            return $mockRouting;
+        } else {
+            throw new \Exception('There is no ' . $mockRoutingJsonFile . ' file. Please pull data from client-commons submodule.');
         }
     }
 }

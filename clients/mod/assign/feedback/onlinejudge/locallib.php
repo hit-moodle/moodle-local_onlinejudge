@@ -63,10 +63,8 @@ require_once('testcase_form.php');
 
 use SphereEngine\Api\CompilersClientV4;
 
-class assign_feedback_onlinejudge extends assign_feedback_plugin
-{
-    public function get_name()
-    {
+class assign_feedback_onlinejudge extends assign_feedback_plugin {
+    public function get_name() {
         return get_string('pluginname', 'assignfeedback_onlinejudge');
     }
 
@@ -77,8 +75,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
      * @throws dml_exception
      */
 
-    function get_settings(MoodleQuickForm $mform)
-    {
+    function get_settings(MoodleQuickForm $mform) {
         global $CFG, $COURSE, $DB;
 
         $ynoptions = array(0 => get_string('no'), 1 => get_string('yes'));
@@ -166,13 +163,34 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
 
     }
 
+    /**
+     * @param stdClass $data
+     * @return bool
+     */
+    public function save_settings(stdClass $data) {
+        global $DB;
+
+        if (!empty($errors = $this->form_validation($data))) {
+            $table = new html_table();
+            foreach ($errors as $error => $value) $table->data[] = array($error, $value);
+            $output = html_writer::table($table);
+            $this->set_error($output);
+            return false;
+        }
+        $exists = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->get_instance()->id)) ? true : false;
+        if (!$exists) {
+            return add_instance($data, $this->assignment->get_instance()->id);
+        } else {
+            return update_instance($data, $this->assignment->get_instance()->id);
+        }
+
+    }
 
     /**
      * Any extra validation checks needed for the settings
      * form for this feedback plugin should be added to this method.
      */
-    function form_validation($data)
-    {
+    function form_validation($data) {
         global $CFG;
 
         $errors = array();
@@ -215,31 +233,6 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
     }
 
     /**
-     * @param stdClass $data
-     * @return bool
-     */
-    public function save_settings(stdClass $data)
-    {
-        global $DB;
-
-        if (!empty($errors = $this->form_validation($data))) {
-            $table = new html_table();
-            foreach ($errors as $error => $value)
-                $table->data[] = array($error, $value);
-            $output = html_writer::table($table);
-            $this->set_error($output);
-            return false;
-        }
-        $exists = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->get_instance()->id)) ? true : false;
-        if (!$exists) {
-            return add_instance($data, $this->assignment->get_instance()->id);
-        } else {
-            return update_instance($data, $this->assignment->get_instance()->id);
-        }
-
-    }
-
-    /**
      * Deletes a program assignment activity
      *
      * Deletes all database records, files and calendar eventsevent for this assignment.
@@ -248,15 +241,13 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
      * @throws coding_exception
      * @throws dml_exception
      */
-    function delete_instance()
-    {
+    function delete_instance() {
         global $CFG, $DB;
 
         // delete onlinejudge submissions
         $submissions = $DB->get_records('assignment_submissions', array('assignment' => $this->assignment->get_instance()->id));
         foreach ($submissions as $submission) {
-            if (!$DB->delete_records('assignment_oj_submissions', array('submission' => $submission->id)))
-                return false;
+            if (!$DB->delete_records('assignment_oj_submissions', array('submission' => $submission->id))) return false;
         }
 
         // delete testcases
@@ -285,8 +276,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function view_header()
-    {
+    public function view_header() {
         $course_context = context_module::instance($this->assignment->get_course_module()->id);
         $cmid = $this->assignment->get_course_module()->id;
         // Checking if the user is allowed to edit/update course [ Not Student ].
@@ -299,9 +289,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
                 $output .= $message;
                 $output .= '</div>';
             }
-            $urlparams = array('id' => $cmid,
-                'a' => $this->assignment->get_instance()->id
-            );
+            $urlparams = array('id' => $cmid, 'a' => $this->assignment->get_instance()->id);
             $url = new moodle_url('/mod/assign/feedback/onlinejudge/testcase.php', $urlparams);
             $output .= "<a href='$url' class='btn btn-primary' type='button'>" . get_string('testcasemanagement', 'assignfeedback_onlinejudge') . "</a> ";
             $url = new moodle_url('/mod/assign/feedback/onlinejudge/rejudge.php', array('id' => $cmid, 'a' => $this->assignment->get_instance()->id));
@@ -312,17 +300,50 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
     }
 
     /**
+     * Display judge info about the assignment
+     */
+
+    function view_judge_info() {
+        global $DB;
+        $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->get_instance()->id));
+
+        $table = new html_table();
+        $table->id = 'assignment_onlinejudge_information';
+        $table->attributes['class'] = 'generaltable';
+        $table->size = array('30%', '');
+
+        // Language
+        $item_name = get_string('assignmentlangs', 'assignfeedback_onlinejudge') . ':';
+        $item = onlinejudge_get_language_name($onlinejudge->language);
+        $table->data[] = array($item_name, $item);
+
+        // Compiler
+        if ($compiler_info = onlinejudge_get_compiler_info($onlinejudge->language)) {
+            $item_name = get_string('compiler', 'assignfeedback_onlinejudge') . ':';
+            $table->data[] = array($item_name, $compiler_info);
+        }
+
+        // Limits
+        $item_name = get_string('memlimit', 'assignfeedback_onlinejudge') . ':';
+        $item = display_size($onlinejudge->memlimit);
+        $table->data[] = array($item_name, $item);
+        $item_name = get_string('cpulimit', 'assignfeedback_onlinejudge') . ':';
+        $item = $onlinejudge->cpulimit . ' ' . get_string('sec');
+        $table->data[] = array($item_name, $item);
+
+        return html_writer::table($table);
+    }
+
+    /**
      * The judge works as a daemon so there is nothing to be saved through the normal interface.
      *
      * @param stdClass $grade The grade.
      * @param stdClass $data Form data from the feedback form.
      * @return boolean - False
      */
-    public function is_feedback_modified(stdClass $grade, stdClass $data)
-    {
+    public function is_feedback_modified(stdClass $grade, stdClass $data) {
         return false;
     }
-
 
     /**
      * Display judge info about the submission
@@ -331,8 +352,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function view(stdClass $grade)
-    {
+    public function view(stdClass $grade) {
         global $OUTPUT;
         ///////////////////////////////////////////
 
@@ -347,17 +367,10 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
         $item = get_string('notavailable');
         if (isset($onlinejudge_result->status)) {
             $itemstyle = $onlinejudge_result->status == ONLINEJUDGE_STATUS_ACCEPTED ? 'label label-success' : 'label label-warning';
-            $item = html_writer::tag('h5',
-                html_writer::tag('span', get_string('status' . $onlinejudge_result->status, 'local_onlinejudge'), array('class' => $itemstyle))
-            );
+            $item = html_writer::tag('h5', html_writer::tag('span', get_string('status' . $onlinejudge_result->status, 'local_onlinejudge'), array('class' => $itemstyle)));
             #region force judge button.
             if (has_capability('mod/assign:grade', $this->assignment->get_context())) {
-                $url = new moodle_url('/mod/assign/view.php', array('action' => 'viewpluginpage',
-                    'pluginsubtype' => 'assignfeedback',
-                    'plugin' => 'onlinejudge',
-                    'pluginaction' => 'forcejudge',
-                    'id' => $this->assignment->get_course_module()->id,
-                    'userid' => $submission->userid));
+                $url = new moodle_url('/mod/assign/view.php', array('action' => 'viewpluginpage', 'pluginsubtype' => 'assignfeedback', 'plugin' => 'onlinejudge', 'pluginaction' => 'forcejudge', 'id' => $this->assignment->get_course_module()->id, 'userid' => $submission->userid));
 
                 $attributes = array('href' => $url, 'class' => 'btn btn-info btn-sm');
                 $item .= html_writer::tag('a', get_string('forcejudge', 'assignfeedback_onlinejudge'), $attributes);
@@ -377,15 +390,10 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
         ///////////////////////////////////////////
 
         // Source code
-        $urlparams = array('id' => $this->assignment->get_course_module()->id,
-            'a' => $this->assignment->get_instance()->id,
-            'submissionid' => $submission->id,
-        );
+        $urlparams = array('id' => $this->assignment->get_course_module()->id, 'a' => $this->assignment->get_instance()->id, 'submissionid' => $submission->id,);
         $url = new moodle_url('/mod/assign/feedback/onlinejudge/source.php', $urlparams);
         $icon = $OUTPUT->pix_icon('docs', get_string('more'));
-        $attributes = array('href' => $url,
-            'title' => get_string('more'),
-        );
+        $attributes = array('href' => $url, 'title' => get_string('more'),);
         $attributes['id'] = $OUTPUT->add_action_handler(new popup_action('click', $url));
         $icon = '<i class="fa fa-file-text fa-2x" aria-hidden="true"></i>';
         $item = html_writer::tag('a', $icon, $attributes);
@@ -447,13 +455,47 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
     }
 
     /**
+     * return success rate. return more details if $detail is set
+     * @throws coding_exception
+     */
+    function get_statistics($submission = null, &$detail = null, $judge_status) {
+        global $DB;
+        if (is_null($submission)) $submission = $this->assignment->get_user_submission(0, false);
+        $judged = $judge_status != ONLINEJUDGE_STATUS_JUDGING or $judge_status != ONLINEJUDGE_STATUS_PENDING ? true : false;
+        if (isset($submission->id) && $judged) {
+            $statistics = array();
+            $sql = 'SELECT s.*, t.submission FROM {onlinejudge_tasks} s 
+                    LEFT JOIN {assignment_oj_submissions} t 
+                    ON s.id = t.task 
+                    WHERE t.submission = ? and s.deleted != 1 and s.status != -1';
+            $results = $DB->get_records_sql($sql, array($submission->id));
+            foreach ($results as $result) {
+                $status = $result->status;
+                if (!array_key_exists($status, $statistics)) $statistics[$status] = 0;
+                $statistics[$status]++;
+            }
+            $judge_count = 0;
+            foreach ($statistics as $status => $count) {
+                if (empty($detail)) $detail = get_string('status' . $status, 'local_onlinejudge') . ': ' . $count; else
+                    $detail .= '<br />' . get_string('status' . $status, 'local_onlinejudge') . ': ' . $count;
+                if ($status == 1) // Means Acceptance
+                    $judge_count += $count;
+            }
+
+            if (array_key_exists(1, $statistics)) return $judge_count / count($results); else
+                return 0;
+        }
+        $detail = get_string('notavailable');
+        return get_string('notavailable');
+    }
+
+    /**
      * Allows students to view their submission status in the assignment page context.
      * @param stdClass $grade
      * @return bool [Return true if there are submission is not yet judged.]
      * @throws coding_exception
      */
-    public function is_empty(stdClass $grade)
-    {
+    public function is_empty(stdClass $grade) {
 
         $submission = $this->assignment->get_user_submission($grade->userid, false);
         $onlinejudge_result = get_onlinejudge_result($submission, $this->assignment->get_instance()->grade);
@@ -462,49 +504,12 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
     }
 
     /**
-     * Display judge info about the assignment
-     */
-
-    function view_judge_info()
-    {
-        global $DB;
-        $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $this->assignment->get_instance()->id));
-
-        $table = new html_table();
-        $table->id = 'assignment_onlinejudge_information';
-        $table->attributes['class'] = 'generaltable';
-        $table->size = array('30%', '');
-
-        // Language
-        $item_name = get_string('assignmentlangs', 'assignfeedback_onlinejudge') . ':';
-        $item = onlinejudge_get_language_name($onlinejudge->language);
-        $table->data[] = array($item_name, $item);
-
-        // Compiler
-        if ($compiler_info = onlinejudge_get_compiler_info($onlinejudge->language)) {
-            $item_name = get_string('compiler', 'assignfeedback_onlinejudge') . ':';
-            $table->data[] = array($item_name, $compiler_info);
-        }
-
-        // Limits
-        $item_name = get_string('memlimit', 'assignfeedback_onlinejudge') . ':';
-        $item = display_size($onlinejudge->memlimit);
-        $table->data[] = array($item_name, $item);
-        $item_name = get_string('cpulimit', 'assignfeedback_onlinejudge') . ':';
-        $item = $onlinejudge->cpulimit . ' ' . get_string('sec');
-        $table->data[] = array($item_name, $item);
-
-        return html_writer::table($table);
-    }
-
-    /**
      * @param stdClass $grade
      * @param $showviewlink
      * @return string - return a string representation of the submission status.
      * @throws coding_exception
      */
-    public function view_summary(stdClass $grade, & $showviewlink)
-    {
+    public function view_summary(stdClass $grade, & $showviewlink) {
         $output = "";
         // Allowing view link to be rendered.
         $showviewlink = true;
@@ -518,12 +523,10 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
 
     }
 
-
     /**
      * Rejudge all submissions
      */
-    function rejudge_all()
-    {
+    function rejudge_all() {
 
         global $DB;
         $submissions = $DB->get_records('assign_submission', array('assignment' => $this->assignment->get_instance()->id, 'status' => 'submitted'));
@@ -545,17 +548,13 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function view_page($action)
-    {
+    public function view_page($action) {
         global $DB;
         if ($action == 'forcejudge') {
             $context = $this->assignment->get_course_context();
             require_capability('mod/assign:grade', $context);
             $cmid = $this->assignment->get_course_module()->id;
-            $urlparams = array(
-                'id' => $cmid,
-                'action' => 'grading'
-            );
+            $urlparams = array('id' => $cmid, 'action' => 'grading');
 
             $url = new moodle_url('/mod/assign/view.php', $urlparams);
             $userid = required_param('userid', PARAM_INT);
@@ -566,48 +565,6 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin
             redirect($url, get_string('forcejudgerequestsent', 'assignfeedback_onlinejudge', $user_fullname));
         }
         return '';
-    }
-
-    /**
-     * return success rate. return more details if $detail is set
-     * @throws coding_exception
-     */
-    function get_statistics($submission = null, &$detail = null, $judge_status)
-    {
-        global $DB;
-        if (is_null($submission))
-            $submission = $this->assignment->get_user_submission(0, false);
-        $judged = $judge_status != ONLINEJUDGE_STATUS_JUDGING or $judge_status != ONLINEJUDGE_STATUS_PENDING ? true : false;
-        if (isset($submission->id) && $judged) {
-            $statistics = array();
-            $sql = 'SELECT s.*, t.submission FROM {onlinejudge_tasks} s 
-                    LEFT JOIN {assignment_oj_submissions} t 
-                    ON s.id = t.task 
-                    WHERE t.submission = ? and s.deleted != 1 and s.status != -1';
-            $results = $DB->get_records_sql($sql, array($submission->id));
-            foreach ($results as $result) {
-                $status = $result->status;
-                if (!array_key_exists($status, $statistics))
-                    $statistics[$status] = 0;
-                $statistics[$status]++;
-            }
-            $judge_count = 0;
-            foreach ($statistics as $status => $count) {
-                if (empty($detail))
-                    $detail = get_string('status' . $status, 'local_onlinejudge') . ': ' . $count;
-                else
-                    $detail .= '<br />' . get_string('status' . $status, 'local_onlinejudge') . ': ' . $count;
-                if ($status == 1) // Means Acceptance
-                    $judge_count += $count;
-            }
-
-            if (array_key_exists(1, $statistics))
-                return $judge_count / count($results);
-            else
-                return 0;
-        }
-        $detail = get_string('notavailable');
-        return get_string('notavailable');
     }
 
 }

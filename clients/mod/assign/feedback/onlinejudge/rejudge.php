@@ -96,16 +96,11 @@ if ($pending > PREVENTION_THRESHHOLD) {
     $rejudge_state = $assignmentinstance->rejudge_all();
 
     if ($rejudge_state) {
-        $urlparams = array(
-            'id' => $cm->id,
-            'action' => 'grading'
-        );
+        $urlparams = array('id' => $cm->id, 'action' => 'grading');
         $url = new moodle_url('/mod/assign/view.php', $urlparams);
         redirect($url, get_string('rejudgeallrequestsent', 'assignfeedback_onlinejudge'), 10, \core\output\notification::NOTIFY_SUCCESS);
     } else {
-        $urlparams = array(
-            'id' => $cm->id,
-        );
+        $urlparams = array('id' => $cm->id,);
         $url = new moodle_url('/mod/assign/view.php', $urlparams);
         redirect($url, get_string('rejudgeallrequestfailed', 'assignfeedback_onlinejudge'), 10, \core\output\notification::NOTIFY_ERROR);
     }

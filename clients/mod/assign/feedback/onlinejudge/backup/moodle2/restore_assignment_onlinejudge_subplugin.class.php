@@ -43,50 +43,12 @@
  * but it's a good example of subplugins supported at different
  * elements (assignment and submission)
  */
-class restore_assignfeedback_onlinejudge_subplugin extends restore_subplugin
-{
-
-    /**
-     * Returns the paths to be handled by the subplugin at assignment level
-     */
-    protected function define_assignment_subplugin_structure() {
-
-        $paths = array();
-
-        $elename = $this->get_namefor('onlinejudge');
-        $elepath = $this->get_pathfor('/onlinejudges/onlinejudge'); // because we used get_recommended_name() in backup this works
-        $paths[] = new restore_path_element($elename, $elepath);
-
-        $elename = $this->get_namefor('testcase');
-        $elepath = $this->get_pathfor('/testcases/testcase'); // because we used get_recommended_name() in backup this works
-        $paths[] = new restore_path_element($elename, $elepath);
-
-        return $paths; // And we return the interesting paths
-    }
-
-    /**
-     * Returns the paths to be handled by the subplugin at submission level
-     */
-    protected function define_submission_subplugin_structure() {
-
-        $paths = array();
-
-        $elename = $this->get_namefor('onlinejudge_submission');
-        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission'); // because we used get_recommended_name() in backup this works
-        $paths[] = new restore_path_element($elename, $elepath);
-
-        $elename = $this->get_namefor('task');
-        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission/tasks/task'); // because we used get_recommended_name() in backup this works
-        $paths[] = new restore_path_element($elename, $elepath);
-
-        return $paths; // And we return the interesting paths
-    }
+class restore_assignfeedback_onlinejudge_subplugin extends restore_subplugin {
 
     /**
      * This method processes the onlinejudge element inside one onlinejudge assignment (see onlinejudge subplugin backup)
      */
-    public function process_assignfeedback_onlinejudge_assign($data)
-    {
+    public function process_assignfeedback_onlinejudge_assign($data) {
         global $DB;
 
         $data = (object)$data;
@@ -138,8 +100,7 @@ class restore_assignfeedback_onlinejudge_subplugin extends restore_subplugin
     /**
      * This method processes the onlinejudge_submission element inside one onlinejudge assignment (see onlinejudge subplugin backup)
      */
-    public function process_assignfeedback_onlinejudge_onlinejudge_submission($data)
-    {
+    public function process_assignfeedback_onlinejudge_onlinejudge_submission($data) {
         global $DB;
 
         $data = (object)$data;
@@ -148,5 +109,41 @@ class restore_assignfeedback_onlinejudge_subplugin extends restore_subplugin
         $data->submission = $this->get_mappingid('assignment_submission', $data->submission);
 
         $DB->insert_record('assignment_oj_submissions', $data);
+    }
+
+    /**
+     * Returns the paths to be handled by the subplugin at assignment level
+     */
+    protected function define_assignment_subplugin_structure() {
+
+        $paths = array();
+
+        $elename = $this->get_namefor('onlinejudge');
+        $elepath = $this->get_pathfor('/onlinejudges/onlinejudge'); // because we used get_recommended_name() in backup this works
+        $paths[] = new restore_path_element($elename, $elepath);
+
+        $elename = $this->get_namefor('testcase');
+        $elepath = $this->get_pathfor('/testcases/testcase'); // because we used get_recommended_name() in backup this works
+        $paths[] = new restore_path_element($elename, $elepath);
+
+        return $paths; // And we return the interesting paths
+    }
+
+    /**
+     * Returns the paths to be handled by the subplugin at submission level
+     */
+    protected function define_submission_subplugin_structure() {
+
+        $paths = array();
+
+        $elename = $this->get_namefor('onlinejudge_submission');
+        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission'); // because we used get_recommended_name() in backup this works
+        $paths[] = new restore_path_element($elename, $elepath);
+
+        $elename = $this->get_namefor('task');
+        $elepath = $this->get_pathfor('/onlinejudge_submissions/onlinejudge_submission/tasks/task'); // because we used get_recommended_name() in backup this works
+        $paths[] = new restore_path_element($elename, $elepath);
+
+        return $paths; // And we return the interesting paths
     }
 }

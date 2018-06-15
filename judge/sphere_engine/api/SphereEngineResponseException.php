@@ -40,8 +40,7 @@ use Exception;
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache Licene v2
  * @link     https://github.com/sphere-engine/sphereengine-api-php-client
  */
-class SphereEngineResponseException extends Exception
-{
+class SphereEngineResponseException extends Exception {
 
     protected $errorCode = 0;
 
@@ -51,14 +50,12 @@ class SphereEngineResponseException extends Exception
      * @param string $code HTTP status code
      * @param string $errorCode Error code
      */
-    public function __construct($message = "", $code = 0, $errorCode = 0)
-    {
+    public function __construct($message = "", $code = 0, $errorCode = 0) {
         parent::__construct($message, $code);
         $this->errorCode = $errorCode;
     }
 
-    public function getErrorCode()
-    {
+    public function getErrorCode() {
         return $this->errorCode;
     }
 }

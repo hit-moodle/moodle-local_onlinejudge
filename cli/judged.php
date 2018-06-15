@@ -70,8 +70,7 @@ if ($unrecognized) {
 }
 
 if ($options['help']) {
-    $help =
-        "Judge all unjudged tasks.
+    $help = "Judge all unjudged tasks.
 
 Options:
 -h, --help            Print out this help
@@ -164,8 +163,7 @@ fclose($LOCK);
  *
  * @return an unjudged task or null;
  */
-function get_one_unjudged_task()
-{
+function get_one_unjudged_task() {
     global $CFG, $DB, $LOCK;
 
     $task = null;
@@ -186,8 +184,7 @@ function get_one_unjudged_task()
 }
 
 // Judge all unjudged tasks
-function judge_all_unjudged()
-{
+function judge_all_unjudged() {
     while ($task = get_one_unjudged_task()) {
         verbose(cli_heading('TASK: ' . $task->id, true));
         verbose('Judging...');
@@ -203,15 +200,13 @@ function judge_all_unjudged()
     }
 }
 
-function sigterm_handler($signo)
-{
+function sigterm_handler($signo) {
     global $forcestop;
     $forcestop = true;
     verbose("Signal $signo catched");
 }
 
-function verbose($msg)
-{
+function verbose($msg) {
     global $options;
     if ($options['verbose']) {
         mtrace(rtrim($msg));

@@ -46,20 +46,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = array(
 
-    array(
-        'eventname' => 'assignsubmission_file\event\submission_created',
-        'callback' => 'invoke_judge',
-        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
-    ),
-    array(
-        'eventname' => 'assignsubmission_file\event\submission_updated',
-        'callback' => 'invoke_judge',
-        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
-    ),
+    array('eventname' => 'assignsubmission_file\event\submission_created', 'callback' => 'invoke_judge', 'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'), array('eventname' => 'assignsubmission_file\event\submission_updated', 'callback' => 'invoke_judge', 'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'),
 
-    array(
-        'eventname' => 'mod_onlinejudge\event\onlinejudge_task_judged',
-        'callback' => 'onlinejudge_task_judged',
-        'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'
-    ),
-);
+    array('eventname' => 'mod_onlinejudge\event\onlinejudge_task_judged', 'callback' => 'onlinejudge_task_judged', 'includefile' => '/mod/assign/feedback/onlinejudge/lib.php'),);
