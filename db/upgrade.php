@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -32,7 +43,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_local_onlinejudge_upgrade($oldversion=0) {
+function xmldb_local_onlinejudge_upgrade($oldversion = 0) {
     global $CFG, $DB, $OUTPUT;
 
     $dbman = $DB->get_manager();
@@ -99,6 +110,17 @@ function xmldb_local_onlinejudge_upgrade($oldversion=0) {
 
         // onlinejudge savepoint reached
         upgrade_plugin_savepoint(true, 2011102401, 'local', 'onlinejudge');
+    }
+
+    if ($oldversion < 2018061400) {
+        $table = new xmldb_table('onlinejudge_tasks');
+        $field = new xmldb_field('compile_lm_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_warnings_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('compile_static_option', XMLDB_TYPE_INTEGER, null, null, false, null, 1, 'compileonly');
+        $dbman->add_field($table, $field);
+        upgrade_plugin_savepoint(true, 2018061400, 'local', 'onlinejudge');
     }
 
     echo $OUTPUT->notification(get_string('upgradenotify', 'local_onlinejudge'), 'notifysuccess');

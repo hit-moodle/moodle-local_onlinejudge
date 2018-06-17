@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -25,7 +36,7 @@
 
 /**
  * Online Judge navigation menu
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang

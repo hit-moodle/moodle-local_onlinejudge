@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -38,6 +49,6 @@ function xmldb_local_onlinejudge_uninstall() {
     unset_config('ideonedelay', 'local_onlinejudge');
 
     $fs = get_file_storage();
-    return $fs->delete_area_files(get_context_instance(CONTEXT_SYSTEM)->id, 'local_onlinejudge');
+    return $fs->delete_area_files(context_system::instance()->id, 'local_onlinejudge');
 }
 

@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -32,8 +43,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__).'/../../config.php');
-require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
 require_login(SITEID, false);
 
@@ -45,9 +56,9 @@ if (empty($task)) {
     print_error('invalidtaskid', 'local_onlinejudge', '', $taskid);
 }
 
-$context = get_context_instance(CONTEXT_MODULE, $task->cmid);
+$context = context_module::instance($task->cmid);
 
-$PAGE->set_url('/mod/assignment/type/onlinejudge/details.php');
+$PAGE->set_url('/mod/assign/feedeback/onlinejudge/details.php');
 $PAGE->set_pagelayout('popup');
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('details', 'local_onlinejudge'));
@@ -76,23 +87,22 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable';
 
 foreach ($task as $key => $content) {
-    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields))
-        or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
+    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields)) or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
         continue;
     }
 
-    $titlecell   = new html_table_cell();
+    $titlecell = new html_table_cell();
     $contentcell = new html_table_cell();
 
     $titlecell->text = get_string($key, 'local_onlinejudge');
     if (in_array($key, $sensitive_fields)) {
         $titlecell->text .= '*';
     }
-
-    if (empty($content)) {
+    // empty is not used as it treats '0' as empty.
+    if (!isset($content) and is_null($content)) {
         $content = get_string('notavailable');
     } else {
-        $formatter = 'format_'.$key;
+        $formatter = 'format_' . $key;
         if (function_exists($formatter)) {
             $content = $formatter($content);
         }
@@ -115,11 +125,11 @@ if (!$ajax) {
 }
 
 function format_compileroutput($string) {
-    return '<pre>'.htmlspecialchars($string).'</pre>';
+    return '<pre>' . htmlspecialchars($string) . '</pre>';
 }
 
 function format_cpuusage($string) {
-    return $string.' '.get_string('sec');
+    return $string . ' ' . get_string('sec');
 }
 
 function format_memusage($string) {
@@ -133,4 +143,3 @@ function format_stdout($string) {
 function format_stderr($string) {
     return format_compileroutput($string);
 }
-

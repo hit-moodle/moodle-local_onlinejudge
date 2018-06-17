@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -25,7 +36,7 @@
 
 /**
  * Capability definitions for online judge local plugin
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -37,38 +48,11 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
     // Ability to view the current status
-    'local/onlinejudge:viewjudgestatus' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
-        )
-    ),
+    'local/onlinejudge:viewjudgestatus' => array('captype' => 'read', 'contextlevel' => CONTEXT_SYSTEM, 'archetypes' => array('teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW, 'student' => CAP_ALLOW,)),
 
     // Ability to view own statistics
-    'local/onlinejudge:viewmystat' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
-        )
-    ),
+    'local/onlinejudge:viewmystat' => array('captype' => 'read', 'contextlevel' => CONTEXT_SYSTEM, 'archetypes' => array('teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW, 'student' => CAP_ALLOW,)),
 
     // Ability to view senstitive details
-    'local/onlinejudge:viewsensitive' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    ),
-);
+    'local/onlinejudge:viewsensitive' => array('captype' => 'read', 'contextlevel' => CONTEXT_MODULE, 'archetypes' => array('teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW)),);
 

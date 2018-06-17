@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -39,9 +50,9 @@ define('CLI_SCRIPT', true);
 define('LOCK_FILE', '/temp/onlinejudge/lock');
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
-require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->libdir.'/clilib.php');      // cli only functions
-require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/clilib.php');      // cli only functions
+require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
 // Ensure errors are well explained
 if ($CFG->debug < DEBUG_NORMAL) {
@@ -49,8 +60,8 @@ if ($CFG->debug < DEBUG_NORMAL) {
 }
 
 // now get cli options
-$longoptions  = array('help'=>false, 'nodaemon'=>false, 'once'=>false, 'verbose'=>false);
-$shortoptions = array('h'=>'help', 'n'=>'nodaemon', 'o'=>'once', 'v'=>'verbose');
+$longoptions = array('help' => false, 'nodaemon' => false, 'once' => false, 'verbose' => false);
+$shortoptions = array('h' => 'help', 'n' => 'nodaemon', 'o' => 'once', 'v' => 'verbose');
 list($options, $unrecognized) = cli_get_params($longoptions, $shortoptions);
 
 if ($unrecognized) {
@@ -59,8 +70,7 @@ if ($unrecognized) {
 }
 
 if ($options['help']) {
-    $help =
-"Judge all unjudged tasks.
+    $help = "Judge all unjudged tasks.
 
 Options:
 -h, --help            Print out this help
@@ -89,7 +99,7 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
     if ($pid == -1) {
         cli_error('Could not fork');
     } else if ($pid > 0) { // parent process
-        mtrace('Judge daemon successfully created. PID = '.$pid);
+        mtrace('Judge daemon successfully created. PID = ' . $pid);
         die;
     } else { // child process
         // make the current process a session leader.
@@ -109,7 +119,7 @@ verbose('Judge daemon is running now.');
 
 if ($CFG->ostype != 'WINDOWS' and function_exists('pcntl_signal')) {
     // Handle SIGTERM and SIGINT so that can be killed without pain
-    declare(ticks = 1); // tick use required as of PHP 4.3.0
+    declare(ticks=1); // tick use required as of PHP 4.3.0
     pcntl_signal(SIGTERM, 'sigterm_handler');
     pcntl_signal(SIGINT, 'sigterm_handler');
 }
@@ -121,7 +131,7 @@ if (!check_dir_exists(dirname($lockfile))) {
 }
 $LOCK = fopen($lockfile, 'w');
 if (!$LOCK) {
-    mtrace('Can not create'.$CFG->dataroot.LOCK_FILE);
+    mtrace('Can not create' . $CFG->dataroot . LOCK_FILE);
     die;
 }
 
@@ -134,9 +144,8 @@ while (!$forcestop) {
         break;
     }
 
-    //Check interval is 5 seconds
-    // TODO: definable by admin
-    sleep(5);
+    // Check interval is definable by admin (5 seconds default)
+    sleep(get_config('local_onlinejudge', 'judgecheckinterval'));
 
     if ($plugin_version < get_config('local_onlinejudge', 'version')) {
         verbose('Plugin was upgraded.');
@@ -177,14 +186,14 @@ function get_one_unjudged_task() {
 // Judge all unjudged tasks
 function judge_all_unjudged() {
     while ($task = get_one_unjudged_task()) {
-        verbose(cli_heading('TASK: '.$task->id, true));
+        verbose(cli_heading('TASK: ' . $task->id, true));
         verbose('Judging...');
         try {
             $task = onlinejudge_judge($task);
             verbose("Successfully judged: $task->status");
         } catch (Exception $e) {
             $info = get_exception_info($e);
-            $errmsg = "Judged inner level exception handler: ".$info->message.' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
+            $errmsg = "Judged inner level exception handler: " . $info->message . ' Debug: ' . $info->debuginfo . "\n" . format_backtrace($info->backtrace, true);
             cli_problem($errmsg);
             // Continue to get next unjudged task
         }
@@ -203,4 +212,3 @@ function verbose($msg) {
         mtrace(rtrim($msg));
     }
 }
-

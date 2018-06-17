@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -25,7 +36,7 @@
 
 /**
  * Online Judge cron job
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -53,18 +64,18 @@ if ($a->count > 0) {
             $admin = get_admin();
             foreach ($users as $user) {
                 $eventdata = new stdClass();
-                $eventdata->component         = 'local_onlinejudge';
-                $eventdata->name              = 'judgedcrashed';
-                $eventdata->userfrom          = $admin;
-                $eventdata->userto            = $user;
-                $eventdata->subject           = get_string('judgednotifysubject', 'local_onlinejudge', $a);
-                $eventdata->fullmessage       = get_string('judgednotifybody', 'local_onlinejudge', $a);
+                $eventdata->component = 'local_onlinejudge';
+                $eventdata->name = 'judgedcrashed';
+                $eventdata->userfrom = $admin;
+                $eventdata->userto = $user;
+                $eventdata->subject = get_string('judgednotifysubject', 'local_onlinejudge', $a);
+                $eventdata->fullmessage = get_string('judgednotifybody', 'local_onlinejudge', $a);
                 $eventdata->fullmessageformat = FORMAT_PLAIN;
-                $eventdata->fullmessagehtml   = '';
-                $eventdata->smallmessage      = '';
-                $eventdata->notification      = 1;
+                $eventdata->fullmessagehtml = '';
+                $eventdata->smallmessage = '';
+                $eventdata->notification = 1;
                 message_send($eventdata);
-                mtrace('    Sent notification to '.fullname($user));
+                mtrace('    Sent notification to ' . fullname($user));
             }
         }
     }

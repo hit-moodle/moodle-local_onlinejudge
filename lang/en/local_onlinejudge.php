@@ -1,4 +1,15 @@
 <?php
+///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -25,7 +36,7 @@
 
 /**
  * Strings for local_onlinejudge
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -41,28 +52,14 @@ $string['cpuusage'] = 'CPU usage';
 $string['defaultlanguage'] = 'Default language';
 $string['defaultlanguage_help'] = 'Default language setting for new online judge assignments.';
 $string['details'] = 'Details';
-$string['ideoneautherror'] = 'Wrong username or wrong password';
-$string['ideonedelay'] = 'Delay between requests to ideone.com (seconds)';
-$string['ideonedelay_help'] = 'If the delay between sending judge requests and getting results is too short, ideone.com will reject.';
-$string['ideoneerror'] = 'Ideone returns error: {$a}';
-$string['ideonelogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Moodle Online Judge</a> uses <a href="http://ideone.com">Ideone API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
-$string['ideoneresultlink'] = 'See details at <a href="http://ideone.com/{$a}">http://ideone.com/{$a}</a>.';
-$string['ideoneuserrequired'] = 'Required if ideone.com judge is selected';
+$string['seautherror'] = 'Wrong access token or client id';
+$string['sedelay'] = 'Delay between requests to sphere-engine.com (seconds)';
+$string['sedelay_help'] = 'If the delay between sending judge requests and getting results is too short, sphere-engine.com will reject.';
+$string['seerror'] = 'Sphere Engine returns error: {$a}';
+$string['selogo'] = '<a href="https://github.com/hit-moodle/moodle-local_onlinejudge">Moodle Online Judge</a> uses <a href="https://sphere-engine.com/">Sphere Engine Compilers API</a> &copy; by <a href="http://sphere-research.com">Sphere Research Labs</a>';
+$string['seresultlink'] = 'See details at <a href="https://{$a->end_point}.compilers.sphere-engine.com/api/v4/submissions/{$a->submission_id}?access_token={$a->access_token}">https://{$a->end_point}.compilers.sphere-engine.com/api/v4/submissions/{$a->submission_id}?access_token={$a->access_token}</a>.';
+$string['seclientidrequired'] = 'Required if sphere-engine.com judge is selected';
 $string['info'] = 'Information';
-$string['info0'] = 'If you have been waiting too long, please inform the admin';
-$string['info1'] = 'Congratulation!!!';
-$string['info2'] = 'A good program must return 0 if no error occurs';
-$string['info3'] = 'The compiler dislikes your code';
-$string['info4'] = 'It seems that the compiler likes your code';
-$string['info5'] = 'You ate too much memory';
-$string['info6'] = 'Your code sent too much to stdout';
-$string['info7'] = 'Almost perfect, except some bad white spaces, tabs, new lines and etc';
-$string['info8'] = 'Your code called some functions which are <em>not</em> allowed to run';
-$string['info9'] = '[SIGSEGV, Segment fault] Bad array index, bad pointer access or even worse';
-$string['info10'] = 'The program has been running for too long time';
-$string['info11'] = 'Double check your code. Don\'t output any typo or non-required characters';
-$string['info21'] = 'The judge engine does not work well. Please inform the admin';
-$string['info22'] = 'If you have been waiting too long, please inform the admin';
 $string['infostudent'] = 'Information';
 $string['infoteacher'] = 'Sensitive information';
 $string['invalidlanguage'] = 'Invalid language ID: {$a}';
@@ -81,6 +78,8 @@ $string['langc_sandbox'] = 'C (run locally)';
 $string['langc_warn2err_sandbox'] = 'C (run locally, warnings as errors)';
 $string['langcpp_sandbox'] = 'C++ (run locally)';
 $string['langcpp_warn2err_sandbox'] = 'C++ (run locally, warnings as errors)';
+$string['judgecheckinterval'] = 'Judge Daemon Check Interval (second)';
+$string['judgecheckinterval_help'] = 'How many seconds the judge daemon should wait before judging all un-judged tasks.';
 $string['maxcpulimit'] = 'Maximum CPU usage (second)';
 $string['maxcpulimit_help'] = 'How long can a program been judged keep running.';
 $string['maxmemlimit'] = 'Maximum memory usage (MB)';
@@ -89,7 +88,7 @@ $string['memusage'] = 'Memory usage';
 $string['messageprovider:judgedcrashed'] = 'Online judge daemon crashed notification';
 $string['mystat'] = 'My Statistics';
 $string['notesensitive'] = '* Shown to teachers only';
-$string['onefileonlyideone'] = 'Ideone.com does not support multi-files';
+$string['onefileonlyse'] = 'sphere-engine.com does not support multi-files';
 $string['onlinejudge:viewjudgestatus'] = 'View judge status';
 $string['onlinejudge:viewmystat'] = 'View self statistics';
 $string['onlinejudge:viewsensitive'] = 'View sensitive details';
@@ -115,5 +114,7 @@ $string['status23'] = 'Multi-status';
 $string['status255'] = 'Unsubmitted';
 $string['stderr'] = 'Standard error output';
 $string['stdout'] = 'Standard output';
-$string['upgradenotify'] = 'Do NOT forget to execute cli/install_assignment_type and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
-
+$string['upgradenotify'] = 'Do NOT forget to execute cli/install_assign_feedback and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
+$string['event_onlinejudge_task_judged'] = "Event Online Judge Task Judged";
+$string['event_onlinejudge_task_description'] = "The event is concerned with firing the 'onlinejudge_task_judged' located in MOODLE_PATH/mod/assign/feedback/onlinejudge/lib.php.";
+// TODO: add translations to other languages.

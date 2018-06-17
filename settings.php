@@ -1,5 +1,17 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                       Online Judge Moodle 3.4+                        //
+//                 Copyright (C) 2018 onwards Andrew Nagyeb              //
+// This program is based on the work of Sun Zhigang (C) 2009 Moodle 2.6. //
+//                                                                       //
+//    Modifications were made in order to upgrade the program so that    //
+//                     it is compatible to Moodle 3.4+.                  //
+//                       Original License Follows                        //
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // This file is part of Online Judge 2//moodle.org/                      //
 //                                                                       //
@@ -20,7 +32,7 @@
 
 /**
  * Administration forms of the online judge
- * 
+ *
  * @package   local_onlinejudge
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
@@ -29,13 +41,13 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) { // needs this condition or there is error on login page
-    require_once($CFG->dirroot.'/local/onlinejudge/judgelib.php');
+    require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
 
     $temp = new admin_settingpage('onlinejudge', get_string('pluginname', 'local_onlinejudge'));
-
+    $temp->add(new admin_setting_configtext('local_onlinejudge/judgecheckinterval', get_string('judgecheckinterval', 'local_onlinejudge'), get_string('judgecheckinterval_help', 'local_onlinejudge'), 5, PARAM_INT));
     $temp->add(new admin_setting_configtext('local_onlinejudge/maxmemlimit', get_string('maxmemlimit', 'local_onlinejudge'), get_string('maxmemlimit_help', 'local_onlinejudge'), 64, PARAM_INT));
     $temp->add(new admin_setting_configtext('local_onlinejudge/maxcpulimit', get_string('maxcpulimit', 'local_onlinejudge'), get_string('maxcpulimit_help', 'local_onlinejudge'), 10, PARAM_INT));
-    $temp->add(new admin_setting_configtext('local_onlinejudge/ideonedelay', get_string('ideonedelay', 'local_onlinejudge'), get_string('ideonedelay_help', 'local_onlinejudge'), 10, PARAM_INT));
+    $temp->add(new admin_setting_configtext('local_onlinejudge/sedelay', get_string('sedelay', 'local_onlinejudge'), get_string('sedelay_help', 'local_onlinejudge'), 10, PARAM_INT));
 
     $choices = onlinejudge_get_languages();
     $temp->add(new admin_setting_configselect('local_onlinejudge/defaultlanguage', get_string('defaultlanguage', 'local_onlinejudge'), get_string('defaultlanguage_help', 'local_onlinejudge'), '', $choices));
@@ -44,4 +56,3 @@ if ($hassiteconfig) { // needs this condition or there is error on login page
 
     $ADMIN->add('localplugins', $temp);
 }
-
