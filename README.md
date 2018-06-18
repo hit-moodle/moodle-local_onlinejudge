@@ -102,14 +102,14 @@ In Windows
 
 Sphere Engine
 ------------
-In order to start using sphere engine, you have to run:
+In order to start using sphere engine, you have go to the following path:
+
+> MOODLE_PATH/local/onlinejudge/judge/sphere_engine/api/
+
+and run:
 ```bash
 composer require guzzlehttp/guzzle
 ``` 
-inside the following path :
-
-*MOODLE_PATH/local/onlinejudge/judge/sphere_engine/api/*
-
 Usage
 =====
 
