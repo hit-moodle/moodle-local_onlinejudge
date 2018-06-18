@@ -3,7 +3,7 @@
 Introduction
 ============
 
-The Online Judge 3 plugin for Moodle 3 is designed for courses involving programming.
+The Online Judge 3 plugin for Moodle 3 (there are older versions) is designed for courses involving programming.
 It can automatically grade submitted source code by testing them against customizable
 test cases (ACM-ICPC/Online Judge style).
 
@@ -65,8 +65,9 @@ Download
 Using git:
 
 ```
-git clone git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge
+git clone -b OJ_VERSION git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge
 ```
+Check [branches](https://github.com/hit-moodle/moodle-local_onlinejudge/branches) to view all the available versions.
 
 
 Installation / Upgrading
