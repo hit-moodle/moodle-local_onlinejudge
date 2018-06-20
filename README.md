@@ -1,5 +1,9 @@
 **This plugin is in BETA version and NOT recommended to use in production sites**
 
+*README* varies in respect to version, check [branches](https://github.com/hit-moodle/moodle-local_onlinejudge/branches) to view all the available versions.
+
+------
+
 Introduction
 ============
 
@@ -67,8 +71,7 @@ Using git:
 ```
 git clone -b OJ_VERSION git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge
 ```
-Check [branches](https://github.com/hit-moodle/moodle-local_onlinejudge/branches) to view all the available versions.
-
+*OJ_VERSION* is obtained from the available branches.
 
 Installation / Upgrading
 ========================
@@ -88,8 +91,7 @@ In Linux
 ```
 cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make
 ```
-Important Note: Make sure the file named `sand` is executable and has the following context:
-`system_u:object_r:bin_t:s0`.
+**Note**: Make sure the file named `sand` is *executable*, and has the following context: `system_u:object_r:bin_t:s0`.
 
 In Windows
 ----------
@@ -97,7 +99,7 @@ In Windows
 1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove it.
 2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
 3. Put `onlinejudge` into `MOODLE_PATH\local\`
-4. **Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assignment_type.bat`.**
+4. **Enter folder `MOODLE_PATH\local\onlinejudge\cli` and run `install_assign_feedback.bat`.**
 5. Login your site as admin and access /admin/index.php. The plugins will be installed/upgraded.
 6. **In command prompt, `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the judge daemon.**
 
