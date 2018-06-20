@@ -58,7 +58,7 @@ Download it from https://github.com/hit-moodle/moodle-local_onlinejudge/archives
 
 or using git:
 
-`git clone git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge`
+`git clone -b OJ_2.0 git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge`
 
 
 Installation / Upgrading
