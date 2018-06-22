@@ -44,4 +44,5 @@ $plugin->requires = 2017111300;  // Requires this Moodle version
 $plugin->component = 'assignfeedback_onlinejudge';
 $plugin->maturity = MATURITY_BETA;
 $plugin->release = "3.0 beta4"; // User-friendly version number
+$plugin->dependencies = array('local_onlinejudge' => 2018061400);
 
