@@ -46,7 +46,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/questionlib.php'); //for get_grade_options()
-require_once($CFG->dirroot . '/local/onlinejudge/judgelib.php');
+$locallib_file = $CFG->dirroot . '/local/onlinejudge/judgelib.php';
+file_exists($locallib_file) AND require_once $locallib_file;
 require_once($CFG->dirroot . '/mod/assign/feedbackplugin.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once('testcase_form.php');
