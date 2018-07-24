@@ -393,11 +393,11 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         // Source code
         $urlparams = array('id' => $this->assignment->get_course_module()->id, 'a' => $this->assignment->get_instance()->id, 'submissionid' => $submission->id,);
         $url = new moodle_url('/mod/assign/feedback/onlinejudge/source.php', $urlparams);
-        $icon = $OUTPUT->pix_icon('docs', get_string('more'));
-        $attributes = array('href' => $url, 'title' => get_string('more'),);
-        $attributes['id'] = $OUTPUT->add_action_handler(new popup_action('click', $url));
-        $icon = '<i class="fa fa-file-text fa-2x" aria-hidden="true"></i>';
-        $item = html_writer::tag('a', $icon, $attributes);
+        $attributes = array('src' => $url);
+        $item = html_writer::tag('iframe', $attributes);
+        $external_link_icon = '<br><i class="fa fa-external-link" aria-hidden="true"></i>';
+        $external_link_attributes = array('href' => $url , 'target' => '_blank', 'title' => get_string('more'));
+        $item .= html_writer::tag('a', $external_link_icon, $external_link_attributes);
         $item_name = get_string('source_code', 'assignfeedback_onlinejudge');
         $table->data[] = array($item_name, $item);
         ///////////////////////////////////////////
