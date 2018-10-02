@@ -92,7 +92,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         unset($choices);
         $choices = onlinejudge_get_languages();
         $mform->addElement('select', 'language', get_string('assignmentlangs', 'assignfeedback_onlinejudge'), $choices);
-        $mform->setDefault('language', isset($onlinejudge) ? $onlinejudge->language : get_config('local_onlinejudge', 'defaultlanguage'));
+        $mform->setDefault('language', !empty($onlinejudge) ? $onlinejudge->language : get_config('local_onlinejudge', 'defaultlanguage'));
         // Disabling element if online judge enable button is not checked.
         $mform->disabledIf('language', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
@@ -101,7 +101,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         $choices = question_bank::fraction_options(); // Steal from question lib
         $mform->addElement('select', 'ratiope', get_string('ratiope', 'assignfeedback_onlinejudge'), $choices);
         $mform->addHelpButton('ratiope', 'ratiope', 'assignfeedback_onlinejudge');
-        $mform->setDefault('ratiope', isset($onlinejudge) ? $onlinejudge->ratiope : 0);
+        $mform->setDefault('ratiope', !empty($onlinejudge) ? $onlinejudge->ratiope : 0);
         $mform->setAdvanced('ratiope');
         $mform->disabledIf('ratiope', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
@@ -110,20 +110,20 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         unset($choices);
         $choices = get_max_cpu_times();
         $mform->addElement('select', 'cpulimit', get_string('cpulimit', 'assignfeedback_onlinejudge'), $choices);
-        $mform->setDefault('cpulimit', isset($onlinejudge) ? $onlinejudge->cpulimit : 1);
+        $mform->setDefault('cpulimit', !empty($onlinejudge) ? $onlinejudge->cpulimit : 1);
         $mform->disabledIf('cpulimit', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
         // Max. memory usage
         unset($choices);
         $choices = get_max_memory_usages();
         $mform->addElement('select', 'memlimit', get_string('memlimit', 'assignfeedback_onlinejudge'), $choices);
-        $mform->setDefault('memlimit', isset($onlinejudge) ? $onlinejudge->memlimit : 1048576);
+        $mform->setDefault('memlimit', !empty($onlinejudge) ? $onlinejudge->memlimit : 1048576);
         $mform->disabledIf('memlimit', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
         // Compile only?
         $mform->addElement('select', 'compileonly', get_string('compileonly', 'assignfeedback_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compileonly', 'compileonly', 'assignfeedback_onlinejudge');
-        $mform->setDefault('compileonly', isset($onlinejudge) ? $onlinejudge->compileonly : 0);
+        $mform->setDefault('compileonly', !empty($onlinejudge) ? $onlinejudge->compileonly : 0);
         $mform->setAdvanced('compileonly');
         $mform->disabledIf('compileonly', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
@@ -132,30 +132,30 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
             $mform->addElement('text', 'clientid', get_string('clientid', 'assignfeedback_onlinejudge'), array('size' => 20));
             $mform->addHelpButton('clientid', 'clientid', 'assignfeedback_onlinejudge');
             $mform->setType('clientid', PARAM_ALPHANUMEXT);
-            $mform->setDefault('clientid', isset($onlinejudge) ? $onlinejudge->clientid : '');
+            $mform->setDefault('clientid', !empty($onlinejudge) ? $onlinejudge->clientid : '');
             $mform->disabledIf('clientid', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
             $mform->addElement('password', 'accesstoken', get_string('accesstoken', 'assignfeedback_onlinejudge'), array('size' => 20));
             $mform->addHelpButton('accesstoken', 'accesstoken', 'assignfeedback_onlinejudge');
-            $mform->setDefault('accesstoken', isset($onlinejudge) ? $onlinejudge->accesstoken : '');
+            $mform->setDefault('accesstoken', !empty($onlinejudge) ? $onlinejudge->accesstoken : '');
             $mform->disabledIf('accesstoken', 'assignfeedback_onlinejudge_enabled', 'notchecked');
         }
         // Newly added tags
         $mform->addElement('select', 'compile_lm_option', get_string('compile_lm_option', 'assignfeedback_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compile_lm_option', 'compile_lm_option', 'assignfeedback_onlinejudge');
-        $mform->setDefault('compile_lm_option', isset($onlinejudge) ? $onlinejudge->compile_lm_option : 1);
+        $mform->setDefault('compile_lm_option', !empty($onlinejudge) ? $onlinejudge->compile_lm_option : 1);
         $mform->setAdvanced('compile_lm_option');
         $mform->disabledIf('compile_lm_option', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
         $mform->addElement('select', 'compile_warnings_option', get_string('compile_warnings_option', 'assignfeedback_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compile_warnings_option', 'compile_warnings_option', 'assignfeedback_onlinejudge');
-        $mform->setDefault('compile_warnings_option', isset($onlinejudge) ? $onlinejudge->compile_warnings_option : 1);
+        $mform->setDefault('compile_warnings_option', !empty($onlinejudge) ? $onlinejudge->compile_warnings_option : 1);
         $mform->setAdvanced('compile_warnings_option');
         $mform->disabledIf('compile_warnings_option', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
         $mform->addElement('select', 'compile_static_option', get_string('compile_static_option', 'assignfeedback_onlinejudge'), $ynoptions);
         $mform->addHelpButton('compile_static_option', 'compile_static_option', 'assignfeedback_onlinejudge');
-        $mform->setDefault('compile_static_option', isset($onlinejudge) ? $onlinejudge->compile_static_option : 1);
+        $mform->setDefault('compile_static_option', !empty($onlinejudge) ? $onlinejudge->compile_static_option : 1);
         $mform->setAdvanced('compile_static_option');
         $mform->disabledIf('compile_static_option', 'assignfeedback_onlinejudge_enabled', 'notchecked');
 
