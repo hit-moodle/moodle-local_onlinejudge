@@ -1,0 +1,193 @@
+// tip bulb definition
+ifdef::env-github[]
+:tip-caption: :bulb:
+endif::[]
+//
+
+// sectionining configurations
+:idprefix:
+:idseparator: -
+:sectanchors:
+:sectlinks:
+:sectnumlevels: 6
+:sectnums:
+:toc: macro
+:toclevels: 6
+:toc-title:
+//
+
+// variables
+:moodle_url: https://download.moodle.org/releases/latest/
+//
+
+[TIP]
+This plugin is in BETA version and NOT recommended to use in production websites
+
+*readme* varies in respect to version (i.e., branch), there are https://github.com/hit-moodle/moodle-local_onlinejudge/branches[two available ones].
+
+toc::[]
+
+= Introduction
+
+The Online Judge plugin for {moodle_url}[Moodle] is designed for courses involving programming. It can automatically grade submitted source code by testing them against customizable test cases https://en.wikipedia.org/wiki/International_Collegiate_Programming_Contest[(ACM-ICPC/Online Judge style)].
+
+== Components
+
+[%header,cols=2*] 
+|===
+h|Component
+h|Description
+
+
+|judgelib
+|A local-type plugin which provides an online judge function library to any part of Moodle.
+
+|judges
+|Judge engine plugins for judgelib
+
+|clients
+|Although there is a developed user interface client, any kind of moodle plugins can work as the client of `judgelib` to provide UI to teachers and students and call the `judgelib` to judge submissions. 
+|===
+
+== Judge Engines
+
+[%header,cols=2*] 
+|===
+h|Judge Engine
+h|Description
+
+
+|<<sandbox>>
+|Compiles and executes C/C++ programs locally in a protected environment (https://github.com/openjudge/sandbox[see libsandbox]). Supports **Linux 32/64-bit only**.
+
+|<<sphere-engine>>
+|Posts all data to sphere-engine.com which compiles and executes programs remotely. https://sphere-engine.com/supported-languages[Supports 40+ languages], such as C/C++, Java, Python, C#, JavaScript, Perl, PHP. **Works on both Windows and Linux**.
+
+|Docker **(under development)** 
+|Posts all data to docker image which compilers, executes, and limiting their behavior. 
+|===
+
+== Plugin Client
+
+Online Judge Assignment Feedback Plugin: online judge version of the https://docs.moodle.org/dev/Assign_feedback_plugins[official feedback plugin] assignment activity.
+
+The workflow is:
+
+1. Administrators install and config it.
+2. Teachers create *Assignment*, choose *Online Judge* as a feedback type, and setup *testcases*, etc.
+3. Students submit code in Online Judge Assignment Activities.
+4. The <<judge-daemon>> judges the submissions in background.
+5. Teachers and students get judge results in Online Judge Assignment Activities.
+
+
+= Prerequisites
+
+== Linux
+
+* https://download.moodle.org/releases/latest/[Moodle] `2.0`-`2.7`, `3.4+`
+* `php-cli`
+* (optional but recommended) `make`, `gcc` and `g++`. For 64-bit system, `libc` 32-bit development libraries, e.g., `libc6-dev-i386`, `glibc-devel.i386`, are required.
+* `pcntl` and `posix` extension for `php-cli`
+
+=== SELinux 
+
+Ensure that SELinux allows apache to execute outgoing HTTP requests through the following command:
+
+```bash
+getsebool httpd_can_network_connect
+```
+if it is not set true, run:
+```bash
+setsebool -P httpd_can_network_connect on
+```
+
+== Windows
+
+* {moodle_url}[Moodle] `2.0`-`2.7`, `3.4+`
+* `php-cli`
+
+
+= Download
+
+Using git:
+
+```
+git clone -b OJ_VERSION git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge
+```
+
+[TIP]
+OJ_VERSION is obtained from the available branches.
+
+= Installation / Upgrading
+
+
+[TIP]
+`MOODLE_PATH` means the root path of your moodle installation.
+
+== Linux 
+
+1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove/move it https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback#L7-L11[(because it will be automatically removed)].
+2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
+3. Put `onlinejudge` into `MOODLE_PATH/local/`
+4. Run `MOODLE_PATH/local/onlinejudge/cli/install_assign_feedback`.
+5. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
+6. In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`, to launch the <<judge-daemon>>.
+
+=== Sandbox 
+
+If you would like to use sandbox judge engine, then run:
+```
+cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make
+```
+
+[TIP]
+Make sure the file named `sand` is _executable_, and has the following context: `system_u:object_r:bin_t:s0`.
+
+== Windows
+
+1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove/move it https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback.bat#L7-L9[(because it will be automatically removed)].
+2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
+3. Put `onlinejudge` into `MOODLE_PATH\local\`
+4. Navigate to `MOODLE_PATH\local\onlinejudge\cli` and run `install_assign_feedback.bat`.
+5. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
+6. In command prompt, write `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the <<judge-daemon>>.
+
+== Sphere Engine
+
+In order to start using sphere engine, navigate to the following path:
+
+> MOODLE_PATH/local/onlinejudge/judge/sphere_engine/api/
+
+and run:
+
+```bash
+composer require guzzlehttp/guzzle
+``` 
+
+= Usage
+
+== Online Judge Assignment Feedback Type
+
+After installation, there will be a new assignment feedback type called *Online Judge* appears in the *"Feedback types"* while creating the assignment. Simply check it it and follow the inline help.
+
+After creating the assignment, two buttons will appear in the assignment page context, `Test Case Management` and `Rejudge All` buttons.
+
+== Judge Daemon
+
+The judge daemon, which exists in https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/cli/judged.php[`cli/judged.php`], has several helpful options for debugging purposes. Use `--help` argument for more information.
+
+= Links
+
+[cols=2*] 
+|===
+
+|Home
+|<https://github.com/hit-moodle/moodle-local_onlinejudge>
+
+|FAQ
+|<https://github.com/hit-moodle/moodle-local_onlinejudge/wiki>
+
+|Bug reports, feature requests, help wanted and other issues:
+|<https://github.com/hit-moodle/moodle-local_onlinejudge/issues>
+|===
+
