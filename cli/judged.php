@@ -90,7 +90,7 @@ if ($CFG->ostype != 'WINDOWS' and !$options['nodaemon']) {
     // create daemon
     verbose(cli_heading('Creating daemon', true));
 
-    if (!function_exists('pcntl') || !function_exists('posix')) {
+    if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
         cli_error('PHP pcntl and posix extension must be installed!');
     }
 
