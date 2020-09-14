@@ -1,3 +1,257 @@
+[2013/04/30] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c fallback to hybrid profiling the full asynchronous profiling
+    introduced in 0.3.5-2 may fail to update the resource usage of some very
+    short tasks leaving some statistics zero.
+  * in platform.c improved trace_kill() to overcome syscall overrun
+
+[2013/04/12] LIU Yu, <pineapple.liu@gmail.com>
+  * moved macro RVAL_{IF,ELSE,FI} from platform.h to internal.h
+  * in platform.{h,c} improved proc_dump() to handle some marginal conditions
+  * in configure.in updated version to 0.3.5-3
+
+[2013/03/31] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.{h,c} renamed proc_syscall_mode() -> proc_abi()
+  * in internal.{h,awk} renamed t_option_name() -> s_trace_opt_name()
+
+[2013/03/23] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c renamed sandbox_ref_t -> sandbox_mgr_t
+  * in platform.c fixed SIGPROF / SIGSTAT frequency mismatch
+  * in platform.c rewrote sleep timeout calibration in sandbox_manager()
+  * in platform.c added errno preservation to an early return of proc_probe()
+  * in sandbox.c moved mem profiling from sandbox_watcher() to sandbox_profiler()
+  * in sandbox.c removed an aggressive MONITOR_ERROR from sandbox_profiler()
+  * updated copyright year in source code headers
+  * in configure.in added -lm to linker arguments
+
+[2013/01/09] LIU Yu, <pineapple.liu@gmail.com>
+  * modified configure.in to generate pkgconfig and rpmbuild spec's from
+    template files sandbox.{pc,spec}.in and removed sandbox.{pc,spec}
+
+[2012/11/08] LIU Yu, <pineapple.liu@gmail.com>
+  * removed --enable-cachesz configure option as it has little effect on SMP 
+    systems; also removed cache_flush() from platform.{h,c} and sandbox.c
+  * in internal.h capitalized ts_{less,inplace_add,inplace_sub} macros
+  * moved sandbox_manager(), sandbox_pool and global_mutex from sandbox.c to 
+    platform.c; also localized them as static function / variables
+  * moved sandbox_ref_t and sandbox_pool_t from internal.h to platform.c
+  * in platform.c renamed init() -> global_init(), fini() -> global_fini(),
+    sandbox_pool -> global_pool
+
+[2012/10/13] LIU Yu, <pineapple.liu@gmail.com>
+  * the global trace pool is now implicit rather than an optional feature.
+  * in sandbox.c optimized sandbox_manager() to reduce memory footprint.
+  * in platform.{h,c} removed sandbox_timer() and optimized proc_probe().
+  * in configure.in updated version to 0.3.5-2
+
+[2012/10/08] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h fixed x86_64 syscall abi (4th argument)
+
+[2012/10/05] LIU Yu, <pineapple.liu@gmail.com>
+  * in Makefile.in reordered linker arguments to resolve a gcc linking error
+
+[2012/08/31] LIU Yu, <pineapple.liu@gmail.com>
+  * revoked the use of real-time signals, RT_SIGTERM (SIGRTMIN + 1) -> SIGEXIT
+    (SIGUSR1), RT_SIGSTAT (SIGRTMIN + 2) -> SIGSTAT (SIGUSR2), RT_SIGPROF ->
+    SIGPROF. This hopefully resolves an EINVAL in the trace manager thread due
+    to signal queue jamming.
+
+[2012/08/27] LIU Yu, <pineapple.liu@gmail.com>
+  * added a new --enable-pool configure option to enable global trace pool at
+    compile time. The global trace pool keeps track of all active instances of
+    sandbox running in the same process; and it incorporates a sandbox manager
+    to centralize some redundant duties of per-sandbox profiler threads.
+  * in platform.{h,c} renamed functions for clarity trace_self() -> trace_me(),
+    syscall_mode() -> proc_syscall_mode(), trace_main() -> trace_handler()
+  * in sandbox.c merged sandbox_resolver() into sandbox_watcher()
+  * in sandbox.c the profiler thread now sends a SIGSTOP signal to the prisoner
+    process after any out-of-quota event is posted. And the default policy 
+    bypasses SIGSTOP / SIGCONT events by default.
+  * moved macros PROF_FREQ and STAT_FREQ to internal.h (sandbox-dev.h)
+
+[2012/08/23] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.{h,c} added a new worker_t type with both tid (pthread_t)
+    and target (thread_func_t function pointers), the tracer and monitors
+    of a sandbox are redefined as worker_t objects
+
+[2012/08/20] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.{h,c} revised concurrency control mechanism to use rwlock
+  * in platform.c added global init() and fini() functions
+  * in platform.c proc_probe() no longer check for prisoner process state
+  * in platform.{h,c} and sandbox.c removed stub function trace_patch()
+
+[2012/08/07] LIU Yu, <pineapple.liu@gmail.com>
+  * in configure.in added multi-arch libdir test
+  * in configure.in updated version to 0.3.5-1
+  * updated intro in configure.in
+
+[2012/07/12] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c moved utime / stime profiling from the tracer to the profiler
+    thread, and used real-time signal RT_SIGSTAT(+1) for notification
+  * in sandbox.c the profiler now depends on real-time signal RT_SIGQUIT(+2) 
+    to quit the main profiling loop instead of sigtimedwait() timeout
+  * in internal.h exposed RT_SIGSTAT and RT_SIGQUIT names with macros
+  * in platform.h removed cutime, cstime, cminflt, cmajflt fields from proc_t
+
+[2012/07/10] LIU Yu, <pineapple.liu@gmail.com>
+  * in README updated introductive messages
+  * in sandbox.c replaced SIGALRM and SIGPROF signals used by the profiler 
+    thread with real-time signals RT_SIGSTAT(+1) and RT_SIGPROF(+3)
+  * in internal.h exposed RT_SIGALRM and RT_SIGPROF names with macros
+  * in sandboc.c restore old sigmask at the end of sandbox_execute()
+
+[2012/07/07] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.pc revised sandbox.pc.in for correct static linking
+  * in sandbox.c zero-fill struct sigevent vars to suppress valgrind warning
+  * in configure.in updated version to 0.3.4-3
+
+[2012/07/04] LIU Yu, <pineapple.liu@gmail.com>
+  * added sandbox.pc.in as pkgconfig file template
+  * added sandbox.spec.in as rpm specification template
+  * merged descriptive texts and version numbers to configure.in
+  * in platform.h fixed integer overflow in argument extraction
+  * in configure.in propagate config options to sandbox.spec
+  * in configure.in updated version to 0.3.4-2
+
+[2012/04/22] LIU Yu, <pineapple.liu@gmail.com>
+  * renamed symbols.{h,c,awk} -> internal.{h,c,awk} and moved some internal
+    directives from sandbox.h to internal.h
+  * in sandbox.spec and Makefile.in install src/internal.h to <sandbox-dev.h>
+  * in configure.in and sandbox.spec updated version to 0.3.4-1
+
+[2012/04/03] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c revised tracer / watcher interaction flow and resolved a dead-
+    lock in the old implementation of FLUSH_ALL_EVENTS(); a new feature of the
+    watcher is to set the result to BP and exit the watching loop when a) the 
+    prisoner process is already gone (and the tracer exited its main loop), and 
+    b) the policy still want the sandbox to CONT
+  * in configure.in and sandbox.spec updated version to 0.3.3-rc5
+
+[2012/03/31] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c implemented trace_kill() opcode rewrite
+  * in sandbox.c renamed MONITOR_SINK() -> FLUSH_ALL_EVENTS()
+  * in platform.c renamed __trace() -> __trace_impl(), renamed __trace_async() 
+    -> __trace(), and removed trace proxy selection
+
+[2012/03/30] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.h revised comments of trace_*() and proc_*() functions
+  * in platform.c discarded T_KILL trace option and trace_kill() no longer does 
+    syscall-rewite; in its current implementation, trace_kill() is equivalent
+    to kill(-pid, SIGKILL); we plan to add a T_SETDATA trace option and adopt 
+    opcode rewrite that changes the instructions at [EIP/RIP] to NOP (0x90)
+  * in sandbox.c renamed CLEAR_EVENTS() -> MONITOR_SINK() to reflect the actual 
+    functionality, trace_kill() is now invoked from the watcher thread rather
+    than from the tracer thread
+
+[2012/03/27] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c added function syscall_mode() for system call mode inspection
+  * in configure.in, added a new --enable-chkvsc option to turn on vsyscall
+    opcode inspection in syscall_mode()
+  * in platform.h macro SCMODE is renamed THE_SCMODE and uses syscall_mode()
+  * in sandbox.c moved illegal scmode detection from the main tracing loop to 
+    the default policy, and renamed the latter to sandbox_default_policy()
+  * in sandbox.c made sandbox_default_policy() reject SYS_*fork, SYS_clone, 
+    SYS_ptrace, and SYS_wait* system calls by default
+
+[2012/03/26] LIU Yu, <pineapple.liu@gmail.com>
+  * install the core library to configurable $(libdir) instead of $(prefix)/lib,
+    and in sandbox.spec added libsandbox.so(TAG)(BIT) to the *provides* list of 
+    the rpm package, this fixes a rpm dependency lookup error on x86_64
+  * in platform.h patched SCMODE detection code for x86_64 to capture
+    *JMP <__kernel_vsyscall+3>*-style system call entrance
+  * in configure.in and sandbox.spec updated version to 0.3.3-rc4
+
+[2011/12/15] LIU Yu, <pineapple.liu@gmail.com>
+  * simplified FUNC_{BEGIN,RET} macros
+  * in configure.in and sandbox.spec updated version to 0.3.3-rc3
+
+[2011/12/12] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c fixed permission check of the targeted program
+
+[2011/12/11] LIU Yu, <pineapple.liu@gmail.com>
+  * in platform.c fixed opcode inspection in syscall tracing mode
+  * in platform.h fixed syscall mode detection on x86_64 platform following
+    http://scary.beasts.org/security/CESA-2009-001.html
+
+[2011/12/05] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.h changed signal field in stat_t to struct {signo, code}
+  * in sandbox.c centralized signal-event posting code
+  * in sandbox.c distinguish SIGXFSZ generated by the kernel and by user mode
+    "kill -XFSZ" through probing the siginfo.si_code
+  * abandoned planned support of multi-process task
+
+[2011/11/30] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c distinguish SIGTRAP generated by the kernel and by user mode
+    "kill -TRACE" through probing the siginfo.si_code
+  * in sandbox.c changed waitpid to waitid for future multi-process tasks
+  * in sandbox.c moved utime/stime profiling to the profiling thread
+  * no longer generate sysret event upon the initial SIGTRAP
+  * in configure.in and sandbox.spec updated version to 0.3.3-rc2
+
+[2011/11/21] LIU Yu, <pineapple.liu@gmail.com>
+  * added asynchronous-mode trace to allow calling trace_*() from threads other
+    than the one forked the prisoner process
+  * fixed 32bit syscall ABI on 64bit systems
+  * in configure.in added procfs test and removed optional threading feature
+
+[2011/11/13] LIU Yu, <pineapple.liu@gmail.com>
+  * in configure.in removed WITH_NATIVE_TRACER macros
+  * added support for multiple monitoring threads
+  * added a new watcher thread for watching signals and wallclock timer
+  * improved libsandbox code for C++ compilation
+
+[2011/11/10] LIU Yu, <pineapple.liu@gmail.com>
+  * in configure.in fixed PACKAGE_RELEASE macro expansion error
+  * in sandbox.c and platform.{h,c} added partial 64bit support
+  * in sandbox.h added new mode fileds in event_data_t._SYS{CALL,RET}
+  * in sandbox.spec and configure.in updated version to 0.3.3
+  
+[2011/11/08] LIU Yu, <pineapple.liu@gmail.com>
+  * in configure.in and sandbox.c added --enable-rtsched option which turns on
+    realtime scheduling (SCHED_RR) when executing sandbox with super user
+  * in configure.in changed --enable-cache => --enable-cachesz=SIZE
+  * in sandbox.c fixed event detection when the prisoner process got SIGKILLed 
+    due to exceeding hard resource limit set by the OS
+  * pushed RELEASE macro in Makefile to configure.in
+
+[2011/11/07] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c added a event queue to avoid using SIGUSR1 to trigger ML event
+    (this makes life easier for prisoner processes that uses SIGUSR1, such as
+    some version of Java VM). The change also correct the ordering of ML and RF 
+    events, in previous versions of libsandbox, ML always comes after RF even
+    when ML actually happens before RF
+  * in sandbox.c explicitly unblocked all signals for the prisoner process by 
+    default (this fixed the issue when the prisoner program blocks some signals 
+    by default and thus fails to trigger certain events)
+  * in platform.h revised arch detection macros and preparing the support of 
+    both SYSCALL/INT80 system calls on x86_64 platforms
+  * in platform.c put i386 code into #ifdef __WORDSIZE == 32 ... #endif blocks,
+    and #include <sys/vfs.h> into #ifdef __linux__ ... #endif blocks
+  * in configure.in added check for statfs() and <sys/{param,mount}.h> and a new
+    argument --enable-cache to override the default cache size in platform.c
+  * in Makefile.in made compilation sensitive to config.status
+  * in sandbox.h added reserved result S_RESULT_R[0-5] and reserved status S_
+    STATUS_[0-3] for future extension 
+  * in sandbox.spec and configure.in updated version to 0.3.2
+
+[2011/11/05] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.c changed WITH_NATIVE_MONITOR => WITH_SIMPLE_MONITOR and
+    WITH_CUSTOM_MONITOR => WITH_NATIVE_MONITOR to better represent the semantics
+  * in configure.in removed --disable-{tracer,monitor} options, and added 
+    --enable-{thread,debug} options
+  * in sandbox.spec and configure.in updated version to 0.3.1
+
+[2011/11/03] LIU Yu, <pineapple.liu@gmail.com>
+  * added autoconf/automake directives (configure.in config.h.in Makefile.in) and
+    removed Makefile
+  * in sandbox.h added S_QUOTA_PROCESS and S_RESULT_PL directives to handle
+    future multi-process tasks
+  * in platform.h added os detection macros and removed cygwin support
+  * in sandbox.spec changed hard-coded /usr prefix to %{_prefix} macro
+  * in sandbox.spec and Makefile.in update version to 0.3.0
+
+[2011/08/27] LIU Yu, <pineapple.liu@gmail.com>
+  * in sandbox.spec updated project description
+
 [2011/08/15] LIU Yu, <pineapple.liu@gmail.com>
   * in platform.c changed proc_probe() to ignore case when checking process status
   * in sandbox.spec and Makefile update version to 0.2.18
@@ -53,7 +307,7 @@
   * in platform.h and platform.c added an `opt' argument to proc_probe() to
     specify probe targets
   * in sandbox.c change invocations of proc_probe() to reflect the above change
-  * in platform.c proc_dump() uses procfs to access target process
+  * in platform.c proc_dump() uses procfs to access the prisoner process
   * in platform.h added macros SYSCALL_ARG[1-5] and SYSRET_RETVAL for accessing
     arguments / ret values of system calls in a platform independent manner
   * in sandbox.c change the formation of SYSCALL and SYSRET events to reflect
@@ -102,7 +356,7 @@
 [2006/12/30] LIU Yu, <pineapple.liu@gmail.com>
   * in sandbox.c probe the prisoner process when it is stopped rather than it 
     receives SIGTRAP signal (resume the changes of 0.2.9-7)
-  * in sandbox.c pass the pid of targeted process via syscall event parameter
+  * in sandbox.c pass the pid of the prisoner process via syscall event param
   * in sandbox.spec and Makefile updated version to 0.2.10-4
   * canceled the pid parameter in syscall events
 
@@ -117,7 +371,7 @@
   
 [2006/12/12] LIU Yu, <pineapple.liu@gmail.com>
   * in platform.h and problem.c added `proc_dump' function for dumping data
-    from the specified address of targeted process.
+    from the specified address of the prisoner process.
   * in sandbox.spec and Makefile updated version to 0.2.10-1
   
 [2006/12/08] LIU Yu, <pineapple.liu@gmail.com>

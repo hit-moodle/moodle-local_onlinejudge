@@ -1,5 +1,4 @@
 #include <sandbox.h>
-#include <symbols.h>
 #include <getopt.h>
 #include <sys/time.h>
 #include <string.h>
@@ -249,23 +248,23 @@ static void print (const sandbox_t * const sandbox) {
 	assert(sandbox);
    	syslog(LOG_USER | LOG_INFO, "status:    % 10d\n", sandbox->status);
    	syslog(LOG_USER | LOG_INFO, "result:    % 10d\n", sandbox->result);
-	syslog(LOG_USER | LOG_INFO, "elapsed:   % 10ld msec\n", sandbox->stat.stopped.tv_sec * 1000 -
+	syslog(LOG_USER | LOG_INFO, "elapsed:   % 10ld msec\n", sandbox->stat.elapsed.tv_sec * 1000 -
 			sandbox->stat.started.tv_sec * 1000 +
-			sandbox->stat.stopped.tv_usec / 1000 -
-			sandbox->stat.started.tv_usec / 1000);
+			sandbox->stat.elapsed.tv_sec / 1000 -
+			sandbox->stat.started.tv_sec / 1000);
 	syslog(LOG_USER | LOG_INFO, "cpu.usr:   % 10ld msec\n",
-			sandbox->stat.ru.ru_utime.tv_sec * 1000 +
-			sandbox->stat.ru.ru_utime.tv_usec / 1000);
+			sandbox->stat.cpu_info.utime.tv_sec * 1000 +
+			sandbox->stat.cpu_info.utime.tv_sec / 1000);
 	syslog(LOG_USER | LOG_INFO, "cpu.sys:   % 10ld msec\n",
-			sandbox->stat.ru.ru_stime.tv_sec * 1000 +
-			sandbox->stat.ru.ru_stime.tv_usec / 1000);
+			sandbox->stat.cpu_info.stime.tv_sec * 1000 +
+			sandbox->stat.cpu_info.stime.tv_sec / 1000);
 	syslog(LOG_USER | LOG_INFO, "cpu.all:   % 10ld msec\n",
-			sandbox->stat.ru.ru_utime.tv_sec * 1000 +    
-			sandbox->stat.ru.ru_utime.tv_usec / 1000 +
-			sandbox->stat.ru.ru_stime.tv_sec * 1000 +
-			sandbox->stat.ru.ru_stime.tv_usec / 1000);
-	syslog(LOG_USER | LOG_INFO, "cpu.tsc:   %10llu\n", sandbox->stat.tsc);
-	syslog(LOG_USER | LOG_INFO, "mem.vsize: % 10ld kB\n", (long)sandbox->stat.vsize / 1024);
+			sandbox->stat.cpu_info.utime.tv_sec * 1000 +
+			sandbox->stat.cpu_info.utime.tv_sec / 1000 +
+			sandbox->stat.cpu_info.stime.tv_sec * 1000 +
+			sandbox->stat.cpu_info.stime.tv_sec / 1000);
+	syslog(LOG_USER | LOG_INFO, "cpu.tsc:   %10llu\n", sandbox->stat.cpu_info.tsc);
+	syslog(LOG_USER | LOG_INFO, "mem.vsize: % 10ld kB\n", (long)sandbox->stat.mem_info.vsize / 1024);
 }
 
 void usage(char program[]) {

@@ -1,7 +1,7 @@
 ################################################################################
 # The Sandbox Libraries RPM Specification                                      #
 #                                                                              #
-# Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                      #
+# Copyright (C) 2004-2009, 2011-2013 LIU Yu, pineapple.liu@gmail.com           #
 # All rights reserved.                                                         #
 #                                                                              #
 # Redistribution and use in source and binary forms, with or without           #
@@ -30,11 +30,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE   #
 # POSSIBILITY OF SUCH DAMAGE.                                                  #
 ################################################################################
-%define name libsandbox
-%define version 0.2.18
-%define release 1
 
-Summary: The Sandbox Libraries
+%define sbox @PACKAGE_NAME@
+%define name lib%{sbox}
+%define version @PACKAGE_VERSION@
+%define release @PACKAGE_RELEASE@
+
+Summary: @PACKAGE_BRIEF@
 Name: %{name}
 Version: %{version}
 Release: %{release}
@@ -43,32 +45,40 @@ License: BSD License
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
-Vendor: The Sandbox Libraries Project
+Vendor: OpenJudge Alliance, http://openjudge.net
 Packager: LIU Yu <pineapple.liu@gmail.com>
 Url: http://sourceforge.net/projects/libsandbox
-Provides: libsandbox sandbox.h libsandbox.so
+
+Provides: %{sbox}.h %{sbox}-dev.h
+%ifarch x86_64
+Provides: %{name}.so()(64bit)
+%else
+Provides: %{name}.so
+%endif
 
 %description
-This project provides API's in the C/C++ programming language for executing simple 
-(single process) programs in a restricted environment. Runtime behaviors of the 
-targeted program can be monitored and blocked according to configurable / 
-programmable policies.
+@PACKAGE_DESCR@
 
 %prep
 %setup
+./configure --prefix=%{buildroot}%{_prefix} --libdir=%{buildroot}%{_libdir} --includedir=%{buildroot}%{_includedir} @PACKAGE_CONFIG@
 
 %build
 make
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+make prefix=%{buildroot}%{_prefix} install
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}%{_prefix}
+rmdir --ignore-fail-on-non-empty %{buildroot}
 
 %files
 %defattr(-,root,root)
-/usr/include/sandbox.h
-/usr/lib/%{name}.so.%{version}
-/usr/lib/%{name}.so
-%doc README CHANGES
+%{_includedir}/%{sbox}.h
+%{_includedir}/%{sbox}-dev.h
+%{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/%{name}.so.%{version}
+%{_libdir}/%{name}.so
+%{_libdir}/%{name}.a
+%doc README COPYING CHANGES

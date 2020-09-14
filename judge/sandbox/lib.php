@@ -50,7 +50,11 @@ require_once($CFG->dirroot . "/local/onlinejudge/judgelib.php");
 define('SANDBOX_SAND', escapeshellcmd($CFG->dirroot . '/local/onlinejudge/judge/sandbox/sand/sand'));
 
 class judge_sandbox extends judge_base {
-    protected static $supported_languages = array('c' => 'gcc -m32 -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%', 'c_warn2err' => 'gcc -m32 -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %static% -o %DEST% %SOURCES% %LM%', 'cpp' => 'g++ -m32 -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%', 'cpp_warn2err' => 'g++ -m32 -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %STATIC% -o %DEST% %SOURCES% %LM%');
+    protected static $supported_languages = array(
+        'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%',
+        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %static% -o %DEST% %SOURCES% %LM%',
+        'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%',
+        'cpp_warn2err' => 'g++ -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %STATIC% -o %DEST% %SOURCES% %LM%');
 
     static function get_languages() {
         $langs = array();

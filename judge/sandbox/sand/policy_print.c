@@ -14,7 +14,7 @@ __sandbox_default_policy(const policy_t * ppolicy, const event_t * pevent,
     switch (pevent->type)
     {
     case S_EVENT_SYSCALL:
-        printf("%d\n", pevent->data._SYSCALL.scno);
+        printf("%d\n", pevent->data._SYSCALL.scinfo);
         *paction = (action_t){S_ACTION_CONT};
         break;
     case S_EVENT_SYSRET:
@@ -45,6 +45,7 @@ __sandbox_default_policy(const policy_t * ppolicy, const event_t * pevent,
             *paction = (action_t){S_ACTION_KILL, {{S_RESULT_TL}}};
             break;
         case S_QUOTA_MEMORY:
+
             *paction = (action_t){S_ACTION_KILL, {{S_RESULT_ML}}};
             break;
         case S_QUOTA_DISK:

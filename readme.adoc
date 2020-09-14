@@ -86,7 +86,7 @@ The workflow is:
 
 * https://download.moodle.org/releases/latest/[Moodle] `2.0`-`2.7`, `3.4+`
 * `php-cli`
-* (optional but recommended) `make`, `gcc` and `g++`. For 64-bit system, `libc` 32-bit development libraries, e.g., `libc6-dev-i386`, `glibc-devel.i386`, are required.
+* `make`, `gcc` and `g++`.
 * `pcntl` and `posix` extension for `php-cli`
 
 === SELinux 
@@ -137,7 +137,9 @@ OJ_VERSION is obtained from the available branches.
 
 If you would like to use sandbox judge engine, then run:
 ```
-cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/ && make
+cd MOODLE_PATH/local/onlinejudge/judge/sandbox/sand/libsandbox && ./configure
+cd ..
+make
 ```
 
 [TIP]

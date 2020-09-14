@@ -28,10 +28,10 @@ allow(const event_t * pevent)
 
     if (initing) 
     {
-        if (pevent->data._SYSCALL.scno == init_syscalls[init_step])
+        if (pevent->data._SYSCALL.scinfo == init_syscalls[init_step])
             init_step++;
         else {
-            last_rf_called = pevent->data._SYSCALL.scno;
+            last_rf_called = pevent->data._SYSCALL.scinfo;
             return 0;
         }
 
@@ -44,12 +44,12 @@ allow(const event_t * pevent)
     {
         int i;
         for (i=0; allowed_syscalls[i]; i++) {
-            if (pevent->data._SYSCALL.scno == allowed_syscalls[i])
+            if (pevent->data._SYSCALL.scinfo == allowed_syscalls[i])
                 return 1;
         }
 
         /* a rf called */
-        last_rf_called = pevent->data._SYSCALL.scno;
+        last_rf_called = pevent->data._SYSCALL.scinfo;
         return 0;
     }
 }

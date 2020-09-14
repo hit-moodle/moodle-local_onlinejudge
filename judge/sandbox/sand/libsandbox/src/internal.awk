@@ -1,7 +1,7 @@
 ################################################################################
-# Sandbox Library Source File (symbols.c) Generator Script                     #
+# Sandbox Library Source File (internal.c) Generator Script                    #
 #                                                                              #
-# Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                      #
+# Copyright (C) 2004-2009, 2011-2013 LIU Yu, pineapple.liu@gmail.com           #
 # All rights reserved.                                                         #
 #                                                                              #
 # Redistribution and use in source and binary forms, with or without           #
@@ -33,7 +33,7 @@
 
 BEGIN {
     print "/*******************************************************************************"
-    print " * Copyright (C) 2004-2009 LIU Yu, pineapple.liu@gmail.com                     *"
+    print " * Copyright (C) 2004-2009, 2011-2013 LIU Yu, pineapple.liu@gmail.com          *"
     print " * All rights reserved.                                                        *"
     print " *                                                                             *"
     print " * Redistribution and use in source and binary forms, with or without          *"
@@ -63,46 +63,57 @@ BEGIN {
     print " * POSSIBILITY OF SUCH DAMAGE.                                                 *"
     print " ******************************************************************************/"
     print "/*"
-    print " * This file was automatically generated with \"symbols.awk\""
+    print " * This file was automatically generated with \"internal.awk\""
     print " */"
     print ""
-    print "#include \"symbols.h\""
+    print "#include \"internal.h\""
     print ""
-    print "#ifndef NDEBUG"
+    print "#ifdef __cplusplus"
+    print "extern \"C\""
+    print "{"
+    print "#endif"
     print ""
-	    
+    
     nevent = 0
-    ievent = 0;    
+    ievent = 0;
     naction = 0;
     iaction = 0;
     nstatus = 0;
     istatus = 0;
     nresult = 0;
     iresult = 0;
+    noption = 0;
+    ioption = 0;
 }
-/^[[:space:]]*S_EVENT_[[:upper:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
+/^[[:space:]]*S_EVENT_[[:alnum:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
     ievent = sprintf("%d", $3);
     if (nevent <= ievent) 
     	nevent = ievent + 1;
     eventlist[ievent] = sprintf("%s", substr($1, 9, 16));
 }
-/^[[:space:]]*S_ACTION_[[:upper:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
+/^[[:space:]]*S_ACTION_[[:alnum:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
     iaction = sprintf("%d", $3);
     if (naction <= iaction) 
     	naction = iaction + 1;
     actionlist[iaction] = sprintf("%s", substr($1, 10, 16));
 }
-/^[[:space:]]*S_STATUS_[[:upper:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
+/^[[:space:]]*S_STATUS_[[:alnum:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
     istatus = sprintf("%d", $3);
     if (nstatus <= istatus) 
     	nstatus = istatus + 1;
     statuslist[istatus] = sprintf("%s", substr($1, 10, 16));
 }
-/^[[:space:]]*S_RESULT_[[:upper:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
+/^[[:space:]]*S_RESULT_[[:alnum:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
     iresult = sprintf("%d", $3);
     if (nresult <= iresult) 
     	nresult = iresult + 1;
     resultlist[iresult] = sprintf("%s", substr($1, 10, 16));
+}
+/^[[:space:]]*T_OPTION_[[:alnum:]]+[[:space:]]+=[[:space:]]+[[:digit:]+][.]*/ {
+    ioption = sprintf("%d", $3);
+    if (noption <= ioption)
+        noption = ioption + 1;
+    optionlist[ioption] = sprintf("%s", substr($1, 10, 16)); 
 }
 END {
     print "const char *"
@@ -118,6 +129,7 @@ END {
             printf("        \"N/A\", /* %d */\n", n);
     }
     print "    };"
+    print "    assert((unsigned int)event < sizeof(table) / sizeof(char *));"
     print "    return table[event];"
     print "}"
     print ""
@@ -135,10 +147,11 @@ END {
        	    printf("        \"N/A\", /* %d */\n", n);
     }
     print "    };"
+    print "    assert((unsigned int)action < sizeof(table) / sizeof(char *));"
     print "    return table[action];"
     print "}"
     print ""
-	
+
     print "const char *"
     print "s_status_name(int status)"
     print "{"
@@ -152,6 +165,7 @@ END {
        	    printf("        \"N/A\", /* %d */\n", n);
     }
     print "    };"
+    print "    assert((unsigned int)status < sizeof(table) / sizeof(char *));"
     print "    return table[status];"
     print "}"
     print ""
@@ -169,8 +183,30 @@ END {
             printf("        \"N/A\", /* %d */\n", n);
     }
     print "    };"
+    print "    assert((unsigned int)result < sizeof(table) / sizeof(char *));"
     print "    return table[result];"
     print "}"
     print ""
-    print "#endif /* !defined NDEBUG */"
+
+    print "const char *"
+    print "s_trace_opt_name(int option)"
+    print "{"
+    print "    static const char * table[] = "
+    print "    {"
+    for (n = 0; n < noption; n++)
+    {
+        if (optionlist[n] != "")
+            printf("        \"%s\", /* %d */\n", optionlist[n], n);
+        else
+            printf("        \"N/A\", /* %d */\n", n);
+    }
+    print "    };"
+    print "    assert((unsigned int)option < sizeof(table) / sizeof(char *));"
+    print "    return table[option];"
+    print "}"
+    print ""
+
+    print "#ifdef __cplusplus"
+    print "} /* extern \"C\" */"
+    print "#endif"
 }
