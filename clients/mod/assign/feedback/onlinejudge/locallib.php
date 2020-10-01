@@ -364,7 +364,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         $submission = $this->assignment->get_user_submission($grade->userid, false);
         $onlinejudge_result = get_onlinejudge_result($submission, $this->assignment->get_instance()->grade);
         // Status
-        $item_name = get_string('status', 'assignfeedback_onlinejudge') . $OUTPUT->help_icon('status', 'assignfeedback_onlinejudge');
+        $item_name = get_string('status', 'assignfeedback_onlinejudge') . ' ' .$OUTPUT->help_icon('status', 'assignfeedback_onlinejudge');
         $item = get_string('notavailable');
         if (isset($onlinejudge_result->status)) {
             $itemstyle = $onlinejudge_result->status == ONLINEJUDGE_STATUS_ACCEPTED ? 'label label-success' : 'label label-warning';

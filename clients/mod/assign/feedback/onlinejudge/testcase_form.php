@@ -64,7 +64,7 @@ class testcase_form extends moodleform {
         $mform = $this->_form; // Don't forget the underscore!
 
         $repeatarray = array();
-        $repeatarray[] = $mform->createElement('header', 'testcases', get_string('testcases', 'assignfeedback_onlinejudge') . '{no}');
+        $repeatarray[] = $mform->createElement('header', 'testcases', get_string('testcases', 'assignfeedback_onlinejudge') . ' ' .'{no}');
 
         $choices = question_bank::fraction_options(); // Steal from question lib
         $repeatarray[] = $mform->createElement('select', 'subgrade', get_string('subgrade', 'assignfeedback_onlinejudge'), $choices);
@@ -98,7 +98,7 @@ class testcase_form extends moodleform {
         $repeateloptions['output']['disabledif'] = array('usefile', 'checked');
 
         $repeatnumber = max($this->testcasecount + 1, $this->testcases_number);
-        $this->repeat_elements($repeatarray, $repeatnumber, $repeateloptions, 'boundary_repeats', 'add_testcases', 1, get_string('addtestcases', 'assignfeedback_onlinejudge', 1), true);
+        $this->repeat_elements($repeatarray, $repeatnumber, $repeateloptions, 'boundary_repeats', 'add_testcases', 1, get_string('addtestcases', 'assignfeedback_onlinejudge', 1), false);
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
