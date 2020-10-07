@@ -81,7 +81,7 @@ class judge_base {
 
     function __construct($task) {
         $this->task = $task;
-        $this->language = substr($this->task->language, 0, strrpos($this->task->language, '_'));
+        $this->language = substr($this->task->language, 0, strpos($this->task->language, '-'));
     }
 
     /**
@@ -424,7 +424,7 @@ function onlinejudge_get_judge_classes() {
  * Parse judge engine name from language
  */
 function onlinejudge_judge_name($language) {
-    return substr($language, strpos($language, '_') + 1);
+    return substr($language, strpos($language, '-') + 1);
 }
 
 /**

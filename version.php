@@ -43,8 +43,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $plugin->component = 'local_onlinejudge'; // Declare the type and name of this plugin.
-$plugin->version = 2020081400;   // The (date) version of this plugin
+$plugin->version = 2020100700;   // The (date) version of this plugin
 $plugin->requires = 2017111300;   // Requires this Moodle version
 
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = "3.0 beta4"; // User-friendly version number
+$plugin->maturity = MATURITY_RC;
+$plugin->release = "v3.1-r3"; // User-friendly version number

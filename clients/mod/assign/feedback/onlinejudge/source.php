@@ -97,10 +97,10 @@ $onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $a));
  *  which is not valid for the syntax highlighter so we have to reformat it.
  */
 if (onlinejudge_judge_name($onlinejudge->language) == 'sphere_engine') {
-    $lang = strtok($onlinejudge->language, '_');
+    $lang = strtok($onlinejudge->language, '-');
     $lang = judge_sphere_engine::get_language_name($lang);
 } else
-    $lang = strtok($onlinejudge->language, '_');
+    $lang = strtok($onlinejudge->language, '-');
 
 $lines = array();
 foreach ($files as $file) {

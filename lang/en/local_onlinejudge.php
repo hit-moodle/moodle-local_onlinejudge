@@ -74,10 +74,10 @@ It is possible that the judge daemon of online judge was crashed or quitted. You
 Or, it is possible that there are too much tasks in the queue and you should consider to run multiply judge daemons.';
 $string['judgednotifysubject'] = '{$a->count} pending tasks have been waiting too long';
 $string['judgestatus'] = 'Online Judge has judged <strong>{$a->judged}</strong> tasks and there are <strong>{$a->pending}</strong> tasks in the waiting queue.';
-$string['langc_sandbox'] = 'C (run locally)';
-$string['langc_warn2err_sandbox'] = 'C (run locally, warnings as errors)';
-$string['langcpp_sandbox'] = 'C++ (run locally)';
-$string['langcpp_warn2err_sandbox'] = 'C++ (run locally, warnings as errors)';
+$string['langc-sandbox'] = 'C (run locally)';
+$string['langc_warn2err-sandbox'] = 'C (run locally, warnings as errors)';
+$string['langcpp-sandbox'] = 'C++ (run locally)';
+$string['langcpp_warn2err-sandbox'] = 'C++ (run locally, warnings as errors)';
 $string['judgecheckinterval'] = 'Judge Daemon Check Interval (second)';
 $string['judgecheckinterval_help'] = 'How many seconds the judge daemon should wait before judging all un-judged tasks.';
 $string['maxcpulimit'] = 'Maximum CPU usage (second)';

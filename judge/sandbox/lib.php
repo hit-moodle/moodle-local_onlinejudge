@@ -62,7 +62,7 @@ class judge_sandbox extends judge_base {
             return $langs;
         }
         foreach (self::$supported_languages as $key => $value) {
-            $langs[$key . '_sandbox'] = get_string('lang' . $key . '_sandbox', 'local_onlinejudge');
+            $langs[$key . '-sandbox'] = get_string('lang' . $key . '-sandbox', 'local_onlinejudge');
         }
         return $langs;
     }
@@ -91,7 +91,7 @@ class judge_sandbox extends judge_base {
      * @return compiler information or null
      */
     static function get_compiler_info($language) {
-        $language = substr($language, 0, strrpos($language, '_'));
+        $language = substr($language, 0, strpos($language, '-'));
         return self::$supported_languages[$language];
     }
 

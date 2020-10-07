@@ -163,8 +163,12 @@ In order to start using sphere engine, navigate to the following path:
 and run:
 
 ```bash
-composer require guzzlehttp/guzzle
-``` 
+composer install
+```
+
+[TIP]
+Sphere Engine accepts only one file. So, ensure that the "Maximum number of uploaded files" under "Submission types"
+is equal to `1`.
 
 = Usage
 

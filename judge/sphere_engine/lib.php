@@ -62,7 +62,7 @@ class judge_sphere_engine extends judge_base {
             return $langs;
         }
         foreach (self::$supported_languages as $langid => $name) {
-            $langs[$langid . '_' . 'sphere_engine'] = $name;
+            $langs[$langid . '-' . 'sphere_engine'] = $name;
         }
         return $langs;
     }
@@ -156,7 +156,7 @@ class judge_sphere_engine extends judge_base {
             $details = $submission_data['result'];
             $task->stdout = $client->getSubmissionStream($submisison_id, 'output');;
             $task->stderr = $details['streams']['error'];
-            $task->compileroutput = $details['cmpinfo'];
+            $task->compileroutput = $details['streams']['cmpinfo'];
             $task->memusage = $details['memory'];
             $task->cpuusage = $details['time'];
             $task->infoteacher = get_string('seresultlink', 'local_onlinejudge', array('end_point' => $end_point, 'submission_id' => $submisison_id, 'access_token' => $access_token));

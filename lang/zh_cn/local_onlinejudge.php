@@ -74,10 +74,10 @@ $string['judgednotifybody'] = '在{$a->count}个待测任务中，最早的任�
 还有一种可能是任务队列里有太多任务了。您可以考虑多运行几个后台评测进程。';
 $string['judgednotifysubject'] = '有{$a->count}个待测任务已经等待得太久';
 $string['judgestatus'] = '在线评测已经评测了<strong>{$a->judged}</strong>个任务。现在等待队列中还有<strong>{$a->pending}</strong>个任务。';
-$string['langc_sandbox'] = 'C (本地运行)';
-$string['langc_warn2err_sandbox'] = 'C (本地运行，警告视为错误)';
-$string['langcpp_sandbox'] = 'C++ (本地运行)';
-$string['langcpp_warn2err_sandbox'] = 'C++ (本地运行，警告视为错误)';
+$string['langc-sandbox'] = 'C (本地运行)';
+$string['langc_warn2err-sandbox'] = 'C (本地运行，警告视为错误)';
+$string['langcpp-sandbox'] = 'C++ (本地运行)';
+$string['langcpp_warn2err-sandbox'] = 'C++ (本地运行，警告视为错误)';
 $string['maxcpulimit'] = '最多可用CPU时间（秒）';
 $string['maxcpulimit_help'] = '一个被测程序最多可以运行多长时间。';
 $string['maxmemlimit'] = '最多可用内存（MB）';

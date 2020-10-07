@@ -73,10 +73,10 @@ e possivel que o Analisador tenha parado de funcionar.
 Voc� deve inicia-lo o mais rapidamente possivel!';
 $string['judgednotifysubject'] = '{$a->count} tarefas pendentes que esperaram tempo de mais';
 $string['judgestatus'] = 'Analisador on-line tem <strong> {$a->judged} </strong> tarefas julgadas  e <strong> {$a->pending} </strong> tarefas na fila de espera.';
-$string['langc_sandbox'] = 'C (executado localmente)';
-$string['langc_warn2err_sandbox'] = 'C (executado localmente, avisos como erros)';
-$string['langcpp_sandbox'] = 'C + + (executado localmente)';
-$string['langcpp_warn2err_sandbox'] = 'C + + (executado localmente, avisos como erros)';
+$string['langc-sandbox'] = 'C (executado localmente)';
+$string['langc_warn2err-sandbox'] = 'C (executado localmente, avisos como erros)';
+$string['langcpp-sandbox'] = 'C + + (executado localmente)';
+$string['langcpp_warn2err-sandbox'] = 'C + + (executado localmente, avisos como erros)';
 $string['maxcpulimit'] = 'Maximo o uso da CPU (segundo)';
 $string['maxcpulimit_help'] = 'Quanto tempo um programa pode continuar executando.';
 $string['maxmemlimit'] = 'Utilizacao maxima da memoria (MB)';
