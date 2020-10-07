@@ -118,6 +118,6 @@ foreach ($files as $file) {
     $lines[] = $line;
 }
 if (!empty($lines)) {
-    $item = implode($lines, '<hr>');
+    $item = implode('<hr>', $lines);
 }
 include('source.html');

@@ -432,7 +432,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
                 $i++;
             }
             if (!empty($lines)) {
-                $item = implode($lines, '<hr>');
+                $item = implode('<hr>', $lines);
             }
         }
         $item = format_text($item, FORMAT_MOODLE, array('allowid' => true)); // popup details links require id
