@@ -95,9 +95,9 @@ if ($pending > PREVENTION_THRESHHOLD) {
     echo $OUTPUT->footer();
 
 } else if ($confirm == 1 && confirm_sesskey()) {
-    $rejudge_state = $assignmentinstance->rejudge_all();
+    $rejudgestate = $assignmentinstance->rejudge_all();
 
-    if ($rejudge_state) {
+    if ($rejudgestate) {
         $urlparams = array('id' => $cm->id, 'action' => 'grading');
         $url = new moodle_url('/mod/assign/view.php', $urlparams);
         redirect($url, get_string('rejudgeallrequestsent', 'assignfeedback_onlinejudge'), 10, \core\output\notification::NOTIFY_SUCCESS);

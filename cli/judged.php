@@ -131,14 +131,14 @@ $lockfile = $CFG->dataroot . LOCK_FILE;
 if (!check_dir_exists(dirname($lockfile))) {
     throw new moodle_exception('errorcreatingdirectory', '', '', $lockfile);
 }
-$LOCK = fopen($lockfile, 'w');
-if (!$LOCK) {
+$lock = fopen($lockfile, 'w');
+if (!$lock) {
     mtrace('Can not create' . $CFG->dataroot . LOCK_FILE);
     die;
 }
 
 $forcestop = false;
-$plugin_version = get_config('local_onlinejudge', 'version');
+$pluginversion = get_config('local_onlinejudge', 'version');
 while (!$forcestop) {
     judge_all_unjudged();
 
@@ -149,7 +149,7 @@ while (!$forcestop) {
     // Check interval is definable by admin (5 seconds default)
     sleep(get_config('local_onlinejudge', 'judgecheckinterval'));
 
-    if ($plugin_version < get_config('local_onlinejudge', 'version')) {
+    if ($pluginversion < get_config('local_onlinejudge', 'version')) {
         verbose('Plugin was upgraded.');
         break;
     }
@@ -158,7 +158,7 @@ while (!$forcestop) {
 verbose('Clean temp files.');
 onlinejudge_clean_temp_dir(false);  // Clean full tree of temp dir
 verbose('Judge daemon exits.');
-fclose($LOCK);
+fclose($lock);
 
 /**
  * Return one unjudged task and set it status as JUDGING
@@ -166,21 +166,21 @@ fclose($LOCK);
  * @return an unjudged task or null;
  */
 function get_one_unjudged_task() {
-    global $CFG, $DB, $LOCK;
+    global $CFG, $DB, $lock;
 
     $task = null;
 
-    flock($LOCK, LOCK_EX); // try locking, but ignore if not available (eg. on NFS and FAT)
+    flock($lock, LOCK_EX); // try locking, but ignore if not available (eg. on NFS and FAT)
     try {
         if ($task = $DB->get_record('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), '*', IGNORE_MULTIPLE)) {
             $DB->set_field('onlinejudge_tasks', 'status', ONLINEJUDGE_STATUS_JUDGING, array('id' => $task->id));
         }
     } catch (Exception $e) {
-        flock($LOCK, LOCK_UN);
+        flock($lock, LOCK_UN);
         throw $e;
     }
 
-    flock($LOCK, LOCK_UN);
+    flock($lock, LOCK_UN);
 
     return $task;
 }

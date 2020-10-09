@@ -41,10 +41,10 @@
 //  This fragment is called by /admin/index.php
 ////////////////////////////////////////////////////////////////////////////////
 
-$plugin->version = 2020100401;
+$plugin->version = 2020100901;
 $plugin->requires = 2017111300;  // Requires this Moodle version
 $plugin->component = 'assignfeedback_onlinejudge';
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = "v3.2.0-r2"; // User-friendly version number
+$plugin->release = "v3.3.0-r2"; // User-friendly version number
 $plugin->dependencies = array('local_onlinejudge' => 2020100700);
 

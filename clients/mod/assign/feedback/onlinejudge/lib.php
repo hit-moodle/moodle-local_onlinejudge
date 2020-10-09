@@ -44,15 +44,15 @@ require_once($CFG->dirroot . "/mod/assign/locallib.php");
  * Create a new onlinejudge type assignment activity
  *
  * @param stdClass $assign The data from the form
- * @param $assign_id
+ * @param $assignid
  * @return int The id of the assignment
  */
-function add_instance(stdClass $assign, $assign_id) {
+function add_instance(stdClass $assign, $assignid) {
     global $DB;
     $returnid = null;
-    if ($assign_id) {
+    if ($assignid) {
         $onlinejudge = $assign;
-        $onlinejudge->assignment = $assign_id;
+        $onlinejudge->assignment = $assignid;
         $returnid = $DB->insert_record('assignment_oj', $onlinejudge);
     }
 
@@ -70,9 +70,9 @@ function update_instance($assign, $assignid) {
     $returnid = null;
     if ($assignid) {
         $onlinejudge = $assign;
-        $old_onlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignid));
-        if ($old_onlinejudge) {
-            $onlinejudge->id = $old_onlinejudge->id;
+        $oldonlinejudge = $DB->get_record('assignment_oj', array('assignment' => $assignid));
+        if ($oldonlinejudge) {
+            $onlinejudge->id = $oldonlinejudge->id;
             $returnid = $DB->update_record('assignment_oj', $onlinejudge);
         }
     }
@@ -86,10 +86,10 @@ function update_instance($assign, $assignid) {
  *
  * it will update the grade if necessary
  * @param object [submission]
- * @param int [assign_grade]
+ * @param int [assigngrade]
  * @return object
  */
-function get_onlinejudge_result($submission, $assign_grade) {
+function get_onlinejudge_result($submission, $assigngrade) {
     global $DB;
     if (empty($submission)) return null;
 
@@ -99,7 +99,7 @@ function get_onlinejudge_result($submission, $assign_grade) {
                 WHERE s.submission = ? AND s.latest = 1
                 ORDER BY t.sortorder ASC';
     $onlinejudges = $DB->get_records_sql($sql, array($submission->id));
-    $ass_oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
+    $assoj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
     $cases = array();
     $result = new \stdClass;
     $result->judgetime = 0;
@@ -108,7 +108,7 @@ function get_onlinejudge_result($submission, $assign_grade) {
             $task->testcase = $oj->testcase;
             $task->feedback = $oj->feedback;
 
-            $task->grade = grade_marker($task->status, $oj->subgrade, $assign_grade, $ass_oj->ratiope);
+            $task->grade = grade_marker($task->status, $oj->subgrade, $assigngrade, $assoj->ratiope);
 
             if ($task->judgetime > $result->judgetime) {
                 $result->judgetime = $task->judgetime;
@@ -126,12 +126,12 @@ function get_onlinejudge_result($submission, $assign_grade) {
     return $result;
 }
 
-function update_submission($submission, $new_oj = false) {
+function update_submission($submission, $newoj = false) {
     global $DB;
 
     $DB->update_record('assign_submission', $submission);
 
-    if ($new_oj) {
+    if ($newoj) {
         $submission->submission = $submission->id;
         $DB->insert_record('assignment_oj_submissions', $submission);
     } else {
@@ -324,7 +324,7 @@ function onlinejudge_task_judged($event) {
     $cm = get_coursemodule_from_instance('assign', $submission->assignment, 0, false, MUST_EXIST);
     $context = context_course::instance($cm->course);
     $ass = new assign($context, $cm, get_course($cm->course));
-    $ass_oj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
+    $assoj = $DB->get_record('assignment_oj', array('assignment' => $submission->assignment));
     $sql = 'SELECT s.*, t.subgrade
         FROM {assignment_oj_submissions} s LEFT JOIN {assignment_oj_testcases} t
         ON s.testcase = t.id
@@ -336,7 +336,7 @@ function onlinejudge_task_judged($event) {
     $finalgrade = 0;
     foreach ($onlinejudges as $oj) {
         if ($task = onlinejudge_get_task($oj->task)) {
-            $task->grade = grade_marker($task->status, $oj->subgrade, $ass->get_instance()->grade, $ass_oj->ratiope);
+            $task->grade = grade_marker($task->status, $oj->subgrade, $ass->get_instance()->grade, $assoj->ratiope);
             if ($task->grade == -1) { // Not all testcases are judged, or judge engines internal error
                 // In the case of internal error, keep old grade is reasonable
                 // since most of internal errors are caused by system
@@ -345,11 +345,11 @@ function onlinejudge_task_judged($event) {
             $finalgrade += $task->grade;
         }
     }
-    $grade_item = $ass->get_user_grade($submission->userid, true);
-    $grade_item->grade = $finalgrade;
-    $grade_item->timemodified = time();
-    $grade_item->grader = get_admin()->id;
-    $ass->update_grade($grade_item);
+    $gradeitem = $ass->get_user_grade($submission->userid, true);
+    $gradeitem->grade = $finalgrade;
+    $gradeitem->timemodified = time();
+    $gradeitem->grader = get_admin()->id;
+    $ass->update_grade($gradeitem);
     return true;
 }
 

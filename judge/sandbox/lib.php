@@ -104,18 +104,18 @@ class judge_sandbox extends judge_base {
      */
     function judge() {
         static $binfile = '';
-        static $last_compilation_status = -1;
-        static $last_compileroutput = '';
+        static $lastcompilationstatus = -1;
+        static $lastcompileroutput = '';
 
         if (!$this->last_task_is_simlar()) {
             onlinejudge_clean_temp_dir();
             $files = $this->create_temp_files();
             $binfile = $this->compile($files);
-            $last_compilation_status = $this->task->status;
-            $last_compileroutput = $this->task->compileroutput;
+            $lastcompilationstatus = $this->task->status;
+            $lastcompileroutput = $this->task->compileroutput;
         } else { // reuse results of last compilation
-            $this->task->status = $last_compilation_status;
-            $this->task->compileroutput = $last_compileroutput;
+            $this->task->status = $lastcompilationstatus;
+            $this->task->compileroutput = $lastcompileroutput;
         }
 
         if ($this->task->status == ONLINEJUDGE_STATUS_COMPILATION_OK && !$this->task->compileonly) {
@@ -129,28 +129,28 @@ class judge_sandbox extends judge_base {
      * Whether the last task is using the same program with current task
      */
     protected function last_task_is_simlar() {
-        static $last_contenthashs = array();
-        $new_contenthashs = array();
+        static $lastcontenthashs = array();
+        $newcontenthashs = array();
 
         $fs = get_file_storage();
         $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
         foreach ($files as $file) {
-            $new_contenthashs[] = $file->get_contenthash();
+            $newcontenthashs[] = $file->get_contenthash();
         }
 
-        $result = $last_contenthashs == $new_contenthashs;
-        $last_contenthashs = $new_contenthashs;
+        $result = $lastcontenthashs == $newcontenthashs;
+        $lastcontenthashs = $newcontenthashs;
         return $result;
     }
 
     protected function compile($files) {
         $search = array('%SOURCES%', '%DEST%', '%WALL%', '%STATIC%', '%LM%');
         // Replacing each true/false value with its compiler command.
-        $warnings_param = $this->task->compile_warnings_option ? "-Wall" : "";
-        $static_param = $this->task->compile_static_option ? "-static" : "";
-        $mathlibrary_param = $this->task->compile_lm_option ? "-lm" : "";;
+        $warningsparam = $this->task->compile_warnings_option ? "-Wall" : "";
+        $staticparam = $this->task->compile_static_option ? "-static" : "";
+        $mathlibraryparam = $this->task->compile_lm_option ? "-lm" : "";;
         // -----------------------------------------------
-        $replace = array('"' . implode('" "', $files) . '"', '"' . onlinejudge_get_temp_dir() . '/a.out"', $warnings_param, $static_param, $mathlibrary_param);
+        $replace = array('"' . implode('" "', $files) . '"', '"' . onlinejudge_get_temp_dir() . '/a.out"', $warningsparam, $staticparam, $mathlibraryparam);
         // construct compiler command
         $command = str_replace($search, $replace, self::$supported_languages[$this->language]);
         // run compiler and redirect stderr to stdout
@@ -178,7 +178,7 @@ class judge_sandbox extends judge_base {
 
     protected function run_in_sandbox($binfile) {
 
-        $rval_status = array(ONLINEJUDGE_STATUS_PENDING, ONLINEJUDGE_STATUS_ACCEPTED, ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS, ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED, ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED, ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED, ONLINEJUDGE_STATUS_RUNTIME_ERROR, ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION, ONLINEJUDGE_STATUS_INTERNAL_ERROR);
+        $rvalstatus = array(ONLINEJUDGE_STATUS_PENDING, ONLINEJUDGE_STATUS_ACCEPTED, ONLINEJUDGE_STATUS_RESTRICTED_FUNCTIONS, ONLINEJUDGE_STATUS_MEMORY_LIMIT_EXCEED, ONLINEJUDGE_STATUS_OUTPUT_LIMIT_EXCEED, ONLINEJUDGE_STATUS_TIME_LIMIT_EXCEED, ONLINEJUDGE_STATUS_RUNTIME_ERROR, ONLINEJUDGE_STATUS_ABNORMAL_TERMINATION, ONLINEJUDGE_STATUS_INTERNAL_ERROR);
 
         $sand = SANDBOX_SAND;
         if (!is_executable($sand)) {
@@ -203,18 +203,18 @@ class judge_sandbox extends judge_base {
         // Any error output will be appended to $exec_file.err
         fwrite($pipes[0], $this->task->input);
         fclose($pipes[0]);
-        $return_value = proc_close($proc);
+        $returnvalue = proc_close($proc);
 
         $this->task->stdout = file_get_contents($binfile . '.out');
         $this->task->stderr = file_get_contents($binfile . '.err');
 
-        if ($return_value == 255) {
-            throw new onlinejudge_exception('sandboxerror', $return_value);
-        } else if ($return_value >= 2) {
-            $this->task->status = $rval_status[$return_value];
+        if ($returnvalue == 255) {
+            throw new onlinejudge_exception('sandboxerror', $returnvalue);
+        } else if ($returnvalue >= 2) {
+            $this->task->status = $rvalstatus[$returnvalue];
             return;
-        } else if ($return_value == 0) {
-            throw new onlinejudge_exception('sandboxerror', $return_value);
+        } else if ($returnvalue == 0) {
+            throw new onlinejudge_exception('sandboxerror', $returnvalue);
         }
 
         $this->task->status = $this->diff();

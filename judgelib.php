@@ -68,8 +68,8 @@ define("ONLINEJUDGE_STATUS_UNSUBMITTED", 255);
 
 require_once(dirname(__FILE__) . '/exceptions.php');
 
-$judge_plugins = get_list_of_plugins('local/onlinejudge/judge');
-foreach ($judge_plugins as $dir) {
+$judgeplugins = get_list_of_plugins('local/onlinejudge/judge');
+foreach ($judgeplugins as $dir) {
     require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
 }
 
@@ -293,24 +293,24 @@ function onlinejudge_submit_task($cmid, $userid, $language, $files, $component, 
     $task->id = $DB->insert_record('onlinejudge_tasks', $task);
 
     $fs = get_file_storage();
-    $file_record = new \stdClass;
-    $file_record->contextid = context_system::instance()->id;
-    $file_record->component = 'local_onlinejudge';
-    $file_record->filearea = 'tasks';
-    $file_record->itemid = $task->id;
+    $filerecord = new \stdClass;
+    $filerecord->contextid = context_system::instance()->id;
+    $filerecord->component = 'local_onlinejudge';
+    $filerecord->filearea = 'tasks';
+    $filerecord->itemid = $task->id;
     foreach ($files as $key => $value) {
         if ($value instanceof stored_file) {
-            $fs->create_file_from_storedfile($file_record, $value);
+            $fs->create_file_from_storedfile($filerecord, $value);
         } else {
-            $file_record->filepath = dirname($key);
-            if (strpos($file_record->filepath, '/') !== 0) {
-                $file_record->filepath = '/' . $file_record->filepath;
+            $filerecord->filepath = dirname($key);
+            if (strpos($filerecord->filepath, '/') !== 0) {
+                $filerecord->filepath = '/' . $filerecord->filepath;
             }
-            if (strrpos($file_record->filepath, '/') !== strlen($file_record->filepath) - 1) {
-                $file_record->filepath .= '/';
+            if (strrpos($filerecord->filepath, '/') !== strlen($filerecord->filepath) - 1) {
+                $filerecord->filepath .= '/';
             }
-            $file_record->filename = basename($key);
-            $fs->create_file_from_string($file_record, $value);
+            $filerecord->filename = basename($key);
+            $fs->create_file_from_string($filerecord, $value);
         }
     }
 

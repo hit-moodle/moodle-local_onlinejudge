@@ -54,12 +54,12 @@ mtrace('Starting online judge cron');
 $a = new stdClass();
 $a->count = $DB->count_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING));
 if ($a->count > 0) {
-    $oldest_unjudged = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), 'submittime ASC', 'submittime', 0, 1);
-    $pending_period = time() - reset($oldest_unjudged)->submittime;
-    $a->period = format_time($pending_period);
+    $oldestunjudged = $DB->get_records('onlinejudge_tasks', array('status' => ONLINEJUDGE_STATUS_PENDING), 'submittime ASC', 'submittime', 0, 1);
+    $pendingperiod = time() - reset($oldestunjudged)->submittime;
+    $a->period = format_time($pendingperiod);
 
     // if there is at least one task has been keeping unjudged in queue for more than 5 mins
-    if ($pending_period > 5 * 60) {
+    if ($pendingperiod > 5 * 60) {
         mtrace("    Found $a->count long time pending tasks.");
 
         if ($users = get_users_from_config(get_config('local_onlinejudge', 'judgedcrashnotify'), 'moodle/site:config')) {

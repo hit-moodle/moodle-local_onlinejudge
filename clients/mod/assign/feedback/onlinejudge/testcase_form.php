@@ -52,7 +52,7 @@ require_once($CFG->libdir . '/questionlib.php'); //for get_grade_options()
 
 
 class testcase_form extends moodleform {
-    var $testcases_number = 5;
+    var $testcasesnumber = 5;
     var $testcasecount;
 
     function __construct($testcasecount) {
@@ -99,7 +99,7 @@ class testcase_form extends moodleform {
         $repeateloptions['input']['disabledif'] = array('usefile', 'checked');
         $repeateloptions['output']['disabledif'] = array('usefile', 'checked');
 
-        $repeatnumber = max($this->testcasecount + 1, $this->testcases_number);
+        $repeatnumber = max($this->testcasecount + 1, $this->testcasesnumber);
         $this->repeat_elements($repeatarray, $repeatnumber, $repeateloptions, 'boundary_repeats', 'add_testcases', 1, get_string('addtestcases', 'assignfeedback_onlinejudge', 1), false);
 
         $buttonarray = array();

@@ -79,9 +79,9 @@ if ($task->userid != $USER->id) {
 }
 
 // fields of table tasks which should be shown to teachers
-$sensitive_fields = array('stdout', 'stderr', 'infoteacher');
+$sensitivefields = array('stdout', 'stderr', 'infoteacher');
 // fields of table tasks which should be shown to students
-$normal_fields = array('compileroutput', 'memusage', 'cpuusage', 'infostudent');
+$normalfields = array('compileroutput', 'memusage', 'cpuusage', 'infostudent');
 
 $task = (array)$task; // Easier to enum
 
@@ -89,7 +89,7 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable';
 
 foreach ($task as $key => $content) {
-    if ((!in_array($key, $normal_fields) and !in_array($key, $sensitive_fields)) or (in_array($key, $sensitive_fields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
+    if ((!in_array($key, $normalfields) and !in_array($key, $sensitivefields)) or (in_array($key, $sensitivefields) and !has_capability('local/onlinejudge:viewsensitive', $context))) {
         continue;
     }
 
@@ -97,7 +97,7 @@ foreach ($task as $key => $content) {
     $contentcell = new html_table_cell();
 
     $titlecell->text = get_string($key, 'local_onlinejudge');
-    if (in_array($key, $sensitive_fields)) {
+    if (in_array($key, $sensitivefields)) {
         $titlecell->text .= '*';
     }
     // empty is not used as it treats '0' as empty.

@@ -153,16 +153,16 @@ if ($testform->is_cancelled()) {
     $toform = array();
     if ($testcases) {
         $i = 0;
-        foreach ($testcases as $tstObj => $tstValue) {
-            $toform["input[$i]"] = $tstValue->input;
-            $toform["output[$i]"] = $tstValue->output;
-            $toform["feedback[$i]"] = $tstValue->feedback;
-            $toform["subgrade[$i]"] = $tstValue->subgrade;
-            $toform["usefile[$i]"] = $tstValue->usefile;
-            $toform["caseid[$i]"] = $tstValue->id;
+        foreach ($testcases as $testobj => $testvalue) {
+            $toform["input[$i]"] = $testvalue->input;
+            $toform["output[$i]"] = $testvalue->output;
+            $toform["feedback[$i]"] = $testvalue->feedback;
+            $toform["subgrade[$i]"] = $testvalue->subgrade;
+            $toform["usefile[$i]"] = $testvalue->usefile;
+            $toform["caseid[$i]"] = $testvalue->id;
 
-            file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_input', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
-            file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_output', $tstValue->id, array('subdirs' => 0, 'maxfiles' => 1));
+            file_prepare_draft_area($toform["inputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_input', $testvalue->id, array('subdirs' => 0, 'maxfiles' => 1));
+            file_prepare_draft_area($toform["outputfile[$i]"], $context->id, 'mod_assign', 'onlinejudge_output', $testvalue->id, array('subdirs' => 0, 'maxfiles' => 1));
 
             $i++;
         }

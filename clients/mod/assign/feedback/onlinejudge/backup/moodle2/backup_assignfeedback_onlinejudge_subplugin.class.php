@@ -101,18 +101,18 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
         // type of the subplugin, name of the subplugin and name of the connection point (recommended)
         $asssuboff = new backup_nested_element($this->get_recommended_name());
         // onlinejudge assignment type does not copy task details. So must backup from local onlinejudge
-        $onlinejudge_submissions = new backup_nested_element('onlinejudge_submissions');
-        $onlinejudge_submission = new backup_nested_element('onlinejudge_submission', array('id'), array('submission', 'testcase', 'task', 'latest'));
+        $onlinejudgesubmissions = new backup_nested_element('onlinejudgesubmissions');
+        $onlinejudgesubmission = new backup_nested_element('onlinejudgesubmission', array('id'), array('submission', 'testcase', 'task', 'latest'));
         $tasks = new backup_nested_element('tasks');
         $task = new backup_nested_element('task', array('id'), array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output', 'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput', 'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'));
 
         $subplugin->add_child($asssuboff);
-        $asssuboff->add_child($onlinejudge_submissions);
-        $onlinejudge_submissions->add_child($onlinejudge_submission);
-        $onlinejudge_submission->add_child($tasks);
+        $asssuboff->add_child($onlinejudgesubmissions);
+        $onlinejudgesubmissions->add_child($onlinejudgesubmission);
+        $onlinejudgesubmission->add_child($tasks);
         $tasks->add_child($task);
 
-        $onlinejudge_submission->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
+        $onlinejudgesubmission->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
         $task->set_source_table('onlinejudge_tasks', array('cmid' => backup::VAR_MODID, 'id' => '../../task'));
 
         $task->annotate_ids('user', 'userid');
