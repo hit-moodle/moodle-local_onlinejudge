@@ -1,6 +1,7 @@
 // tip bulb definition
 ifdef::env-github[]
-:tip-caption: :bulb:
+:tip-caption: 💡
+:warn-caption: ⚠️
 endif::[]
 //
 
@@ -20,7 +21,7 @@ endif::[]
 :moodle_url: https://download.moodle.org/releases/latest/
 //
 
-[TIP]
+[WARN]
 This plugin is in BETA version and NOT recommended to use in production websites
 
 *readme* varies in respect to version (i.e., branch), there are https://github.com/hit-moodle/moodle-local_onlinejudge/branches[two available ones].
@@ -140,7 +141,7 @@ Make sure the file named `sand` is _executable_, and has the following context: 
 
 
 
-== Sphere Engine
+=== Sphere Engine
 
 In order to start using sphere engine, navigate to the following path:
 
@@ -154,7 +155,7 @@ composer install
 
 [TIP]
 Sphere Engine accepts only one file. So, ensure that the "Maximum number of
-uploaded files" under "Submission types" is equal to `1` when you create an
+uploaded files" under "Submission types" is set to `1` when you create an
 assignment.
 
 == Supported Platforms
@@ -243,6 +244,19 @@ Judge` button which allows you to only rejudge that submission.
 == Judge Daemon
 
 The judge daemon, which exists in https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/cli/judged.php[`cli/judged.php`], has several helpful options for debugging purposes. Use `--help` argument for more information.
+
+```
+Judge all unjudged tasks.
+
+Options:
+-h, --help            Print out this help
+-n, --nodaemon        Do not run as daemon (Linux only)
+-o, --once            Exit while no more to judge
+-v, --verbose         Verbose output
+
+Example:
+$sudo -u www-data /usr/bin/php local/onlinejudge/cli/judged.php
+```
 
 = Links
 
