@@ -107,7 +107,7 @@ function xmldb_assignfeedback_onlinejudge_upgrade($oldversion = 0) {
 
         // Adding keys to table assignment_oj_submissions
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('submission', XMLDB_KEY_FOREIGN, array('submission'), 'assignment_submissions', array('id'));
+        $table->add_key('submission', XMLDB_KEY_FOREIGN, array('submission'), 'assignment_submission', array('id'));
         $table->add_key('testcase', XMLDB_KEY_FOREIGN, array('testcase'), 'assignment_oj_testcases', array('id'));
         // Adding indexes to table assignment_oj_submissions
         $table->add_index('latest', XMLDB_INDEX_NOTUNIQUE, array('latest'));
@@ -286,6 +286,33 @@ function xmldb_assignfeedback_onlinejudge_upgrade($oldversion = 0) {
                 }
             }
         }
+        // define table assignment_oj_submissions to be dropped
+        $table = new xmldb_table('assignment_oj_submissions');
+        // conditionally launch drop table for assignment_oj_submissions
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define table assignment_oj_submissions to be created
+        $table = new xmldb_table('assignment_oj_submissions');
+        // Adding fields to table assignment_oj_submissions
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('submission', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('testcase', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('task', XMLDB_TYPE_INTEGER, '20', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('latest', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '1');
+
+        // Adding keys to table assignment_oj_submissions
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('submission', XMLDB_KEY_FOREIGN, array('submission'), 'assign_submission', array('id'));
+        $table->add_key('testcase', XMLDB_KEY_FOREIGN, array('testcase'), 'assignment_oj_testcases', array('id'));
+        // Adding indexes to table assignment_oj_submissions
+        $table->add_index('latest', XMLDB_INDEX_NOTUNIQUE, array('latest'));
+        // Conditionally launch create table for assignment_oj_submissions
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
         upgrade_plugin_savepoint(true, 2018061400, 'assignfeedback', 'onlinejudge');
     }
 

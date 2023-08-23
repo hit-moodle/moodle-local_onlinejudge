@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@
  * @subpackage backup-moodle2
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @copyright 2011 onwards Sun Zhigang (sunner) {@link http://sunner.cn}
+ * @copyright 2017 onwards Andrew Naguib (ndrwnaguib) {@link http://ndrwnaguib.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +33,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
     /**
      * Returns the subplugin information to attach at assignment element
      */
-    protected function define_assignment_subplugin_structure() {
+    protected function define_grade_subplugin_structure() {
 
         /**
          * Any activity sublugins is always rooted by one backup_subplugin_element()
@@ -55,7 +57,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
          * levels (get_recommended_name() and 'config' in the example below). That will make things
          * on restore easier, as far as subplugin information will be clearly separated from module information.
          */
-        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
+        $subplugin = $this->get_subplugin_element();
 
         /**
          * Here we define the real structure the subplugin is going to generate - see note above. Obviously the
@@ -71,7 +73,7 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
         $assassoff = new backup_nested_element($this->get_recommended_name());
 
         $onlinejudges = new backup_nested_element('onlinejudges');
-        $onlinejudge = new backup_nested_element('onlinejudge', array('id'), array('language', 'memlimit', 'cpulimit', 'compileonly', 'ratiope', 'ideoneuser', 'ideonepass'));
+        $onlinejudge = new backup_nested_element('onlinejudge', array('id'), array('language', 'memlimit', 'cpulimit', 'compileonly', 'ratiope', 'clientid', 'accesstoken', 'compile_lm_option', 'compile_warnings_option', 'compile_static_option'));
         $testcases = new backup_nested_element('testcases');
         $testcase = new backup_nested_element('testcase', array('id'), array('input', 'output', 'usefile', 'feedback', 'subgrade', 'sortorder'));
 
@@ -84,35 +86,32 @@ class backup_assignfeedback_onlinejudge_subplugin extends backup_subplugin {
         $onlinejudge->set_source_table('assignment_oj', array('assignment' => backup::VAR_PARENTID));
         $testcase->set_source_table('assignment_oj_testcases', array('assignment' => backup::VAR_PARENTID));
 
-        $testcase->annotate_files('assign', 'onlinejudge_input', 'id');
-        $testcase->annotate_files('assign', 'onlinejudge_output', 'id');
+        $testcase->annotate_files('assignfeedback_onlinejudge', 'onlinejudge_input', 'id');
+        $testcase->annotate_files('assignfeedback_onlinejudge', 'onlinejudge_output', 'id');
 
-        return $subplugin; // And we return the root subplugin element
-    }
+        // Returns the subplugin information to attach at submission element
 
-    /**
-     * Returns the subplugin information to attach at submission element
-     */
-    protected function define_submission_subplugin_structure() {
-
-        // remember this has not XML representation
-        $subplugin = $this->get_subplugin_element(null, '/assignment/assignmenttype', 'onlinejudge');
-
-        // type of the subplugin, name of the subplugin and name of the connection point (recommended)
-        $asssuboff = new backup_nested_element($this->get_recommended_name());
         // onlinejudge assignment type does not copy task details. So must backup from local onlinejudge
-        $onlinejudgesubmissions = new backup_nested_element('onlinejudgesubmissions');
-        $onlinejudgesubmission = new backup_nested_element('onlinejudgesubmission', array('id'), array('submission', 'testcase', 'task', 'latest'));
+        $onlinejudge_submissions = new backup_nested_element('onlinejudge_submissions');
+        $onlinejudge_submission = new backup_nested_element('onlinejudge_submission', array('id'), array('submission', 'testcase', 'task', 'latest'));
         $tasks = new backup_nested_element('tasks');
-        $task = new backup_nested_element('task', array('id'), array('cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'imput', 'output', 'compileonly', 'component', 'status', 'stdout', 'stderr', 'compileroutput', 'infoteacher', 'infostudent', 'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'));
+        $task = new backup_nested_element(
+            'task',
+            array('id'),
+            array(
+                'cmid', 'userid', 'language', 'memlimit', 'cpulimit', 'input', 'output',
+                'compileonly', 'compile_lm_option', 'compile_warnings_option', 'compile_static_option',
+                'component', 'status', 'stdout', 'stderr', 'compileroutput', 'infoteacher', 'infostudent',
+                'cpuusage', 'memusage', 'submittime', 'judgetime', 'var1', 'var2', 'var3', 'var4', 'deleted'
+            )
+        );
 
-        $subplugin->add_child($asssuboff);
-        $asssuboff->add_child($onlinejudgesubmissions);
-        $onlinejudgesubmissions->add_child($onlinejudgesubmission);
-        $onlinejudgesubmission->add_child($tasks);
+        $assassoff->add_child($onlinejudge_submissions);
+        $onlinejudge_submissions->add_child($onlinejudge_submission);
+        $onlinejudge_submission->add_child($tasks);
         $tasks->add_child($task);
 
-        $onlinejudgesubmission->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
+        $onlinejudge_submission->set_source_table('assignment_oj_submissions', array('submission' => backup::VAR_PARENTID));
         $task->set_source_table('onlinejudge_tasks', array('cmid' => backup::VAR_MODID, 'id' => '../../task'));
 
         $task->annotate_ids('user', 'userid');

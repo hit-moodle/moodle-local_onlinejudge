@@ -244,7 +244,7 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         global $CFG, $DB;
 
         // delete onlinejudge submissions
-        $submissions = $DB->get_records('assignment_submissions', array('assignment' => $this->assignment->get_instance()->id));
+        $submissions = $DB->get_records('assign_submission', array('assignment' => $this->assignment->get_instance()->id));
         foreach ($submissions as $submission) {
             if (!$DB->delete_records('assignment_oj_submissions', array('submission' => $submission->id))) return false;
         }
