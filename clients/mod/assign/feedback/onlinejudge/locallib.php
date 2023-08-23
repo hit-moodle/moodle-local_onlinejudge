@@ -160,10 +160,6 @@ class assign_feedback_onlinejudge extends assign_feedback_plugin {
         $mform->setDefault('compile_static_option', !empty($onlinejudge) ? $onlinejudge->compile_static_option : 1);
         $mform->setAdvanced('compile_static_option');
         $mform->disabledIf('compile_static_option', 'assignfeedback_onlinejudge_enabled', 'notchecked');
-
-        $coursecontext = context_course::instance($COURSE->id);
-        plagiarism_get_form_elements_module($mform, $coursecontext);
-
     }
 
     /**
