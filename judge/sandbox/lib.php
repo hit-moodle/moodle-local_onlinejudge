@@ -54,7 +54,7 @@ define('SANDBOX_SAND', escapeshellcmd($CFG->dirroot . '/local/onlinejudge/judge/
 class judge_sandbox extends judge_base {
     protected static $supported_languages = array(
         'c' => 'gcc -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%',
-        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %static% -o %DEST% %SOURCES% %LM%',
+        'c_warn2err' => 'gcc -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %STATIC% -o %DEST% %SOURCES% %LM%',
         'cpp' => 'g++ -D_MOODLE_ONLINE_JUDGE_ %WALL% %STATIC% -o %DEST% %SOURCES% %LM%',
         'cpp_warn2err' => 'g++ -D_MOODLE_ONLINE_JUDGE_ %WALL% -Werror %STATIC% -o %DEST% %SOURCES% %LM%');
 
@@ -156,6 +156,7 @@ class judge_sandbox extends judge_base {
         // run compiler and redirect stderr to stdout
         $output = array();
         $return = 0;
+        echo("Compilation command: $command\n");
         exec($command . ' 2>&1', $output, $return);
         $arr = array();
         foreach ($output as $value) {
@@ -187,6 +188,7 @@ class judge_sandbox extends judge_base {
 
         $sand .= ' -l cpu=' . escapeshellarg(($this->task->cpulimit) * 1000) . ' -l memory=' . escapeshellarg($this->task->memlimit) . ' -l disk=512000 ' . escapeshellarg($binfile);
 
+        echo("Sandboxing command: $sand\n");
         // run it in sandbox!
         $descriptorspec = array(0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
             1 => array('file', $binfile . '.out', 'w'),  // stdout is a file that the child will write to
