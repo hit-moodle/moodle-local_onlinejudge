@@ -101,8 +101,8 @@ class judge_sphere_engine extends judge_base {
 
         $task = &$this->task;
 
-        $endpoint = $task->var1;
-        $accesstoken = $task->var2;
+        $endpoint = $task->clientid;
+        $accesstoken = $task->accesstoken;
 
         // create client.
         $client = new CompilersClientV4($accesstoken, $endpoint);
