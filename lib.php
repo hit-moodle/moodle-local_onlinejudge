@@ -50,7 +50,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * add the onlinejudge plugin into navigation
  */
-function onlinejudge_extends_navigation(global_navigation $navigation) {
+function onlinejudge_extend_settings_navigation(global_navigation $navigation) {
 
     $onlinejudge = $navigation->add(get_string('pluginname', 'local_onlinejudge'), new moodle_url('/local/onlinejudge/'));
 
