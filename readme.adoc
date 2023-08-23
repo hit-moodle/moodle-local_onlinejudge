@@ -86,7 +86,7 @@ The workflow is:
 
 * https://download.moodle.org/releases/latest/[Moodle] `2.0`-`2.7`, `3.4+`
 * `php-cli`
-* `make`, `gcc` and `g++`.
+* `make`, `gcc`, `gcc-multilib`, and `g++`.
 * `pcntl` and `posix` extension for `php-cli`
 
 === SELinux 
@@ -107,9 +107,9 @@ setsebool -P httpd_can_network_connect on
 * `php-cli`
 
 
-= Download
+= Installation / Upgrading
 
-Using git:
+== Cloning
 
 ```
 git clone -b OJ_VERSION git://github.com/hit-moodle/moodle-local_onlinejudge.git onlinejudge
@@ -118,22 +118,15 @@ git clone -b OJ_VERSION git://github.com/hit-moodle/moodle-local_onlinejudge.git
 [TIP]
 OJ_VERSION is obtained from the available branches.
 
-= Installation / Upgrading
+
 
 
 [TIP]
 `MOODLE_PATH` means the root path of your moodle installation.
 
-== Linux 
+== Judge Engines
 
-1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove/move it https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback#L7-L11[(because it will be automatically removed)].
-2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
-3. Put `onlinejudge` into `MOODLE_PATH/local/`
-4. Run `MOODLE_PATH/local/onlinejudge/cli/install_assign_feedback`.
-5. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
-6. In shell, `sudo -u www-data php MOODLE_PATH/local/onlinejudge/cli/judged.php`, to launch the <<judge-daemon>>.
-
-=== Sandbox 
+=== Sandbox
 
 If you would like to use sandbox judge engine, then run:
 ```
@@ -145,14 +138,7 @@ make
 [TIP]
 Make sure the file named `sand` is _executable_, and has the following context: `system_u:object_r:bin_t:s0`.
 
-== Windows
 
-1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove/move it https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback.bat#L7-L9[(because it will be automatically removed)].
-2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
-3. Put `onlinejudge` into `MOODLE_PATH\local\`
-4. Navigate to `MOODLE_PATH\local\onlinejudge\cli` and run `install_assign_feedback.bat`.
-5. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
-6. In command prompt, write `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the <<judge-daemon>>.
 
 == Sphere Engine
 
@@ -167,16 +153,92 @@ composer install
 ```
 
 [TIP]
-Sphere Engine accepts only one file. So, ensure that the "Maximum number of uploaded files" under "Submission types"
-is equal to `1`.
+Sphere Engine accepts only one file. So, ensure that the "Maximum number of
+uploaded files" under "Submission types" is equal to `1` when you create an
+assignment.
+
+== Supported Platforms
+=== Linux 
+
+1. If the directory `MOODLE_PATH/local/onlinejudge` exists, remove/move it
+https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback#L7-L11[(because
+it will be automatically removed)].
+2. Make sure the directory name of this plugin is `onlinejudge`. If not, rename it.
+3. Put `onlinejudge` into `MOODLE_PATH/local/`
+4. Login your site as admin and access `/admin/index.php`. The plugin will be installed/upgraded.
+5. Configure the maximum cpu and memory limits.
+6. Run `MOODLE_PATH/local/onlinejudge/cli/install_assign_feedback` to install the local plugin.
+7. Login your site as admin and access `/admin/index.php`. The plugin will be installed/upgraded.
+8. In shell, `sudo php MOODLE_PATH/local/onlinejudge/cli/judged.php -n -v`, to launch the <<judge-daemon>>.
+
+=== Windows
+
+1. If the folder `MOODLE_PATH\local\onlinejudge` exists, remove/move it https://github.com/hit-moodle/moodle-local_onlinejudge/blob/e87e12c01f8e2e81bc66471bc0f3e960079256cb/cli/install_assign_feedback.bat#L7-L9[(because it will be automatically removed)].
+2. Make sure the folder name of this plugin is `onlinejudge`. If not, rename it.
+3. Put `onlinejudge` into `MOODLE_PATH\local\`
+4. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
+5. Configure the maximum cpu and memory limits.
+6. Navigate to `MOODLE_PATH\local\onlinejudge\cli` and run `install_assign_feedback.bat` to install the local plugin.
+7. Login your site as admin and access `/admin/index.php`. The plugins will be installed/upgraded.
+8. In command prompt, write `php.exe MOODLE_PATH\local\onlinejudge\cli\judged.php -v`, to launch the <<judge-daemon>>.
 
 = Usage
 
 == Online Judge Assignment Feedback Type
 
-After installation, there will be a new assignment feedback type called *Online Judge* appears in the *"Feedback types"* while creating the assignment. Simply check it it and follow the inline help.
+After installation, there will be a new assignment feedback type called *Online
+Judge* appears in the *"Feedback types"* while creating the assignment. Simply
+check that box and follow the inline help.
 
-After creating the assignment, two buttons will appear in the assignment page context, `Test Case Management` and `Rejudge All` buttons.
+==== Creating an Assignment Activity
+
+After checking the `Online Judge` checkbox, several options will appear:
+
+1. Programming Language (please note that if you installed `libsandbox`, there
+will be two instance of the `C` and `C++` programming languages which could be
+judged either using `libsandbox` or <<sphere-engine>>, however, the ones
+executed by the sandbox engine will have "(run locally)" next to them).
+2. "Ratio for presentation error" (please click the question mark symbol next to
+that field).
+3. "Compile only" (please click the question mark symbol next to
+that field).
+4. "Link Math Library" (please click the question mark symbol next to
+that field).
+5. "Allow Warnings" (please click the question mark symbol next to
+that field).
+6. "Link Static Libraries" (please click the question mark symbol next to that
+field). It is recommended to enable that option if you are using `libsandbox`.
+7. "Maximum CPU time" (please click the question mark symbol next to that
+field).
+8. "Maximum memory usage" (please click the question mark symbol next to that
+field).
+9. "Sphere-Engine Client ID" (If you are using sphere engine, you can find your
+client id in the "API Tokens" tab)
+10. "Sphere-Engine Access Token" (If you are using sphere engine, you can find your
+access token in the "API Tokens" tab)
+
+After creating the assignment, two buttons will appear in the assignment page
+context, `Test Case Management` and `Rejudge All` buttons.
+
+==== Test Case Management
+
+If you click the `Test Case Management` button, you will be redirected to a web
+form which allows you to specify several test cases which will be tested against
+the submitted code. You can specify these test cases either in the textarea
+fields or by uploading testcase files and from which the expected input or
+output will be read.
+
+You may also choose to specify a grade per testcase (e.g., based on their
+difficulty).
+
+=== Rejudge All
+
+This option might come in handy if you have edited the assignment or the judging
+options and would like the have the edits reflected in the previously judged
+submissions.
+
+If you expand the "Online Judge" tab of a submission, there will be a `Force
+Judge` button which allows you to only rejudge that submission.
 
 == Judge Daemon
 
