@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>clients/mod/assign/feedback/onlinejudge/syntaxhighlighter</location>
+        <name>SyntaxHighlighter</name>
+        <version>3.0.83</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>judge/sphere_engine/api</location>
+        <name>Sphere Engine PHP Client</name>
+        <version></version>
+        <license>Apache</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
+        <location>judge/sandbox/sand/libsandbox</location>
+        <name>libsandbox</name>
+        <version></version>
+        <license>BSD</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>
