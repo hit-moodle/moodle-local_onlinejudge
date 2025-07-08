@@ -49,8 +49,7 @@ namespace local_onlinejudge\judge;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../../../../config.php");
-require_once($CFG->dirroot . "/local/onlinejudge/judgelib.php");
+require_once(dirname(__FILE__) . "/../../judgelib.php");
 
 define('SANDBOX_SAND', escapeshellcmd($CFG->dirroot . '/local/onlinejudge/judge/sandbox/sand/sand'));
 

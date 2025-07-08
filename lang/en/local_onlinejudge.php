@@ -119,8 +119,6 @@ $string['stdout'] = 'Standard output';
 $string['upgradenotify'] = 'Do NOT forget to execute cli/install_assign_feedback and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
 $string['event_onlinejudge_task_judged'] = "Event Online Judge Task Judged";
 $string['event_onlinejudge_task_description'] = "The event is concerned with firing the 'onlinejudge_task_judged' located in MOODLE_PATH/mod/assign/feedback/onlinejudge/lib.php.";
-
-// Privacy API strings.
 $string['privacy:metadata:onlinejudge_tasks'] = 'Information about judge tasks submitted by users.';
 $string['privacy:metadata:onlinejudge_tasks:cmid'] = 'The course module ID where the task was submitted.';
 $string['privacy:metadata:onlinejudge_tasks:userid'] = 'The ID of the user who submitted the task.';
@@ -141,5 +139,6 @@ $string['privacy:metadata:onlinejudge_tasks:var2'] = 'Additional variable data f
 $string['privacy:metadata:onlinejudge_tasks:var3'] = 'Additional variable data for the task.';
 $string['privacy:metadata:onlinejudge_tasks:var4'] = 'Additional variable data for the task.';
 $string['privacy:metadata:onlinejudge_tasks:status'] = 'The status of the judge task.';
-
+$string['event_task_judged'] = "Online Judge Task Judged";
+$string['event_task_judged_description'] = "The event is fired when an online judge task has been judged.";
 // TODO: add translations to other languages.

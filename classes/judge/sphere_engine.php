@@ -50,8 +50,7 @@ namespace local_onlinejudge\judge;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../../../../config.php");
-require_once($CFG->dirroot . "/local/onlinejudge/judgelib.php");
+require_once(dirname(__FILE__) . "/../../judgelib.php");
 
 use SphereEngine\Api\CompilersClientV4;
 use SphereEngine\Api\SphereEngineResponseException;
