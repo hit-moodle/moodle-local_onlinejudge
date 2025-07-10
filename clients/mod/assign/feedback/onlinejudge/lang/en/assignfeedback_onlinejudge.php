@@ -153,4 +153,12 @@ $string['compile_warnings_option_help'] = 'if select yes, compiler warning messa
 $string['compile_lm_option_help'] = 'if select yes, math library will be linked while judging submissions.';
 $string['compile_static_option_help'] = 'if select yes, only static libraries will be linked.';
 $string['source_code'] = 'Source code';
+
+// Privacy API strings.
+$string['privacy:metadata:assignment_oj_submissions'] = 'Information about online judge submissions for assignments.';
+$string['privacy:metadata:assignment_oj_submissions:submission'] = 'The assignment submission ID that this online judge data relates to.';
+$string['privacy:metadata:assignment_oj_submissions:testcase'] = 'The testcase ID that was used to judge this submission.';
+$string['privacy:metadata:assignment_oj_submissions:task'] = 'The online judge task ID that corresponds to this submission.';
+$string['privacy:metadata:assignment_oj_submissions:latest'] = 'Whether this is the latest submission for the testcase.';
+
 // TODO: Add translations to other languages.

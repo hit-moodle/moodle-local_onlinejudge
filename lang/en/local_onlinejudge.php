@@ -119,4 +119,27 @@ $string['stdout'] = 'Standard output';
 $string['upgradenotify'] = 'Do NOT forget to execute cli/install_assign_feedback and cli/judged.php. Details in <a href="https://github.com/hit-moodle/moodle-local_onlinejudge/blob/master/README.md" target="_blank">README</a>.';
 $string['event_onlinejudge_task_judged'] = "Event Online Judge Task Judged";
 $string['event_onlinejudge_task_description'] = "The event is concerned with firing the 'onlinejudge_task_judged' located in MOODLE_PATH/mod/assign/feedback/onlinejudge/lib.php.";
+
+// Privacy API strings.
+$string['privacy:metadata:onlinejudge_tasks'] = 'Information about judge tasks submitted by users.';
+$string['privacy:metadata:onlinejudge_tasks:cmid'] = 'The course module ID where the task was submitted.';
+$string['privacy:metadata:onlinejudge_tasks:userid'] = 'The ID of the user who submitted the task.';
+$string['privacy:metadata:onlinejudge_tasks:language'] = 'The programming language used for the submission.';
+$string['privacy:metadata:onlinejudge_tasks:input'] = 'The input data for the judge task.';
+$string['privacy:metadata:onlinejudge_tasks:output'] = 'The expected output data for the judge task.';
+$string['privacy:metadata:onlinejudge_tasks:stdout'] = 'The standard output produced by the user\'s program.';
+$string['privacy:metadata:onlinejudge_tasks:stderr'] = 'The standard error output produced by the user\'s program.';
+$string['privacy:metadata:onlinejudge_tasks:compileroutput'] = 'The output from the compiler when compiling the user\'s code.';
+$string['privacy:metadata:onlinejudge_tasks:infoteacher'] = 'Information visible to teachers about the submission.';
+$string['privacy:metadata:onlinejudge_tasks:infostudent'] = 'Information visible to students about the submission.';
+$string['privacy:metadata:onlinejudge_tasks:cpuusage'] = 'The CPU usage recorded for the task execution.';
+$string['privacy:metadata:onlinejudge_tasks:memusage'] = 'The memory usage recorded for the task execution.';
+$string['privacy:metadata:onlinejudge_tasks:submittime'] = 'The time when the task was submitted.';
+$string['privacy:metadata:onlinejudge_tasks:judgetime'] = 'The time when the task was judged.';
+$string['privacy:metadata:onlinejudge_tasks:var1'] = 'Additional variable data for the task.';
+$string['privacy:metadata:onlinejudge_tasks:var2'] = 'Additional variable data for the task.';
+$string['privacy:metadata:onlinejudge_tasks:var3'] = 'Additional variable data for the task.';
+$string['privacy:metadata:onlinejudge_tasks:var4'] = 'Additional variable data for the task.';
+$string['privacy:metadata:onlinejudge_tasks:status'] = 'The status of the judge task.';
+
 // TODO: add translations to other languages.
