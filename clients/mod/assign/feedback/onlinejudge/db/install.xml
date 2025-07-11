@@ -12,7 +12,7 @@
         <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="1048576" SEQUENCE="false"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="compileonly" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" DEFAULT="0.0" SEQUENCE="false" DECIMALS="10" COMMENT="How much grade can earn when get a presentation error."/>
+        <FIELD NAME="ratiope" TYPE="number" LENGTH="20" NOTNULL="true" DEFAULT="0.0" SEQUENCE="false" DECIMALS="10" COMMENT="Percentage of grade awarded for a presentation error."/>
         <FIELD NAME="clientid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Client ID of sphere-engine.com"/>
         <FIELD NAME="accesstoken" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Access Token of sphere-engine.com"/>
         <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Compiler Parameter [Link the math library]"/>
