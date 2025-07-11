@@ -12,7 +12,7 @@
         <FIELD NAME="language" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Programming language"/>
         <FIELD NAME="memlimit" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="1048576" SEQUENCE="false" COMMENT="max memory"/>
         <FIELD NAME="cpulimit" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="max cpu"/>
-        <FIELD NAME="input" TYPE="binary" NOTNULL="false" SEQUENCE="false" COMMENT="input data"/>
+        <FIELD NAME="input" TYPE="binary" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="input data"/>
         <FIELD NAME="output" TYPE="binary" NOTNULL="false" SEQUENCE="false" COMMENT="output data"/>
         <FIELD NAME="compileonly" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="compile_lm_option" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Compiler Parameter [Link the math library]"/>
