@@ -135,7 +135,7 @@ class sandbox extends base {
         $newcontenthashs = array();
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
+        $files = $fs->get_area_files(\context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
         foreach ($files as $file) {
             $newcontenthashs[] = $file->get_contenthash();
         }

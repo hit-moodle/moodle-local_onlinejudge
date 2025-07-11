@@ -177,12 +177,12 @@ class base {
         $dstfiles = array();
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
+        $files = $fs->get_area_files(\context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
         foreach ($files as $file) {
             $path = onlinejudge_get_temp_dir() . $file->get_filepath();
             $fullpath = $path . $file->get_filename();
             if (!check_dir_exists($path)) {
-                throw new moodle_exception('errorcreatingdirectory', '', '', $path);
+                throw new \moodle_exception('errorcreatingdirectory', '', '', $path);
             }
             $file->copy_content_to($fullpath);
             $dstfiles[] = $fullpath;

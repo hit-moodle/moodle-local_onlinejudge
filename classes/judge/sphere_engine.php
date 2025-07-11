@@ -115,7 +115,7 @@ class sphere_engine extends base {
 
         // Get source code
         $fs = get_file_storage();
-        $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $task->id, 'sortorder, timemodified', false);
+        $files = $fs->get_area_files(\context_system::instance()->id, 'local_onlinejudge', 'tasks', $task->id, 'sortorder, timemodified', false);
         $source = '';
         foreach ($files as $file) {
             $source = $file->get_content();
