@@ -68,152 +68,33 @@ define("ONLINEJUDGE_STATUS_UNSUBMITTED", 255);
 
 require_once(dirname(__FILE__) . '/exceptions.php');
 
+// Load new classes
+require_once(dirname(__FILE__) . '/classes/exception.php');
+require_once(dirname(__FILE__) . '/classes/judge/base.php');
+
+// Backward compatibility aliases
+if (!class_exists('onlinejudge_exception')) {
+    class_alias('\\local_onlinejudge\\exception', 'onlinejudge_exception');
+}
+if (!class_exists('judge_base')) {
+    class_alias('\\local_onlinejudge\\judge\\base', 'judge_base');
+}
+
 $judgeplugins = get_list_of_plugins('local/onlinejudge/judge');
 foreach ($judgeplugins as $dir) {
     require_once("$CFG->dirroot/local/onlinejudge/judge/$dir/lib.php");
 }
 
-class judge_base {
+// Load new judge classes
+require_once(dirname(__FILE__) . '/classes/judge/sandbox.php');
+require_once(dirname(__FILE__) . '/classes/judge/sphere_engine.php');
 
-    // object of the task
-    protected $task;
-
-    // language id without judge id
-    protected $language;
-
-    function __construct($task) {
-        $this->task = $task;
-        $this->language = substr($this->task->language, 0, strpos($this->task->language, '-'));
-    }
-
-    /**
-     * Return an array of programming languages supported by this judge
-     *
-     * The array key must be the language's ID, such as c_sandbox, python_ideone.
-     * The array value must be a human-readable name of the language, such as 'C (local)', 'Python (ideone.com)'
-     */
-    static function get_languages() {
-        return array();
-    }
-
-    /**
-     * Put options into task
-     *
-     * @param object options
-     * @return throw exceptions on error
-     */
-    static function parse_options($options, & $task) {
-        $options = (array)$options;
-        // only common options are parsed here.
-        // special options should be parsed by childclass
-        foreach ($options as $key => $value) {
-            if ($key == 'memlimit' and $value > 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit')) {
-                $value = 1024 * 1024 * get_config('local_onlinejudge', 'maxmemlimit');
-            }
-            if ($key == 'cpulimit' and $value > get_config('local_onlinejudge', 'maxcpulimit')) {
-                $value = get_config('local_onlinejudge', 'maxcpulimit');
-            }
-            $task->$key = $value;
-        }
-    }
-
-    /**
-     * Return the infomation of the compiler of specified language
-     *
-     * @param string $language ID of the language
-     * @return compiler information or null
-     */
-    static function get_compiler_info($language) {
-        return array();
-    }
-
-    /**
-     * Whether the judge is avaliable
-     *
-     * @return true for yes, false for no
-     */
-    static function is_available() {
-        return false;
-    }
-
-    /**
-     * Judge the current task
-     *
-     * @return bool [updated task or false]
-     */
-    function judge() {
-        return false;
-    }
-
-    /**
-     * Compare the stdout of program and the output of testcase
-     */
-    protected function diff() {
-        $task = &$this->task;
-
-        // convert data into UTF-8 charset if possible
-        $task->stdout = $this->convert_to_utf8($task->stdout);
-        $task->stderr = $this->convert_to_utf8($task->stderr);
-        $task->output = $this->convert_to_utf8($task->output);
-
-        // trim tailing return chars which are meaning less
-        $task->output = rtrim($task->output, "\r\n");
-        $task->stdout = rtrim($task->stdout, "\r\n");
-
-        if (strcmp($task->output, $task->stdout) == 0) return ONLINEJUDGE_STATUS_ACCEPTED; else {
-            $tokens = array();
-            $tok = strtok($task->output, " \n\r\t");
-            while ($tok !== false) {
-                $tokens[] = $tok;
-                $tok = strtok(" \n\r\t");
-            }
-
-            $tok = strtok($task->stdout, " \n\r\t");
-            foreach ($tokens as $anstok) {
-                if ($tok === false || $tok !== $anstok) return ONLINEJUDGE_STATUS_WRONG_ANSWER;
-                $tok = strtok(" \n\r\t");
-            }
-            if ($tok !== false) {
-                return ONLINEJUDGE_STATUS_WRONG_ANSWER;
-            }
-            return ONLINEJUDGE_STATUS_PRESENTATION_ERROR;
-        }
-    }
-
-    /**
-     * If string is not encoded in UTF-8, convert it into utf-8 charset
-     */
-    protected function convert_to_utf8($string) {
-        $localwincharset = get_string('localewincharset', 'langconfig');
-        if (!empty($localwincharset) and !mb_check_encoding($string, 'UTF-8') and mb_check_encoding($string, $localwincharset)) {
-            return core_text::convert($string, $localwincharset);
-        } else {
-            return $string;
-        }
-    }
-
-    /**
-     * Save files of current task to a temp directory
-     *
-     * @return array of the full path of saved files
-     */
-    protected function create_temp_files() {
-        $dstfiles = array();
-
-        $fs = get_file_storage();
-        $files = $fs->get_area_files(context_system::instance()->id, 'local_onlinejudge', 'tasks', $this->task->id, 'sortorder', false);
-        foreach ($files as $file) {
-            $path = onlinejudge_get_temp_dir() . $file->get_filepath();
-            $fullpath = $path . $file->get_filename();
-            if (!check_dir_exists($path)) {
-                throw new moodle_exception('errorcreatingdirectory', '', '', $path);
-            }
-            $file->copy_content_to($fullpath);
-            $dstfiles[] = $fullpath;
-        }
-
-        return $dstfiles;
-    }
+// Backward compatibility aliases for judge classes
+if (!class_exists('judge_sandbox')) {
+    class_alias('\\local_onlinejudge\\judge\\sandbox', 'judge_sandbox');
+}
+if (!class_exists('judge_sphere_engine')) {
+    class_alias('\\local_onlinejudge\\judge\\sphere_engine', 'judge_sphere_engine');
 }
 
 /**

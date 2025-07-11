@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_onlinejudge
+ * @package    local_onlinejudge
  * @author     Andrew Naguib <andrewnajeeb at fci dot helwan dot edu dot eg>
  * @copyright  2018 Andrew Naguib
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_onlinejudge\event;
+namespace local_onlinejudge\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class onlinejudge_task_judged extends \core\event\base {
+class task_judged extends \core\event\base {
 
     /**
      * Returns localised general event name.
@@ -33,7 +33,7 @@ class onlinejudge_task_judged extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_onlinejudge_task_judged', 'local_onlinejudge');
+        return get_string('event_task_judged', 'local_onlinejudge');
     }
 
     /**
@@ -42,7 +42,7 @@ class onlinejudge_task_judged extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return get_string('event_onlinejudge_task_judged_description');
+        return get_string('event_task_judged_description', 'local_onlinejudge');
     }
 
     /**
